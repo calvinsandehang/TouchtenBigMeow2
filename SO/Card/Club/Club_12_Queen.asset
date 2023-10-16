@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c31df7bfd287aa4f80ca8ce3ec9370e, type: 3}
   m_Name: Club_12_Queen
   m_EditorClassIdentifier: 
-  _suit: 0
-  _rank: 12
+  _suit: 1
+  _rank: 9
   _cardSprite: {fileID: 21300000, guid: 8648215f647c99a4c9ff0152b4fe9261, type: 3}

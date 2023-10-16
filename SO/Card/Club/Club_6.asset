@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c31df7bfd287aa4f80ca8ce3ec9370e, type: 3}
   m_Name: Club_6
   m_EditorClassIdentifier: 
-  _suit: 0
-  _rank: 6
+  _suit: 1
+  _rank: 3
   _cardSprite: {fileID: 21300000, guid: 015735fd96cc582428e5bb3e998992d9, type: 3}

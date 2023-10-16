@@ -45,8 +45,8 @@ public class UIPlayerCardAssigner : MonoBehaviour
         {
             GameObject cardGO = cardPool.Get();
             cardGO.transform.SetParent(cardParent, false);
-            CardDisplay cardDisplay = cardGO.GetComponent<CardDisplay>();
-            cardDisplay.DisplayCard(cardModel.CardSprite); // Adjust this if necessary to match CardModel structure.
+            UISelectableCard selectableCard = cardGO.GetComponent<UISelectableCard>();
+            selectableCard.Initialize(cardModel); // Adjust this if necessary to match CardModel structure.
             activeCards.Add(cardGO);
         }
     }

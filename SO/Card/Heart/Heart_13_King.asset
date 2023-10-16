@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: Heart_13_King
   m_EditorClassIdentifier: 
   _suit: 2
-  _rank: 13
+  _rank: 10
   _cardSprite: {fileID: 21300000, guid: fea105a31607a3246a3766c2c0b4e3c0, type: 3}

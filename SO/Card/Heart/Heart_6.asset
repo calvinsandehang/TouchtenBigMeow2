@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: Heart_6
   m_EditorClassIdentifier: 
   _suit: 2
-  _rank: 6
+  _rank: 3
   _cardSprite: {fileID: 21300000, guid: fdb2de154c1677b49bbf260090769a45, type: 3}

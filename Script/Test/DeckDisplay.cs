@@ -30,7 +30,7 @@ public class DeckDisplay : MonoBehaviour
             GameObject cardGO = Instantiate(cardPrefab, cardParent);
 
             // Get the CardDisplay component and call its DisplayCard method
-            CardDisplay cardDisplay = cardGO.GetComponent<CardDisplay>();
+            UISelectableCard cardDisplay = cardGO.GetComponent<UISelectableCard>();
             cardDisplay.DisplayCard(cards[i]);
         }
     }

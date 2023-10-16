@@ -4,15 +4,7 @@ using UnityEngine;
 
 public class PlayerSetectedCardEvaluation : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    public List<CardModel> SelectedCard;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+
 }

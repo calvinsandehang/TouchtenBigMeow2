@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c31df7bfd287aa4f80ca8ce3ec9370e, type: 3}
   m_Name: Diamond_11_Jack
   m_EditorClassIdentifier: 
-  _suit: 1
-  _rank: 11
+  _suit: 0
+  _rank: 8
   _cardSprite: {fileID: 21300000, guid: b13391b8bac4b5f41b613229064b0ce8, type: 3}
