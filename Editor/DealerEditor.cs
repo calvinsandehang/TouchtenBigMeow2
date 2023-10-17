@@ -29,7 +29,7 @@ public class DealerEditor : Editor
             {
                 EditorGUILayout.LabelField($"Player {i + 1}'s Hand:", EditorStyles.boldLabel);
 
-                CardModel[] cards = dealer.PlayerHands[i].GetPlayerCards();
+                List<CardModel> cards = dealer.PlayerHands[i].GetPlayerCards();
                 DisplayCardGrid(cards);
             }
         }
@@ -38,7 +38,7 @@ public class DealerEditor : Editor
         if (dealer.IsInitialized) // Check if dealer is initialized
         {
             EditorGUILayout.LabelField("Dealer's Remaining Deck:", EditorStyles.boldLabel);
-            CardModel[] remainingDeck = dealer.GetRemainingDeck().ToArray(); // Retrieve the remaining deck from the dealer
+            List<CardModel> remainingDeck = dealer.GetRemainingDeck(); // Retrieve the remaining deck from the dealer
             if (remainingDeck != null)
             {
                 DisplayCardGrid(remainingDeck); // Display the remaining cards
@@ -59,7 +59,7 @@ public class DealerEditor : Editor
     }
 
 
-    private void DisplayCardGrid(CardModel[] cards)
+    private void DisplayCardGrid(List<CardModel> cards)
     {
         int cardsInRow = 0;
         GUILayout.BeginHorizontal();

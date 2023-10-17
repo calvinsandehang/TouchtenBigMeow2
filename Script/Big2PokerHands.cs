@@ -7,9 +7,9 @@ using static GlobalDefine;
 
 public class Big2PokerHands 
 {
-    public Tuple<HandRank, List<CardModel>, int> GetBestHand(List<CardModel> hand)
+    public Tuple<TableState, HandRank, List<CardModel>, int> GetBestHand(List<CardModel> hand)
     {
-        var methods = new List<Func<List<CardModel>, Tuple<HandRank, List<CardModel>, int>>>()
+        var methods = new List<Func<List<CardModel>, Tuple<TableState, HandRank, List<CardModel>, int>>>()
         {
             CheckStraightFlush,
             CheckFourOfAKind,
@@ -24,20 +24,20 @@ public class Big2PokerHands
         foreach (var method in methods)
         {
             var result = method.Invoke(hand);
-            if (result.Item1 != HandRank.None)
+            if (result.Item2 != HandRank.None)
             {
                 return result;
             }
         }
 
         // In case no hand is found, which should never happen if CheckHighCard is correct
-        return Tuple.Create(HandRank.None, new List<CardModel>(), 0);
+        return Tuple.Create(TableState.None, HandRank.None, new List<CardModel>(), 0);
     }
 
     #region Check Combination
     #region Straight Flush
     // Adjusted CheckStraightFlush method to handle the Big Two rules
-    public Tuple<HandRank, List<CardModel>, int> CheckStraightFlush(List<CardModel> hand)
+    public Tuple<TableState, HandRank, List<CardModel>, int> CheckStraightFlush(List<CardModel> hand)
     {
         var suitedGroups = hand.GroupBy(card => card.CardSuit);
         foreach (var group in suitedGroups)
@@ -50,16 +50,16 @@ public class Big2PokerHands
                 {
                     int straightFlushPoints = fiveCards.Sum(card => (int)card.CardRank + (int)card.CardSuit);
                     Debug.Log($"Straight Flush: Points: {straightFlushPoints}, Cards: {string.Join(", ", fiveCards)}");
-                    return Tuple.Create(HandRank.StraightFlush, fiveCards, straightFlushPoints);
+                    return Tuple.Create(TableState.FiveCards, HandRank.StraightFlush, fiveCards, straightFlushPoints);
                 }
             }
         }
-        return Tuple.Create(HandRank.None, new List<CardModel>(), 0);
+        return Tuple.Create(TableState.None, HandRank.None, new List<CardModel>(), 0);
     }
 
     #endregion
     #region Four of a kind
-    public Tuple<HandRank, List<CardModel>, int> CheckFourOfAKind(List<CardModel> hand)
+    public Tuple<TableState, HandRank, List<CardModel>, int> CheckFourOfAKind(List<CardModel> hand)
     {
         var rankGroups = hand.GroupBy(card => card.CardRank);
         var fourOfAKind = rankGroups.FirstOrDefault(grp => grp.Count() == 4);
@@ -76,14 +76,14 @@ public class Big2PokerHands
             var bestHand = fourOfAKind.Concat(new List<CardModel> { fifthCard }).ToList();
             Debug.Log($"Four of a Kind: Points: {fourPoints}, Cards: {string.Join(", ", bestHand)}");
 
-            return Tuple.Create(HandRank.FourOfAKind, bestHand, fourPoints);
+            return Tuple.Create(TableState.FiveCards, HandRank.FourOfAKind, bestHand, fourPoints);
         }
 
-        return Tuple.Create(HandRank.None, new List<CardModel>(), 0);
+        return Tuple.Create(TableState.None, HandRank.None, new List<CardModel>(), 0);
     }
     #endregion
     #region Full House
-    public Tuple<HandRank, List<CardModel>, int> CheckFullHouse(List<CardModel> hand)
+    public Tuple<TableState, HandRank, List<CardModel>, int> CheckFullHouse(List<CardModel> hand)
     {
         var groups = hand.GroupBy(card => card.CardRank);
         var threeOfAKinds = groups.Where(grp => grp.Count() >= 3);
@@ -114,16 +114,16 @@ public class Big2PokerHands
         if (bestFullHouse != null)
         {
             Debug.Log($"Full House: Points: {highestPoints}, Cards: {string.Join(", ", bestFullHouse)}");
-            return Tuple.Create(HandRank.FullHouse, bestFullHouse, highestPoints);
+            return Tuple.Create(TableState.FiveCards, HandRank.FullHouse, bestFullHouse, highestPoints);
         }
 
-        return Tuple.Create(HandRank.None, new List<CardModel>(), 0);
+        return Tuple.Create(TableState.None, HandRank.None, new List<CardModel>(), 0);
     }
 
 
     #endregion
     #region Flush
-    public Tuple<HandRank, List<CardModel>, int> CheckFlush(List<CardModel> hand)
+    public Tuple<TableState, HandRank, List<CardModel>, int> CheckFlush(List<CardModel> hand)
     {
         var suitedGroups = hand.GroupBy(card => card.CardSuit);
         var flush = suitedGroups.FirstOrDefault(grp => grp.Count() >= 5);
@@ -132,13 +132,13 @@ public class Big2PokerHands
             var flushCards = flush.OrderByDescending(card => card.CardRank).Take(5).ToList();
             int points = flushCards.Sum(card => (int)card.CardRank + (int)card.CardSuit);
             Debug.Log($"Flush: Points: {points}, Cards: {string.Join(", ", flushCards)}");
-            return Tuple.Create(HandRank.Flush, flushCards, points);
+            return Tuple.Create(TableState.FiveCards, HandRank.Flush, flushCards, points);
         }
-        return Tuple.Create(HandRank.None, new List<CardModel>(), 0);
+        return Tuple.Create(TableState.None, HandRank.None, new List<CardModel>(), 0);
     }
     #endregion
     #region Straight
-    public Tuple<HandRank, List<CardModel>, int> CheckStraight(List<CardModel> hand)
+    public Tuple<TableState, HandRank, List<CardModel>, int> CheckStraight(List<CardModel> hand)
     {
         var distinctCards = hand.GroupBy(card => card.CardRank).Select(grp => grp.First());
         var orderedCards = distinctCards.OrderBy(card => card.CardRank).ToList(); // Order by ascending, since we've changed the enum values.
@@ -149,7 +149,7 @@ public class Big2PokerHands
             {
                 int points = fiveCards.Sum(card => (int)card.CardRank + (int)card.CardSuit);
                 Debug.Log($"Straight: Points: {points}, Cards: {string.Join(", ", fiveCards)}");
-                return Tuple.Create(HandRank.Straight, fiveCards, points);
+                return Tuple.Create(TableState.FiveCards, HandRank.Straight, fiveCards, points);
             }
         }
         // Special case for the low-end straight (A, 2, 3, 4, 5) which is now (2, 3, 4, 5, 6) because Ace and Two are high cards.
@@ -158,13 +158,13 @@ public class Big2PokerHands
             var lowStraight = orderedCards.Skip(orderedCards.Count - 5).Take(5).ToList();
             int points = lowStraight.Sum(card => (int)card.CardRank + (int)card.CardSuit);
             Debug.Log($"Straight: Points: {points}, Cards: {string.Join(", ", lowStraight)}");
-            return Tuple.Create(HandRank.Straight, lowStraight, points);
+            return Tuple.Create(TableState.FiveCards, HandRank.Straight, lowStraight, points);
         }
-        return Tuple.Create(HandRank.None, new List<CardModel>(), 0);
+        return Tuple.Create(TableState.None, HandRank.None, new List<CardModel>(), 0);
     }
     #endregion
     #region Three of a kind
-    public Tuple<HandRank, List<CardModel>, int> CheckThreeOfAKind(List<CardModel> hand)
+    public Tuple<TableState, HandRank, List<CardModel>, int> CheckThreeOfAKind(List<CardModel> hand)
     {
         var rankGroups = hand.GroupBy(card => card.CardRank);
         var threeOfAKindGroups = rankGroups.Where(grp => grp.Count() == 3).ToList();
@@ -190,14 +190,14 @@ public class Big2PokerHands
             // Debug log for the combination and points
             Debug.Log($"Three of a Kind: Points: {highestPoints}, Cards: {string.Join(", ", bestThreeOfAKind)}");
 
-            return Tuple.Create(HandRank.ThreeOfAKind, bestThreeOfAKind, highestPoints);
+            return Tuple.Create(TableState.ThreeOfAKind, HandRank.ThreeOfAKind, bestThreeOfAKind, highestPoints);
         }
 
-        return Tuple.Create(HandRank.None, new List<CardModel>(), 0);
+        return Tuple.Create(TableState.None, HandRank.None, new List<CardModel>(), 0);
     }
     #endregion
     #region Check One Pair
-    public Tuple<HandRank, List<CardModel>, int> CheckOnePair(List<CardModel> hand)
+    public Tuple<TableState, HandRank, List<CardModel>, int> CheckOnePair(List<CardModel> hand)
     {
         var rankGroups = hand.GroupBy(card => card.CardRank);
         var pairs = rankGroups.Where(grp => grp.Count() == 2).ToList();
@@ -223,19 +223,25 @@ public class Big2PokerHands
             // Debug log for the combination and points
             Debug.Log($"One Pair: Points: {highestPoints}, Cards: {string.Join(", ", bestPair)}");
 
-            return Tuple.Create(HandRank.Pair, bestPair, highestPoints);
+            return Tuple.Create(TableState.Pair, HandRank.Pair, bestPair, highestPoints);
         }
 
-        return Tuple.Create(HandRank.None, new List<CardModel>(), 0);
+        return Tuple.Create(TableState.None, HandRank.None, new List<CardModel>(), 0);
     }
     #endregion
     #region High Card
-    public Tuple<HandRank, List<CardModel>, int> CheckHighCard(List<CardModel> hand)
+    public Tuple<TableState, HandRank, List<CardModel>, int> CheckHighCard(List<CardModel> hand)
     {
+        if (hand.Count == 0) 
+        {
+            Debug.Log("The hand is empty, please check if something wrong");
+            return Tuple.Create(TableState.None, HandRank.None, new List<CardModel>(), 0);
+        }
+            
         var highCard = hand.OrderByDescending(card => card.CardRank).First();
         int cardPoints = (int)highCard.CardRank + (int)highCard.CardSuit;
         Debug.Log($"High Card: {highCard.CardRank} of {highCard.CardSuit}, Points: {cardPoints}");
-        return Tuple.Create(HandRank.HighCard, new List<CardModel>() { highCard }, cardPoints);
+        return Tuple.Create(TableState.Single,HandRank.HighCard, new List<CardModel>() { highCard }, cardPoints);
     }
     #endregion
     #region Helper

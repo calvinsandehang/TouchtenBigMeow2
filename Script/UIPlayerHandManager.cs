@@ -46,7 +46,7 @@ public class UIPlayerHandManager : MonoBehaviour
         _sortByBestHandButton.onClick.AddListener(() => SortPlayerHand(SortCriteria.BestHand));
     }
 
-    public void InitialDisplayCards(CardModel[] cards)
+    public void InitialDisplayCards(List<CardModel> cards)
     {
         cardModelsInPlayerHand.Clear();
         cardModelsInPlayerHand = cards.ToList();

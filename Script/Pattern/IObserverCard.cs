@@ -4,7 +4,7 @@ using UnityEngine;
 
 public interface IObserverCard 
 {
-    // calsses that inherit from the IObsrver interface
+    // classes that inherit from the IObserver interface
     // must implement the OnNotify method
     public void OnNotify(CardState cardState) 
     {

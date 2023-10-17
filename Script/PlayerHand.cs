@@ -7,7 +7,8 @@ using UnityEngine;
 
 public class PlayerHand : MonoBehaviour
 {
-    public CardModel[] playerCards;
+    public static PlayerHand Instance { get; private set; }
+    public List<CardModel> playerCards = new List<CardModel>();
     private const int playerHandSize = 13;
 
     private Dealer dealer;
@@ -15,7 +16,15 @@ public class PlayerHand : MonoBehaviour
 
     private void Awake()
     {
-        playerCards = new CardModel[playerHandSize];
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(Instance);
+        }
+
         handEvaluator =GetComponent<PlayerHandEvaluator>();
         dealer = Dealer.Instance;
         SubscribeEvent();
@@ -31,26 +40,29 @@ public class PlayerHand : MonoBehaviour
         dealer.OnDealerFinishDealingCards -= EvaluateCardInHand;
     }
 
-    public void AddCard(CardModel card, int index) 
+    public void AddCard(CardModel card) 
     {
-        if (index >= 0 && index < playerCards.Length) 
-        {
-            playerCards[index] = card;
-        }
-        else
-        {
-            Debug.LogError("Index out of range");
-        }
+        playerCards.Add(card);
 
         // If this is the last card, notify that the hand is complete.
-        if (index == playerCards.Length - 1)
-        {
-            UIPlayerHandManager.Instance.InitialDisplayCards(playerCards);
-        }
-
+        UIPlayerHandManager.Instance.InitialDisplayCards(playerCards);
     }
 
-    
+    public void RemoveCards(List<CardModel> removedCards)
+    {
+        // Create a HashSet of cards to be removed based on their rank and suit
+        HashSet<CardModel> cardsToRemove = new HashSet<CardModel>(removedCards);
+
+        // Remove the cards from playerCards that match the criteria
+        playerCards.RemoveAll(card => cardsToRemove.Contains(card));
+
+        // Notify UI to update the displayed cards
+        UIPlayerHandManager.Instance.InitialDisplayCards(playerCards);
+        CardEvaluator.Instance.DeregisterCard(removedCards);
+    }
+
+
+
     public void EvaluateCardInHand() 
     {
         /*
@@ -70,7 +82,7 @@ public class PlayerHand : MonoBehaviour
 
     // Get the cards in the player hand
     // Would be useful for sorting cards
-    public CardModel[] GetPlayerCards() 
+    public List<CardModel> GetPlayerCards() 
     {
         return playerCards;
     }

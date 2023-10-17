@@ -28,6 +28,15 @@ public static class GlobalDefine
         BestHand
     }
 
+    public enum TableState 
+    {
+        None,
+        Single,
+        Pair,
+        ThreeOfAKind,
+        FiveCards
+    }
+
     public delegate void OnCardInteract(CardModel card);
    
 

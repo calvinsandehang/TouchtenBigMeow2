@@ -86,7 +86,7 @@ public class Dealer : MonoBehaviour
 
                 if (card != null)
                 {
-                    playerHand.AddCard(card, i);
+                    playerHand.AddCard(card);
                 }
                 else
                 {
