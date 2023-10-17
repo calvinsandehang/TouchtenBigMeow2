@@ -45,7 +45,7 @@ public class PlayerHand : MonoBehaviour
         // If this is the last card, notify that the hand is complete.
         if (index == playerCards.Length - 1)
         {
-            UIPlayerCardAssigner.Instance.DisplayCardsReceived(playerCards);
+            UIPlayerHandManager.Instance.InitialDisplayCards(playerCards);
         }
 
     }

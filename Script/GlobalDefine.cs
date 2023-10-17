@@ -21,6 +21,14 @@ public static class GlobalDefine
         Jack = 8, Queen = 9, King = 10, Ace = 11, Two = 12
     }
 
+    public enum SortCriteria
+    {
+        Rank,
+        Suit,
+        BestHand
+    }
+
     public delegate void OnCardInteract(CardModel card);
+   
 
 }

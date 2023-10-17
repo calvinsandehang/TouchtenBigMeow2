@@ -5,69 +5,20 @@ using System.Linq;
 using UnityEngine;
 using static GlobalDefine;
 
-public class PlayerHandEvaluator : MonoBehaviour
+public class Big2PokerHands 
 {
-
-    private List<CardModel> hand = new List<CardModel>();
-    private List<Tuple<HandRank, List<CardModel>, int>> rankedHands = new List<Tuple<HandRank, List<CardModel>, int>>();
-
-
-    public void EvaluateHand(List<CardModel> cards)
+    public Tuple<HandRank, List<CardModel>, int> GetBestHand(List<CardModel> hand)
     {
-        hand = cards;
-        StartCoroutine(Evaluate());
-    }
-
-    private IEnumerator Evaluate()
-    {
-        while (hand.Count > 0)
-        {
-            var bestHand = GetBestHand(hand);
-
-            if (bestHand.Item1 == HandRank.None)
-                break; // Exit if no combination is found.            
-
-            int handPoints = CalculateHandPoints(bestHand.Item2);
-            rankedHands.Add(Tuple.Create(bestHand.Item1, bestHand.Item2, handPoints));
-
-
-
-            // Debug log for the combination and points
-            Debug.Log($"Hand Found: {bestHand.Item1}, Points: {handPoints}");
-
-            // Remove the cards of the best hand from the player's hand
-            hand = hand.Except(bestHand.Item2).ToList();
-
-            yield return null;
-        }
-
-        // If there are leftover cards, they are counted as high cards individually.
-        foreach (var card in hand)
-        {
-            int cardPoints = (int)card.CardRank + (int)card.CardSuit;
-            rankedHands.Add(Tuple.Create(HandRank.HighCard,new List<CardModel>(), cardPoints));
-
-            // Debug log for high cards
-            Debug.Log($"High Card: {card.CardRank} of {card.CardSuit}, Points: {cardPoints}");
-
-            yield return null;
-        }
-
-        //rankedHands contains all the evaluated hand
-
-        //post-processing
-        //OnHandEvaluationComplete();
-    }
-
-    private Tuple<HandRank, List<CardModel>, int> GetBestHand(List<CardModel> hand)
-    {
-        // Here you would call each of the hand-checking methods in order of rank, starting with the highest.
-        // If a method returns a valid hand (not HandRank.None), you return that result.
-        // If none of the methods return a valid hand, you return a high card.
-
         var methods = new List<Func<List<CardModel>, Tuple<HandRank, List<CardModel>, int>>>()
         {
-        CheckStraightFlush, CheckFourOfAKind, CheckFullHouse, CheckFlush, CheckStraight, CheckThreeOfAKind,CheckOnePair, CheckHighCard 
+            CheckStraightFlush,
+            CheckFourOfAKind,
+            CheckFullHouse,
+            CheckFlush,
+            CheckStraight,
+            CheckThreeOfAKind,
+            CheckOnePair,
+            CheckHighCard
         };
 
         foreach (var method in methods)
@@ -79,24 +30,14 @@ public class PlayerHandEvaluator : MonoBehaviour
             }
         }
 
-        return Tuple.Create(HandRank.None, new List<CardModel>(), 0); // In case no hand is found, which should never happen if CheckHighCard is correct
-    }
-
-    private int CalculateHandPoints(List<CardModel> hand)
-    {
-        // Calculate points based on your point system.
-        return hand.Sum(card => (int)card.CardRank + (int)card.CardSuit);
-    }
-
-    public List<Tuple<HandRank, List<CardModel>, int>> GetRankedHands()
-    {
-        return rankedHands;
+        // In case no hand is found, which should never happen if CheckHighCard is correct
+        return Tuple.Create(HandRank.None, new List<CardModel>(), 0);
     }
 
     #region Check Combination
     #region Straight Flush
     // Adjusted CheckStraightFlush method to handle the Big Two rules
-    private Tuple<HandRank, List<CardModel>, int> CheckStraightFlush(List<CardModel> hand)
+    public Tuple<HandRank, List<CardModel>, int> CheckStraightFlush(List<CardModel> hand)
     {
         var suitedGroups = hand.GroupBy(card => card.CardSuit);
         foreach (var group in suitedGroups)
@@ -118,7 +59,7 @@ public class PlayerHandEvaluator : MonoBehaviour
 
     #endregion
     #region Four of a kind
-    private Tuple<HandRank, List<CardModel>, int> CheckFourOfAKind(List<CardModel> hand)
+    public Tuple<HandRank, List<CardModel>, int> CheckFourOfAKind(List<CardModel> hand)
     {
         var rankGroups = hand.GroupBy(card => card.CardRank);
         var fourOfAKind = rankGroups.FirstOrDefault(grp => grp.Count() == 4);
@@ -142,28 +83,28 @@ public class PlayerHandEvaluator : MonoBehaviour
     }
     #endregion
     #region Full House
-    private Tuple<HandRank, List<CardModel>, int> CheckFullHouse(List<CardModel> hand)
+    public Tuple<HandRank, List<CardModel>, int> CheckFullHouse(List<CardModel> hand)
     {
         var groups = hand.GroupBy(card => card.CardRank);
         var threeOfAKinds = groups.Where(grp => grp.Count() >= 3);
-        var pairs = groups.Where(grp => grp.Count() >= 2);
+        var pairs = groups.Where(grp => grp.Count() == 2); // Only exact pairs should be considered
 
         List<CardModel> bestFullHouse = null;
         int highestPoints = 0;
 
         foreach (var three in threeOfAKinds)
         {
+            // Calculate the points for this three of a kind, including the suit
+            int threePoints = three.Sum(card => (int)card.CardRank + (int)card.CardSuit); // Points from three of a kind including their suits
+
             foreach (var pair in pairs)
             {
                 if (three.Key != pair.Key)
                 {
-                    // Calculate the points for this full house only from the three of a kind.
-                    int threePoints = three.Sum(card => (int)card.CardRank); // do not add suit points
-
                     // Check if this full house is the highest so far.
                     if (threePoints > highestPoints)
                     {
-                        bestFullHouse = three.Concat(pair.Take(2)).ToList();
+                        bestFullHouse = three.Concat(pair).ToList();
                         highestPoints = threePoints;
                     }
                 }
@@ -178,9 +119,11 @@ public class PlayerHandEvaluator : MonoBehaviour
 
         return Tuple.Create(HandRank.None, new List<CardModel>(), 0);
     }
+
+
     #endregion
     #region Flush
-    private Tuple<HandRank, List<CardModel>, int> CheckFlush(List<CardModel> hand)
+    public Tuple<HandRank, List<CardModel>, int> CheckFlush(List<CardModel> hand)
     {
         var suitedGroups = hand.GroupBy(card => card.CardSuit);
         var flush = suitedGroups.FirstOrDefault(grp => grp.Count() >= 5);
@@ -195,7 +138,7 @@ public class PlayerHandEvaluator : MonoBehaviour
     }
     #endregion
     #region Straight
-    private Tuple<HandRank, List<CardModel>, int> CheckStraight(List<CardModel> hand)
+    public Tuple<HandRank, List<CardModel>, int> CheckStraight(List<CardModel> hand)
     {
         var distinctCards = hand.GroupBy(card => card.CardRank).Select(grp => grp.First());
         var orderedCards = distinctCards.OrderBy(card => card.CardRank).ToList(); // Order by ascending, since we've changed the enum values.
@@ -221,7 +164,7 @@ public class PlayerHandEvaluator : MonoBehaviour
     }
     #endregion
     #region Three of a kind
-    private Tuple<HandRank, List<CardModel>, int> CheckThreeOfAKind(List<CardModel> hand)
+    public Tuple<HandRank, List<CardModel>, int> CheckThreeOfAKind(List<CardModel> hand)
     {
         var rankGroups = hand.GroupBy(card => card.CardRank);
         var threeOfAKindGroups = rankGroups.Where(grp => grp.Count() == 3).ToList();
@@ -253,49 +196,8 @@ public class PlayerHandEvaluator : MonoBehaviour
         return Tuple.Create(HandRank.None, new List<CardModel>(), 0);
     }
     #endregion
-    #region Two Pair
-    private Tuple<HandRank, List<CardModel>, int> CheckTwoPair(List<CardModel> hand)
-    {
-        var rankGroups = hand.GroupBy(card => card.CardRank);
-        var pairs = rankGroups.Where(grp => grp.Count() == 2).ToList();
-
-        List<CardModel> bestTwoPair = null;
-        int highestPoints = 0;
-
-        foreach (var pair1 in pairs)
-        {
-            foreach (var pair2 in pairs)
-            {
-                if (pair1.Key != pair2.Key)
-                {
-                    // Calculate the points for these two pairs.
-                    int pair1Points = pair1.Sum(card => (int)card.CardRank + (int)card.CardSuit);
-                    int pair2Points = pair2.Sum(card => (int)card.CardRank + (int)card.CardSuit);
-                    int totalPoints = pair1Points + pair2Points;
-
-                    // Check if these two pairs have higher points than the current best two pairs.
-                    if (totalPoints > highestPoints)
-                    {
-                        bestTwoPair = pair1.Concat(pair2).ToList();
-                        highestPoints = totalPoints;
-                    }
-                }
-            }
-        }
-
-        if (bestTwoPair != null)
-        {
-            // Debug log for the combination and points
-            Debug.Log($"Two Pair: Points: {highestPoints}, Cards: {string.Join(", ", bestTwoPair)}");
-
-            return Tuple.Create(HandRank.TwoPair, bestTwoPair, highestPoints);
-        }
-
-        return Tuple.Create(HandRank.None, new List<CardModel>(), 0);
-    }
-    #endregion
     #region Check One Pair
-    private Tuple<HandRank, List<CardModel>, int> CheckOnePair(List<CardModel> hand)
+    public Tuple<HandRank, List<CardModel>, int> CheckOnePair(List<CardModel> hand)
     {
         var rankGroups = hand.GroupBy(card => card.CardRank);
         var pairs = rankGroups.Where(grp => grp.Count() == 2).ToList();
@@ -305,8 +207,8 @@ public class PlayerHandEvaluator : MonoBehaviour
 
         foreach (var pair in pairs)
         {
-            // Calculate the points for this pair.
-            int pairPoints = pair.Sum(card => (int)card.CardRank + (int)card.CardSuit);
+
+            int pairPoints = pair.Sum(card => ((int)card.CardRank) + (int)card.CardSuit);
 
             // Check if this pair has higher points than the current best pair.
             if (pairPoints > highestPoints)
@@ -328,7 +230,7 @@ public class PlayerHandEvaluator : MonoBehaviour
     }
     #endregion
     #region High Card
-    private Tuple<HandRank, List<CardModel>, int> CheckHighCard(List<CardModel> hand)
+    public Tuple<HandRank, List<CardModel>, int> CheckHighCard(List<CardModel> hand)
     {
         var highCard = hand.OrderByDescending(card => card.CardRank).First();
         int cardPoints = (int)highCard.CardRank + (int)highCard.CardSuit;
@@ -338,7 +240,7 @@ public class PlayerHandEvaluator : MonoBehaviour
     #endregion
     #region Helper
     // Adjusted IsStraight method to handle the Big Two rules
-    private bool IsStraight(List<CardModel> cards)
+    public bool IsStraight(List<CardModel> cards)
     {
         if (cards.Count < 5) return false; // A straight requires at least 5 cards.
 
@@ -346,7 +248,7 @@ public class PlayerHandEvaluator : MonoBehaviour
 
         // Check for the special case straight of Ace-2-3-4-5
         if (cards[0].CardRank == Rank.Three && cards[1].CardRank == Rank.Four &&
-            cards[2].CardRank == Rank.Five &&  cards[3].CardRank == Rank.Ace &&
+            cards[2].CardRank == Rank.Five && cards[3].CardRank == Rank.Ace &&
             cards[4].CardRank == Rank.Two)
         {
             return true; // This is a valid straight in Big Two.
@@ -380,8 +282,4 @@ public class PlayerHandEvaluator : MonoBehaviour
     }
     #endregion
     #endregion
-
-
-   
-
 }
