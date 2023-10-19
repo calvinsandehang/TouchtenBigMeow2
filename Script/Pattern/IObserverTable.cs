@@ -5,9 +5,9 @@ using static GlobalDefine;
 
 public interface IObserverTable
 {
-    public void OnNotifyTableState(TableState cardState, HandRank tableRank);
+    public void OnNotifyTableState(HandType cardState, HandRank tableRank);
 
-    public void OnNotifyAssigningCard(List<CardModel> cardModels);
+    public void OnNotifyAssigningCard(CardInfo cardInfo);
 
     public void AddSelfToSubjectList();
 

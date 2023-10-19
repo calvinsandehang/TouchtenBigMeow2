@@ -55,11 +55,11 @@ public class PlayerHandSorter
         while (tempCardModels.Count > 0)
         {
             // Get the best hand from the remaining cards
-            Tuple<TableState, HandRank, List<CardModel>, int> bestHand = pokerHandsChecker.GetBestHand(tempCardModels);
-            List<CardModel> bestHandCards = bestHand.Item3;
+            CardInfo cardInfo = pokerHandsChecker.GetBestHand(tempCardModels);
+            List<CardModel> bestHandCards = cardInfo.CardComposition;
 
             // Log for debugging
-            Debug.Log("Best hand rank: " + bestHand.Item2.ToString());
+            //Debug.Log("Best hand rank: " + cardInfo.HandRank.ToString());
             foreach (var card in bestHandCards)
             {
                 Debug.Log("Card in best hand: " + card.CardRank.ToString() + " of " + card.CardSuit.ToString());

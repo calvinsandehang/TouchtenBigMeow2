@@ -252,48 +252,7 @@ public class PlayerHandEvaluator : MonoBehaviour
 
         return Tuple.Create(HandRank.None, new List<CardModel>(), 0);
     }
-    #endregion
-    #region Two Pair
-    private Tuple<HandRank, List<CardModel>, int> CheckTwoPair(List<CardModel> hand)
-    {
-        var rankGroups = hand.GroupBy(card => card.CardRank);
-        var pairs = rankGroups.Where(grp => grp.Count() == 2).ToList();
-
-        List<CardModel> bestTwoPair = null;
-        int highestPoints = 0;
-
-        foreach (var pair1 in pairs)
-        {
-            foreach (var pair2 in pairs)
-            {
-                if (pair1.Key != pair2.Key)
-                {
-                    // Calculate the points for these two pairs.
-                    int pair1Points = pair1.Sum(card => (int)card.CardRank + (int)card.CardSuit);
-                    int pair2Points = pair2.Sum(card => (int)card.CardRank + (int)card.CardSuit);
-                    int totalPoints = pair1Points + pair2Points;
-
-                    // Check if these two pairs have higher points than the current best two pairs.
-                    if (totalPoints > highestPoints)
-                    {
-                        bestTwoPair = pair1.Concat(pair2).ToList();
-                        highestPoints = totalPoints;
-                    }
-                }
-            }
-        }
-
-        if (bestTwoPair != null)
-        {
-            // Debug log for the combination and points
-            Debug.Log($"Two Pair: Points: {highestPoints}, Cards: {string.Join(", ", bestTwoPair)}");
-
-            return Tuple.Create(HandRank.TwoPair, bestTwoPair, highestPoints);
-        }
-
-        return Tuple.Create(HandRank.None, new List<CardModel>(), 0);
-    }
-    #endregion
+    #endregion   
     #region Check One Pair
     private Tuple<HandRank, List<CardModel>, int> CheckOnePair(List<CardModel> hand)
     {

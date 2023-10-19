@@ -24,7 +24,7 @@ public class CardEvaluator : SubjectCardEvaluator
     public static event CardEvaluation OnFiveCardsEvaluated;
 
     // Define a dictionary to map TableState to events
-    private Dictionary<TableState, CardEvaluation> stateToEvent = new Dictionary<TableState, CardEvaluation>();
+    private Dictionary<HandType, CardEvaluation> stateToEvent = new Dictionary<HandType, CardEvaluation>();
 
     private void Awake()
     {
@@ -114,31 +114,25 @@ public class CardEvaluator : SubjectCardEvaluator
     private void DisplayHandCombination(List<CardModel> selectedCards)
     {
         var result = EvaluateHand(selectedCards);
-        var item2 = result.Item2.ToString();
-        var item3 = string.Join(", ", result.Item3);
-        var item4 = result.Item4.ToString();
+        var handRank = result.HandRank.ToString();
+        var cardComposition = string.Join(", ", result.CardComposition);
        
-        string evaluationText = $"Rank : {item2}, Cards: {item3} ,Points: {item4}";
+        string evaluationText = $"Rank : {handRank}, Cards: {cardComposition}";
 
         _text.text = evaluationText;
     }
 
-    public Tuple<TableState, HandRank, List<CardModel>, int> EvaluateHand(List<CardModel> cards)
+    public CardInfo EvaluateHand(List<CardModel> cards)
     {
         Big2PokerHands pokerHandsChecker = new Big2PokerHands();
-        var bestHand = pokerHandsChecker.GetBestHand(cards);
+        var cardInfo = pokerHandsChecker.GetBestHand(cards);
 
-        //TableState playerCardTbState = CheckPlayerCardTableState(bestHand);
-        //TableState tableManagerTbState = TableManager.Instance.CurrentTableState;
-
-
-
-        return bestHand;
+        return cardInfo;
     }
 
-    private TableState CheckPlayerCardTableState(Tuple<TableState, HandRank, List<CardModel>, int> bestHand)
+    private HandType CheckPlayerCardTableState(Tuple<HandType, HandRank, List<CardModel>, int> bestHand)
     {
-        TableState currentCombinationTableState = bestHand.Item1;
+        HandType currentCombinationTableState = bestHand.Item1;
 
         if (stateToEvent.ContainsKey(currentCombinationTableState))
         {
@@ -152,10 +146,10 @@ public class CardEvaluator : SubjectCardEvaluator
     private void InitializeDictionary()
     {
         // Initialize the dictionary with mappings
-        stateToEvent[TableState.Single] = OnSingleCardEvaluated;
-        stateToEvent[TableState.Pair] = OnPairCardEvaluated;
-        stateToEvent[TableState.ThreeOfAKind] = OnThreeOfAKindCardEvaluated;
-        stateToEvent[TableState.FiveCards] = OnFiveCardsEvaluated;
+        stateToEvent[HandType.Single] = OnSingleCardEvaluated;
+        stateToEvent[HandType.Pair] = OnPairCardEvaluated;
+        stateToEvent[HandType.ThreeOfAKind] = OnThreeOfAKindCardEvaluated;
+        stateToEvent[HandType.FiveCards] = OnFiveCardsEvaluated;
     }
     #endregion
 }

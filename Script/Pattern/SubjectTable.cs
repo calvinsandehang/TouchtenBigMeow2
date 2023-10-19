@@ -14,17 +14,11 @@ public abstract class SubjectTable : MonoBehaviour
     public void RemoveObserver(IObserverTable observer)
     {
         observers.Remove(observer);
-    }
-    protected void NotifyObserverTableState(TableState state, HandRank tableRank)
+    } 
+    protected void NotifyObserver(CardInfo cardInfo) 
     {
         observers.ForEach((observer) => {
-            observer.OnNotifyTableState(state, tableRank);
-        });
-    }
-    protected void NotifyObserverAssigningCard(List<CardModel> cardModels) 
-    {
-        observers.ForEach((observer) => {
-            observer.OnNotifyAssigningCard(cardModels);
+            observer.OnNotifyAssigningCard(cardInfo);
         });
     }
 }

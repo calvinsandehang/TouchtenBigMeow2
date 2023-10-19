@@ -26,7 +26,10 @@ public class UISelectableCard : SubjectCard, IPointerClickHandler // Implementin
     {
         return cardModel;
     }
-
+    private void OnDisable()
+    {
+        isSelected = false;
+    }
     void Awake()
     {
         cardImage = GetComponent<Image>();

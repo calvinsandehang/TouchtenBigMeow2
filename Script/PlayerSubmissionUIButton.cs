@@ -21,15 +21,15 @@ public class PlayerSubmissionUIButton : MonoBehaviour
     private void Start()
     {
         // Subscribe to the events
-        PlayerSubmissionCheck.AllowedToSubmitCard += OnAllowedToSubmitCard;
-        PlayerSubmissionCheck.NotAllowedToSubmitCard += OnNotAllowedToSubmitCard;
+        CardSubmissionCheck.AllowedToSubmitCard += OnAllowedToSubmitCard;
+        CardSubmissionCheck.NotAllowedToSubmitCard += OnNotAllowedToSubmitCard;
     }
 
     private void OnDestroy()
     {
         // Unsubscribe from the events to prevent memory leaks
-        PlayerSubmissionCheck.AllowedToSubmitCard -= OnAllowedToSubmitCard;
-        PlayerSubmissionCheck.NotAllowedToSubmitCard -= OnNotAllowedToSubmitCard;
+        CardSubmissionCheck.AllowedToSubmitCard -= OnAllowedToSubmitCard;
+        CardSubmissionCheck.NotAllowedToSubmitCard -= OnNotAllowedToSubmitCard;
     }
 
     private void OnAllowedToSubmitCard()
@@ -48,6 +48,6 @@ public class PlayerSubmissionUIButton : MonoBehaviour
 
     public void OnSubmitButtonPressed() 
     {
-        PlayerSubmissionCheck.Instance.OnSubmitCard();
+        CardSubmissionCheck.Instance.OnSubmitCard();
     }
 }

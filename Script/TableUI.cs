@@ -16,11 +16,15 @@ public class TableUI : MonoBehaviour, IObserverTable
 
     private CardModel[] singleTableCardModel = new CardModel[4];
 
-    TableManager tableManager;
-    TableState currentTableState;
+    Big2TableManager tableManager;
+    HandType currentTableState;
+    private Big2TableManager big2TableManager;
 
     private void Start()
     {
+        big2TableManager = Big2TableManager.Instance;
+        big2TableManager.OnTableUpdated += OnNotifyAssigningCard;
+
         AddSelfToSubjectList();
 
         for (int i = 0; i < _singleTableImages.Length; i++)
@@ -36,13 +40,13 @@ public class TableUI : MonoBehaviour, IObserverTable
         }
 
         // temporary
-        currentTableState = TableState.Single;
+        currentTableState = HandType.Single;
     }
 
     #region Table Observer
     public void AddSelfToSubjectList()
     {
-        tableManager = TableManager.Instance;
+        tableManager = Big2TableManager.Instance;
         tableManager.AddObserver(this);
     }
 
@@ -51,18 +55,19 @@ public class TableUI : MonoBehaviour, IObserverTable
         tableManager.RemoveObserver(this);
     }
 
-    public void OnNotifyAssigningCard(List<CardModel> cardModels)
+
+    public void OnNotifyAssigningCard(CardInfo cardInfo)
     {
         switch (currentTableState)
         {
-            case TableState.None:                               
+            case HandType.None:
                 break;
-            case TableState.Single:
+            case HandType.Single:
 
-                HandleAssigningForSingleCard(cardModels);
+                HandleAssigningForSingleCard(cardInfo.CardComposition);
                 break;
         }
-    }
+    }   
 
     private void HandleAssigningForSingleCard(List<CardModel> cardModels)
     {
@@ -100,17 +105,17 @@ public class TableUI : MonoBehaviour, IObserverTable
 
 
 
-    public void OnNotifyTableState(TableState cardState)
+    public void OnNotifyTableState(HandType cardState)
     {
         switch (cardState) 
         {
-            case TableState.None:
-                currentTableState = TableState.None;
+            case HandType.None:
+                currentTableState = HandType.None;
                 _singleTable.SetActive(false);
                 break;
-            case TableState.Single:
+            case HandType.Single:
                 _singleTable.SetActive(true);
-                currentTableState = TableState.Single;
+                currentTableState = HandType.Single;
                 break;
         }
     }
@@ -120,7 +125,7 @@ public class TableUI : MonoBehaviour, IObserverTable
         RemoveSelfToSubjectList();
     }
 
-    public void OnNotifyTableState(TableState cardState, HandRank tableRank)
+    public void OnNotifyTableState(HandType cardState, HandRank tableRank)
     {
        
     }

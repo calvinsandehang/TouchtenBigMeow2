@@ -5,21 +5,21 @@ using UnityEngine;
 using UnityEngine.UI;
 using static GlobalDefine;
 
-public class TableManager : SubjectTable
+public class TableStateMachine : SubjectTable
 {
     [SerializeField]
     private Button _submitCard;
 
-    public static TableManager Instance { get; private set; }
+    public static TableStateMachine Instance { get; private set; }
     public ObservableList<CardModel> tableCardModel { get; set; } = new ObservableList<CardModel>(new List<CardModel>());
     public List<CardModel> SelectedCardModel = new List<CardModel>();
-    public TableState CurrentTableState = TableState.Single;
+    public HandType CurrentTableState = HandType.Single;
     public HandRank CurrentTableHandRank = HandRank.None;
     private CardEvaluator cardEvaluator;
 
     private void OnTableCardModelChanged(List<CardModel> newCardModels) 
     {
-        NotifyObserverAssigningCard(newCardModels);
+        //NotifyObserver(newCardModels);
     }
     private void Awake()
     {
@@ -39,7 +39,8 @@ public class TableManager : SubjectTable
 
     private void Start()
     {
-        NotifyObserverTableState(CurrentTableState, CurrentTableHandRank);
+        Debug.Log("CurrentTableState" + CurrentTableState);
+        //NotifyObserverTableState(CurrentTableState, CurrentTableHandRank);
         CardEvaluator.OnSelectedCard += AssignTableCards;
     }
     private void OnDestroy()
@@ -53,10 +54,10 @@ public class TableManager : SubjectTable
         
     }
 
-    public void AssignTableState(TableState tableState, HandRank tableRank) 
+    public void AssignTableState(HandType tableState, HandRank tableRank) 
     {
         CurrentTableState = tableState;
-        NotifyObserverTableState(tableState, tableRank);
+        //NotifyObserverTableState(tableState, tableRank);
     }
 
     public void AssignTableCards(List<CardModel> submittedCards)
@@ -71,23 +72,23 @@ public class TableManager : SubjectTable
         CheckTableState(submittedCards);
     }
 
-    public TableState CheckTableState(List<CardModel> cardsOnTable)
+    public HandType CheckTableState(List<CardModel> cardsOnTable)
     {
         int cardCount = cardsOnTable.Count;
         switch (cardCount)
         {
             case 0:
-                return TableState.None;
+                return HandType.None;
             case 1:
-                return TableState.Single;
+                return HandType.Single;
             case 2:
-                return TableState.Pair;
+                return HandType.Pair;
             case 3:
-                return TableState.ThreeOfAKind;
+                return HandType.ThreeOfAKind;
             case 4:
-                return TableState.FiveCards;
+                return HandType.FiveCards;
             default:
-                return TableState.None;
+                return HandType.None;
         }
     }    
 
@@ -95,13 +96,13 @@ public class TableManager : SubjectTable
     {
         switch (CurrentTableState)
         {
-            case TableState.Single:
+            case HandType.Single:
                 return ValidateSingle(selectedCards);
-            case TableState.Pair:
+            case HandType.Pair:
                 return ValidatePair(selectedCards);
-            case TableState.ThreeOfAKind:
+            case HandType.ThreeOfAKind:
                 return ValidateThreeOfAKind(selectedCards);
-            case TableState.FiveCards:
+            case HandType.FiveCards:
                 return ValidateFiveCards(selectedCards, CardRank);
             default:
                 return false;

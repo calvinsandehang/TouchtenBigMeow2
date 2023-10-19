@@ -12,7 +12,7 @@ public static class GlobalDefine
 
     public enum HandRank
     {
-        None, HighCard, Pair, TwoPair, ThreeOfAKind, Straight, Flush, FullHouse, FourOfAKind, StraightFlush, RoyalFlush
+        None, HighCard, Pair, ThreeOfAKind, Straight, Flush, FullHouse, FourOfAKind, StraightFlush, RoyalFlush
     }
 
     public enum Rank
@@ -28,7 +28,7 @@ public static class GlobalDefine
         BestHand
     }
 
-    public enum TableState 
+    public enum HandType 
     {
         None,
         Single,
@@ -38,6 +38,6 @@ public static class GlobalDefine
     }
 
     public delegate void OnCardInteract(CardModel card);
-   
 
+    
 }
