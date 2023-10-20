@@ -15,7 +15,7 @@ public class Big2TableManager : SubjectTable
     [ShowInInspector]
     public List<CardModel> TableCards { get; private set; }
 
-    public event Action<CardInfo> OnTableUpdated;
+    //public event Action<CardInfo> OnTableUpdated;
 
     private void Awake()
     {
@@ -52,7 +52,11 @@ public class Big2TableManager : SubjectTable
         TableHandRank = cardInfo.HandRank;
         TableCards.Clear();
         TableCards.AddRange(cardInfo.CardComposition);
-        OnTableUpdated?.Invoke(cardInfo);
+        NotifyObserver(cardInfo);
+        //OnTableUpdated?.Invoke(cardInfo);
+        
     }
+
+    
 
 }

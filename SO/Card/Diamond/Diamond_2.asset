@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: Diamond_2
   m_EditorClassIdentifier: 
   _suit: 0
-  _rank: 12
+  _rank: 13
   _cardSprite: {fileID: 21300000, guid: dd688ea59152c1945892a9419df4875d, type: 3}

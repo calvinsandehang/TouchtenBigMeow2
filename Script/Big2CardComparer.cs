@@ -12,40 +12,29 @@ public class Big2CardComparer
         HandRank playerRank = EvaluateHand(playerHand);
         HandRank tableRank = EvaluateHand(tableHand);
 
-        // Compare the hand ranks
-        if (playerRank > tableRank)
-        {
-            // Player's hand is better
+        if (tableRank == HandRank.None) // table is empty, always return true
             return true;
-        }
-        else if (playerRank < tableRank)
+
+        // Hands have the same rank, compare the cards within the same rank
+        switch (playerRank)
         {
-            // Opponent's hand is better
-            return false;
-        }
-        else
-        {
-            // Hands have the same rank, compare the cards within the same rank
-            switch (playerRank)
-            {
-                case GlobalDefine.HandRank.HighCard:
-                case GlobalDefine.HandRank.Straight:
-                case GlobalDefine.HandRank.Flush:
-                case GlobalDefine.HandRank.StraightFlush:
-                case GlobalDefine.HandRank.RoyalFlush:
-                    // For these hand ranks, compare the highest cards
-                    return CompareHighCards(playerHand, tableHand);
-                case GlobalDefine.HandRank.Pair:
-                    // For pair, compare the pairs first
-                    return ComparePairs(playerHand, tableHand);
-                case GlobalDefine.HandRank.ThreeOfAKind:
-                case GlobalDefine.HandRank.FourOfAKind:
-                case GlobalDefine.HandRank.FullHouse:
-                    // For three of a kind and four of a kind, compare the set of three/four cards
-                    return CompareThreeOrFourOfAKind(playerHand, tableHand);                
-                default:
-                    return false; // In all other cases, return false
-            }
+            case GlobalDefine.HandRank.HighCard:
+            case GlobalDefine.HandRank.Straight:
+            case GlobalDefine.HandRank.Flush:
+            case GlobalDefine.HandRank.StraightFlush:
+            case GlobalDefine.HandRank.RoyalFlush:
+                // For these hand ranks, compare the highest cards
+                return CompareHighCards(playerHand, tableHand);
+            case GlobalDefine.HandRank.Pair:
+                // For pair, compare the pairs first
+                return ComparePairs(playerHand, tableHand);
+            case GlobalDefine.HandRank.ThreeOfAKind:
+            case GlobalDefine.HandRank.FourOfAKind:
+            case GlobalDefine.HandRank.FullHouse:
+                // For three of a kind and four of a kind, compare the set of three/four cards
+                return CompareThreeOrFourOfAKind(playerHand, tableHand);
+            default:
+                return false; // In all other cases, return false
         }
     }
 
@@ -60,26 +49,54 @@ public class Big2CardComparer
 
     private bool CompareHighCards(List<CardModel> playerHand, List<CardModel> tableHand)
     {
-        // Sort both hands in descending order of card rank
-        playerHand.Sort((a, b) => (int)b.CardRank - (int)a.CardRank);
-        tableHand.Sort((a, b) => (int)b.CardRank - (int)a.CardRank);
+        // Sort both hands in descending order of card rank and then by suit in ascending order
+        playerHand.Sort((a, b) =>
+        {
+            int rankComparison = ((int)b.CardRank).CompareTo((int)a.CardRank);
+            if (rankComparison != 0)
+                return rankComparison;
+            return ((int)a.CardSuit).CompareTo((int)b.CardSuit);
+        });
+
+        tableHand.Sort((a, b) =>
+        {
+            int rankComparison = ((int)b.CardRank).CompareTo((int)a.CardRank);
+            if (rankComparison != 0)
+                return rankComparison;
+            return ((int)a.CardSuit).CompareTo((int)b.CardSuit);
+        });
 
         for (int i = 0; i < playerHand.Count; i++)
         {
-            int comparisonResult = playerHand[i].CardRank.CompareTo(tableHand[i].CardRank);
+            int rankComparison = playerHand[i].CardRank.CompareTo(tableHand[i].CardRank);
 
-            if (comparisonResult > 0)
+            if (rankComparison > 0)
             {
-                return true; // Player's card is higher
+                return true; // Player's card is higher by rank
             }
-            else if (comparisonResult < 0)
+            else if (rankComparison < 0)
             {
-                return false; // table's card is higher
+                return false; // Table's card is higher by rank
+            }
+            else // If ranks are equal, compare the suits
+            {
+                int suitComparison = playerHand[i].CardSuit.CompareTo(tableHand[i].CardSuit);
+                if (suitComparison > 0)
+                {
+                    return true; // Player's card is higher by suit
+                }
+                else if (suitComparison < 0)
+                {
+                    return false; // Table's card is higher by suit
+                }
             }
         }
 
         return false; // Hands are equal, return false
     }
+
+
+
 
     private bool ComparePairs(List<CardModel> playerHand, List<CardModel> tableHand)
     {

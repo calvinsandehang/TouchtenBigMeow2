@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: Spade_8
   m_EditorClassIdentifier: 
   _suit: 3
-  _rank: 5
+  _rank: 6
   _cardSprite: {fileID: 21300002, guid: 248cb141e7dd0164ebf46a89e19fab60, type: 3}

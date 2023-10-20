@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: Club_4
   m_EditorClassIdentifier: 
   _suit: 1
-  _rank: 1
+  _rank: 2
   _cardSprite: {fileID: 21300000, guid: 34a35d88dd589d14e83a0e8fdd205e44, type: 3}

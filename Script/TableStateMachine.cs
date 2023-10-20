@@ -7,6 +7,7 @@ using static GlobalDefine;
 
 public class TableStateMachine : SubjectTable
 {
+    /*
     [SerializeField]
     private Button _submitCard;
 
@@ -39,14 +40,10 @@ public class TableStateMachine : SubjectTable
 
     private void Start()
     {
-        Debug.Log("CurrentTableState" + CurrentTableState);
-        //NotifyObserverTableState(CurrentTableState, CurrentTableHandRank);
-        CardEvaluator.OnSelectedCard += AssignTableCards;
+        Debug.Log("CurrentTableState" + CurrentTableState);    
     }
     private void OnDestroy()
-    {
-        // Unsubscribe from the event when the script is destroyed
-        CardEvaluator.OnSelectedCard -= AssignTableCards;
+    {        
     }
 
     private void ReceivePlayerCard() 
@@ -153,6 +150,6 @@ public class TableStateMachine : SubjectTable
     }
 
 
-
+    */
 
 }

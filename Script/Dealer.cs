@@ -1,7 +1,9 @@
+using Sirenix.OdinInspector;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static GlobalDefine;
 
 
 // Handle giving out card to the player
@@ -17,20 +19,25 @@ public class Dealer : MonoBehaviour
 
     [Header("Rule")]
     [SerializeField]
-    private int _playerNumber = 2;
+    [Range(2, 4)]
+    private int _playerNumber = 4;
+
 
     [SerializeField]
     private int _playerHandCount = 13;
 
     // a deck consist of 52 cards
-    public List<CardModel> deck = new List<CardModel>();
+    public List<CardModel> deck = new List<CardModel>();  
 
-    // Store player hands
-    public List<PlayerHand> PlayerHands { get; private set; }
+    public List<Big2PlayerHand> playerHands { get; private set; } = new List<Big2PlayerHand>();
 
     private DeckModel deckModel;
     
     public event Action OnDealerFinishDealingCards;
+
+
+    
+
 
     #region Initialization
     private void Awake()
@@ -43,10 +50,12 @@ public class Dealer : MonoBehaviour
         {
             Destroy(Instance);
         }
+
+        StartCoroutine(InitializeDealer());
     }
     private void Start()
     {
-        StartCoroutine(InitializeDealer());
+        //StartCoroutine(InitializeDealer());
     }
 
     private IEnumerator InitializeDealer()
@@ -59,28 +68,35 @@ public class Dealer : MonoBehaviour
     }
     #endregion
 
-    public List<PlayerHand> DealCards() 
+    public List<Big2PlayerHand> DealCards() 
     {
-        if (PlayerHands != null) 
+        Debug.Log("Deal Cards");
+        if (playerHands.Count > 0) 
         {
             Debug.LogWarning("Cards have been dealt");
             return null;
         }
-
-        PlayerHands = new List<PlayerHand>();
-
         // create hands for each player
         for (int i = 0; i < _playerNumber; i++)
         {
             GameObject playerHandObject = Instantiate(_playerPrefab);
-            PlayerHand playerHand = playerHandObject.GetComponent<PlayerHand>();
-            PlayerHands.Add(playerHand);
-        }        
+            Big2PlayerHand playerHand = playerHandObject.GetComponent<Big2PlayerHand>();
+
+            if (i == 0) {
+                playerHand.PlayerType = PlayerType.Human; Debug.Log("HUmanPlayer");
+            }
+               
+            
+            else
+                playerHand.PlayerType = PlayerType.AI;            
+
+            playerHands.Add(playerHand);
+        }     
 
         // Deal 13 cards to each player
         for (int i = 0; i <+_playerHandCount; i++)
         {
-            foreach (PlayerHand playerHand in PlayerHands) 
+            foreach (Big2PlayerHand playerHand in playerHands) 
             {
                 CardModel card = deckModel.DrawCard();
 
@@ -98,7 +114,7 @@ public class Dealer : MonoBehaviour
         }
         OnDealerFinishDealingCards?.Invoke();
        
-        return PlayerHands;
+        return playerHands;
     }
 
 
@@ -120,7 +136,8 @@ public class Dealer : MonoBehaviour
 
     #endregion
 
-    #region Helper
+    #region Helper  
+
     private void DeckInitialization()
     {
         deckModel = new DeckModel(_deck);

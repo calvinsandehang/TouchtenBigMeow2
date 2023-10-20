@@ -17,8 +17,8 @@ public static class GlobalDefine
 
     public enum Rank
     {
-        Three = 0, Four = 1, Five = 2, Six = 3, Seven = 4, Eight = 5, Nine = 6, Ten = 7,
-        Jack = 8, Queen = 9, King = 10, Ace = 11, Two = 12
+        Three = 1, Four = 2, Five = 3, Six = 4, Seven = 5, Eight = 6, Nine = 7, Ten = 8,
+        Jack = 9, Queen = 10, King = 11, Ace = 12, Two = 13
     }
 
     public enum SortCriteria
@@ -35,6 +35,17 @@ public static class GlobalDefine
         Pair,
         ThreeOfAKind,
         FiveCards
+    }
+
+    public enum PlayerType 
+    {
+        Human,
+        AI
+    }
+
+    public enum ButtonType
+    {
+        SubmitCard,
     }
 
     public delegate void OnCardInteract(CardModel card);

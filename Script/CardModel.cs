@@ -35,4 +35,16 @@ public class CardModel
             return (CardSuit == card.CardSuit) && (CardRank == card.CardRank);
         }
     }
+
+    public override int GetHashCode()
+    {
+        unchecked // Overflow is fine in this case
+        {
+            int hash = 17; // Some prime number
+            hash = hash * 23 + CardSuit.GetHashCode(); // Combine with Suit's hash code
+            hash = hash * 23 + CardRank.GetHashCode(); // Combine with Rank's hash code
+            return hash;
+        }
+    }
+
 }

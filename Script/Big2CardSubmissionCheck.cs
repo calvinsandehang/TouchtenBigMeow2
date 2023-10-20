@@ -7,10 +7,8 @@ using UnityEngine.UI;
 using static GlobalDefine;
 
 [InfoBox("Bridge between Player and Table")]
-public class CardSubmissionCheck : MonoBehaviour, IObserverCardEvaluator
+public class Big2CardSubmissionCheck : MonoBehaviour, IObserverCardEvaluator
 {
-    public static CardSubmissionCheck Instance { get; private set; }
-
     private Big2TableManager big2TableManager;
     private CardInfo tableInfo;
     public HandType currentTableHandType;
@@ -22,22 +20,20 @@ public class CardSubmissionCheck : MonoBehaviour, IObserverCardEvaluator
     private bool matchingHandType;
 
     public delegate void CardSubmission();
-    public static event CardSubmission AllowedToSubmitCard;
-    public static event CardSubmission NotAllowedToSubmitCard;
+    public event CardSubmission AllowedToSubmitCard;
+    public event CardSubmission NotAllowedToSubmitCard;
 
-    private void Awake()
-    {
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
-    }
+    private Big2PlayerHand playerHand;
+    private PlayerType playerType;
+
+    private Button submitCardButton;
+
+   
+   
+
     private void Start()
     {
+        InitializeParameters();
         InitializeBig2TableManager();
     }
 
@@ -55,10 +51,33 @@ public class CardSubmissionCheck : MonoBehaviour, IObserverCardEvaluator
         currentTableCards = new List<CardModel>();
     }
 
+    private void InitializeParameters()
+    {
+        playerHand = GetComponent<Big2PlayerHand>();
+        playerType = playerHand.PlayerTypeLookUp();
+
+        if (playerType == PlayerType.Human)
+        {
+            SetupSubmissionButton();
+            Debug.Log("Paw");
+        }
+    }
+
+    private void SetupSubmissionButton()
+    {
+        submitCardButton = UIButtonInjector.Instance.GetButton(ButtonType.SubmitCard);
+        submitCardButton.onClick.AddListener(OnSubmitCard);
+
+        UIPlayerSubmissionButton submitButtonBehaviour = submitCardButton.GetComponent<UIPlayerSubmissionButton>();
+        submitButtonBehaviour.InitializeButton(this);
+    }
+
+
     public void OnSubmitCard() 
     {
+        Debug.Log("OnSubmitCard");
         Big2TableManager.Instance.UpdateTableCards(submittedCardInfo);
-        PlayerHand.Instance.RemoveCards(submittedCards);
+        playerHand.RemoveCards(submittedCards);
     }
 
     // Receive selected card from PlayerSelectedCardEvaluator

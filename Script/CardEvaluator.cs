@@ -17,7 +17,6 @@ public class CardEvaluator : SubjectCardEvaluator
     private TextMeshProUGUI _text;
 
     public delegate void CardEvaluation (List<CardModel> evaluatedCard);
-    public static event CardEvaluation OnSelectedCard;
     public static event CardEvaluation OnSingleCardEvaluated;
     public static event CardEvaluation OnPairCardEvaluated;
     public static event CardEvaluation OnThreeOfAKindCardEvaluated;

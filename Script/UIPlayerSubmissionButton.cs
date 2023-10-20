@@ -1,10 +1,12 @@
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PlayerSubmissionUIButton : MonoBehaviour
+public class UIPlayerSubmissionButton : MonoBehaviour
 {
     private Button submitButton;
     private Image buttonImage;
+    private Big2CardSubmissionCheck submissionCheck;
 
     [SerializeField]
     private Color allowedColor = Color.white;
@@ -18,20 +20,21 @@ public class PlayerSubmissionUIButton : MonoBehaviour
         submitButton = GetComponent<Button>();
         OnNotAllowedToSubmitCard();
     }
-    private void Start()
-    {
-        // Subscribe to the events
-        CardSubmissionCheck.AllowedToSubmitCard += OnAllowedToSubmitCard;
-        CardSubmissionCheck.NotAllowedToSubmitCard += OnNotAllowedToSubmitCard;
-    }
-
-    private void OnDestroy()
+ 
+    private void OnDisable()
     {
         // Unsubscribe from the events to prevent memory leaks
-        CardSubmissionCheck.AllowedToSubmitCard -= OnAllowedToSubmitCard;
-        CardSubmissionCheck.NotAllowedToSubmitCard -= OnNotAllowedToSubmitCard;
+        submissionCheck.AllowedToSubmitCard -= OnAllowedToSubmitCard;
+        submissionCheck.NotAllowedToSubmitCard -= OnNotAllowedToSubmitCard;
     }
+    public void InitializeButton(Big2CardSubmissionCheck big2CardSubmissionCheck) 
+    {
+        submissionCheck = big2CardSubmissionCheck;
 
+        // Subscribe to the events
+        submissionCheck.AllowedToSubmitCard += OnAllowedToSubmitCard;
+        submissionCheck.NotAllowedToSubmitCard += OnNotAllowedToSubmitCard;
+    }
     private void OnAllowedToSubmitCard()
     {
         // Set the button interactable and update the image color to allowedColor
@@ -44,10 +47,5 @@ public class PlayerSubmissionUIButton : MonoBehaviour
         // Set the button not interactable and update the image color to notAllowedColor
         submitButton.interactable = false;
         buttonImage.color = notAllowedColor;
-    }
-
-    public void OnSubmitButtonPressed() 
-    {
-        CardSubmissionCheck.Instance.OnSubmitCard();
     }
 }

@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using static GlobalDefine;
 
-public class PlayerHandSorter
+public class Big2CardSorter
 {
     public void SortPlayerHandByRank(List<GameObject> cardsObjectsInPlayerHand)
     {
