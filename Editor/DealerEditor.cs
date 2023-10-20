@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-[CustomEditor(typeof(Dealer))]
+[CustomEditor(typeof(Big2GMStateMachine))]
 public class DealerEditor : Editor
 {
     private const int CardsPerRow = 5; // Number of card images per row
@@ -14,7 +14,7 @@ public class DealerEditor : Editor
         // Draw the default inspector
         DrawDefaultInspector();
 
-        Dealer dealer = (Dealer)target;
+        Big2GMStateMachine dealer = (Big2GMStateMachine)target;
 
         // Add a button to deal the cards
         if (dealer.IsInitialized && GUILayout.Button("Deal Cards")) // Check if dealer is initialized

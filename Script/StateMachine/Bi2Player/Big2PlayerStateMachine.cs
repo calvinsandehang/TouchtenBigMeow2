@@ -13,7 +13,7 @@ public enum PlayerState
     Postgame,
 }
 
-public class Big2PlayerStateMachine : StateManager<PlayerState>
+public class Big2PlayerStateMachine : StateManager<PlayerState>, ISubscriber
 {
     public PlayerState PlayerState { get; private set; }
     private Big2PlayerHand playerHand;
@@ -26,20 +26,31 @@ public class Big2PlayerStateMachine : StateManager<PlayerState>
     public Big2PlayerStateMachineDelegate onPlayerIsLosing;
     public Big2PlayerStateMachineDelegate onPlayerIsWaiting;
 
-    public bool Test;
-
+    public bool Test;    
 
     private void Awake()
     {       
         StateInitialization();
         ParameterInitialization();
+        SubscribeEvent();
 
         CurrentState = States[PlayerState.Pregame];
+    }
+
+    public void SubscribeEvent()
+    {
+        playerHand.OnHandLastCardIsDropped += MakePlayerWin;
+    }
+
+    public void UnsubscribeEvent()
+    {
+        playerHand.OnHandLastCardIsDropped -= MakePlayerWin;
     }
 
     private void ParameterInitialization()
     {
         playerHand = GetComponent<Big2PlayerHand>();
+        cardSubmissionCheck = GetComponent<Big2CardSubmissionCheck>();
     }
 
     private void StateInitialization()
@@ -80,16 +91,21 @@ public class Big2PlayerStateMachine : StateManager<PlayerState>
     {
         return PlayerState;
     }
+
+   
     #endregion
 
     #region Parameter
-    
+
     #endregion
 
 
 
 
     #region Helper
-
+    private void OnDisable()
+    {
+        UnsubscribeEvent();
+    }
     #endregion
 }

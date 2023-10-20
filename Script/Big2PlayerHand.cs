@@ -9,13 +9,19 @@ using static GlobalDefine;
 public class Big2PlayerHand : SubjectPlayer
 {
     public PlayerType PlayerType;
+    public int PlayerID;
 
-    public List<CardModel> playerCards = new List<CardModel>();
+    private List<CardModel> playerCards = new List<CardModel>();
     private const int playerHandSize = 13;
 
-    private Dealer dealer;
+    private Big2GMStateMachine gameMaster;
     private PlayerHandEvaluator handEvaluator;
     private UIPlayerHandManager uiPlayerHandManager;
+
+    private bool inFirstRound;
+    private bool hasThreeOfDiamonds;
+
+    public event Action OnHandLastCardIsDropped;
 
     private void Awake()
     {
@@ -44,6 +50,13 @@ public class Big2PlayerHand : SubjectPlayer
         if (PlayerType == PlayerType.Human)
             UIPlayerHandManager.Instance.DisplayCards(playerCards);
 
+        inFirstRound = gameMaster.CheckGameInFirstRound();
+
+        if (gameMaster.CheckGameInFirstRound()) 
+        {
+            if (card.CardRank == Rank.Three && card.CardSuit == Suit.Diamonds)
+                hasThreeOfDiamonds = true;    
+        }
     }
 
     public void RemoveCards(List<CardModel> removedCards)
@@ -61,6 +74,16 @@ public class Big2PlayerHand : SubjectPlayer
             CardEvaluator.Instance.DeregisterCard(removedCards);
             NotifyObserver(playerCards);
         }
+
+        CheckWinningCondition();
+    }
+
+    private void CheckWinningCondition()
+    {
+        if (playerCards.Count == 0)
+        {
+            OnHandLastCardIsDropped?.Invoke();
+        }
     }
 
 
@@ -68,7 +91,7 @@ public class Big2PlayerHand : SubjectPlayer
     private void ParameterInitialization()
     {
         handEvaluator = GetComponent<PlayerHandEvaluator>();
-        dealer = Dealer.Instance;
+        gameMaster = Big2GMStateMachine.Instance;        
 
         // Injecting this instance to the UIPlayerHandManager
         if (PlayerType == PlayerType.Human)
@@ -83,14 +106,24 @@ public class Big2PlayerHand : SubjectPlayer
         return PlayerType;
     }
     #endregion
-   
+
 
     // Get the cards in the player hand
     // Would be useful for sorting cards
+    #region Look Up & Properties
+    
+
+    public bool CheckHavingThreeOfDiamonds() 
+    {
+        return hasThreeOfDiamonds;
+    }
+
     public List<CardModel> GetPlayerCards() 
     {
         return playerCards;
     }
+    #endregion
+
 
     private void OnDisable()
     {
