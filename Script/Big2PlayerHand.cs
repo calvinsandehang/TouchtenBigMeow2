@@ -28,12 +28,12 @@ public class Big2PlayerHand : SubjectPlayer
 
     private void SubscribeEvent() 
     {
-        dealer.OnDealerFinishDealingCards += EvaluateCardInHand;
+        //dealer.OnDealerFinishDealingCards += EvaluateCardInHand; testing
     }
 
     private void UnsubscribeEvent()
     {
-        dealer.OnDealerFinishDealingCards -= EvaluateCardInHand;
+        //dealer.OnDealerFinishDealingCards -= EvaluateCardInHand; testing
     }
 
     public void AddCard(CardModel card) 
@@ -83,10 +83,7 @@ public class Big2PlayerHand : SubjectPlayer
         return PlayerType;
     }
     #endregion
-    public void EvaluateCardInHand() 
-    {
-        handEvaluator.EvaluateHand(playerCards.ToList());
-    }
+   
 
     // Get the cards in the player hand
     // Would be useful for sorting cards
@@ -99,4 +96,11 @@ public class Big2PlayerHand : SubjectPlayer
     {
         UnsubscribeEvent();
     }
+
+    #region Testing Purposes
+    public void EvaluateCardInHand()
+    {
+        //handEvaluator.EvaluateHand(playerCards.ToList());
+    }
+    #endregion
 }

@@ -5,9 +5,12 @@ using static GlobalDefine;
 
 public class Big2TableStatePreparation: BaseState<TableState>
 {
-    public Big2TableStatePreparation(TableState key, StateManager<TableState> stateManager) : base(key, stateManager)
+    private Big2TableStateMachine tableStateMachine;
+    public Big2TableStatePreparation(TableState key, Big2TableStateMachine stateMachine) : base(key)
     {
+        tableStateMachine = stateMachine;
     }
+
 
     public override void EnterState()
     {

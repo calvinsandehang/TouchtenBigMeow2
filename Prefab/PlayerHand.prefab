@@ -10,8 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 5076711510589481233}
   - component: {fileID: 268125236708108513}
-  - component: {fileID: -6657814827871855664}
   - component: {fileID: 5728997258054005426}
+  - component: {fileID: 5228797022240234200}
   m_Layer: 0
   m_Name: PlayerHand
   m_TagString: Untagged
@@ -46,18 +46,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ad18e3ec6dc5e664f81cd07ba2b9494d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &-6657814827871855664
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2972835322702556544}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eb7f3acde65d3334eaaff25fcf5b67e9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  PlayerType: 0
 --- !u!114 &5728997258054005426
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -71,3 +60,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentTableHandType: 0
+--- !u!114 &5228797022240234200
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2972835322702556544}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b59f17a5311629147842ad56a7fc47ed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Test: 0

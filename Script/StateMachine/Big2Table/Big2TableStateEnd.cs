@@ -4,8 +4,10 @@ using UnityEngine;
 
 public class Big2TableStateEnd : BaseState<TableState>
 {
-    public Big2TableStateEnd(TableState key, StateManager<TableState> stateManager) : base(key, stateManager)
+    private Big2TableStateMachine tableStateMachine;
+    public Big2TableStateEnd(TableState key, Big2TableStateMachine stateMachine ) : base(key)
     {
+        tableStateMachine = stateMachine;
     }
 
     public override void EnterState()

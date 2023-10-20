@@ -2,6 +2,7 @@ using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices.WindowsRuntime;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 using static GlobalDefine;
@@ -28,8 +29,29 @@ public class Big2CardSubmissionCheck : MonoBehaviour, IObserverCardEvaluator
 
     private Button submitCardButton;
 
+    private Big2PlayerStateMachine playerStateMachine;
+    private PlayerState playerState;
+
+    private bool isAllowedToCheck = false;
+
    
-   
+
+    private void SubscribeEvent() 
+    {
+        playerStateMachine.onPlayerIsPlaying += OnPlayerIsPlaying;
+        playerStateMachine.onPlayerIsWaiting += OnPlayerIsNotPlaying;
+    }
+
+    private void UnsubscribeEvent() 
+    {
+        playerStateMachine.onPlayerIsPlaying -= OnPlayerIsPlaying;
+        playerStateMachine.onPlayerIsWaiting -= OnPlayerIsNotPlaying;
+    }
+
+    private void Awake()
+    {
+        
+    }
 
     private void Start()
     {
@@ -53,6 +75,8 @@ public class Big2CardSubmissionCheck : MonoBehaviour, IObserverCardEvaluator
 
     private void InitializeParameters()
     {
+        playerStateMachine = GetComponent<Big2PlayerStateMachine>();
+
         playerHand = GetComponent<Big2PlayerHand>();
         playerType = playerHand.PlayerTypeLookUp();
 
@@ -61,6 +85,9 @@ public class Big2CardSubmissionCheck : MonoBehaviour, IObserverCardEvaluator
             SetupSubmissionButton();
             Debug.Log("Paw");
         }
+
+        SubscribeEvent();
+
     }
 
     private void SetupSubmissionButton()
@@ -78,6 +105,19 @@ public class Big2CardSubmissionCheck : MonoBehaviour, IObserverCardEvaluator
         Debug.Log("OnSubmitCard");
         Big2TableManager.Instance.UpdateTableCards(submittedCardInfo);
         playerHand.RemoveCards(submittedCards);
+
+        NotAllowedToSubmitCard?.Invoke();
+    }
+
+    
+    private void OnPlayerIsPlaying() 
+    {
+        isAllowedToCheck = true;
+    }
+
+    private void OnPlayerIsNotPlaying() 
+    {
+        isAllowedToCheck = false;
     }
 
     // Receive selected card from PlayerSelectedCardEvaluator
@@ -200,6 +240,30 @@ public class Big2CardSubmissionCheck : MonoBehaviour, IObserverCardEvaluator
 
 
     #region Observer Pattern
+    
+    #endregion
+
+    #region Helper
+    private void OnDestroy()
+    {
+        //RemoveSelfToSubjectList(); //testing
+    }
+
+    private void OnEnable()
+    {
+        //AddSelfToSubjectList(); //testing
+    }
+
+    private void OnDisable()
+    {
+        //RemoveSelfToSubjectList(); //testing
+
+        UnsubscribeEvent();
+    }
+    #endregion
+
+    #region Testing and debugging
+    // Card Evaluator
     public void AddSelfToSubjectList()
     {
         // Assuming both TableManager and CardEvaluator have lists of observers
@@ -211,34 +275,4 @@ public class Big2CardSubmissionCheck : MonoBehaviour, IObserverCardEvaluator
         CardEvaluator.Instance?.RemoveObserver(this);
     }
     #endregion
-
-    #region Helper
-    private void OnDestroy()
-    {
-        RemoveSelfToSubjectList();
-    }
-
-    private void OnEnable()
-    {
-        AddSelfToSubjectList();
-    }
-
-    private void OnDisable()
-    {
-        RemoveSelfToSubjectList();  
-    }
-
-    public void OnNotifyHandType(HandType HandType, HandRank tableRank)
-    {
-        Debug.Log("currentHandType " + HandType);
-        currentTableHandType = HandType;
-        currentTableHandRank = tableRank;
-    }
-
-    public void OnNotifyAssigningCard(List<CardModel> cardModels)
-    {
-        
-    }
-    #endregion
-
 }

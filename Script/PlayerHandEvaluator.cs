@@ -10,8 +10,6 @@ public class PlayerHandEvaluator : MonoBehaviour
 
     private List<CardModel> hand = new List<CardModel>();
     private List<Tuple<HandRank, List<CardModel>, int>> rankedHands = new List<Tuple<HandRank, List<CardModel>, int>>();
-
-
     public void EvaluateHand(List<CardModel> cards)
     {
         hand = cards;
