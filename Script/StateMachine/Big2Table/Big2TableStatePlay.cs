@@ -20,7 +20,7 @@ public class Big2TableStatePlay : BaseState<TableState>
     {
     }
 
-    public override TableState GetNextState()
+    public override TableState GetActiveState()
     {
         return TableState.Play;
     }

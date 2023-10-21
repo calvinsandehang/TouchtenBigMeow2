@@ -17,8 +17,8 @@ public class Big2PokerHands
             CheckFlush,
             CheckStraight,
             CheckThreeOfAKind,
-            CheckOnePair,
-            CheckHighCard
+            CheckHighestOnePair,
+            CheckHighCardForHighestValue
         };
 
         foreach (var method in methods)
@@ -33,6 +33,34 @@ public class Big2PokerHands
         // In case no hand is found, which should never happen if CheckHighCard is correct
         return new CardInfo(HandType.None, HandRank.None, new List<CardModel>());
     }
+
+    public CardInfo GetLowestHand(List<CardModel> hand)
+    {
+        var methods = new List<Func<List<CardModel>, CardInfo>>()
+        {
+        CheckHighCardForLowestValue,
+        CheckLowestPair,
+        CheckThreeOfAKind,
+        CheckStraight,
+        CheckFlush,
+        CheckFullHouse,
+        CheckFourOfAKind,
+        CheckStraightFlush
+        };
+
+        foreach (var method in methods)
+        {
+            var result = method.Invoke(hand);
+            if (result.HandRank != HandRank.None)
+            {
+                return result;
+            }
+        }
+
+        // In case no hand is found, which should never happen if CheckHighCard is correct
+        return new CardInfo(HandType.None, HandRank.None, new List<CardModel>());
+    }
+
 
     #region Check Combination
     #region Straight Flush
@@ -318,14 +346,14 @@ public class Big2PokerHands
 
     #endregion
     #region Check One Pair
-    public CardInfo CheckOnePair(List<CardModel> hand)
+    public CardInfo CheckHighestOnePair(List<CardModel> hand)
     {
         var rankGroups = hand.GroupBy(card => card.CardRank);
 
         // Debug the rank groups
         foreach (var group in rankGroups)
         {
-            Debug.Log($"Group Key: {group.Key}, Count: {group.Count()}, Elements: {string.Join(", ", group)}");
+            //Debug.Log($"Group Key: {group.Key}, Count: {group.Count()}, Elements: {string.Join(", ", group)}");
         }
 
         var pairs = rankGroups.Where(grp => grp.Count() == 2).ToList();
@@ -333,7 +361,7 @@ public class Big2PokerHands
         // Debug the pairs
         foreach (var pair in pairs)
         {
-            Debug.Log($"Pair Group: {pair.Key}, Count: {pair.Count()}, Elements: {string.Join(", ", pair)}");
+            //Debug.Log($"Pair Group: {pair.Key}, Count: {pair.Count()}, Elements: {string.Join(", ", pair)}");
         }
 
         List<CardModel> bestPair = null;
@@ -366,12 +394,59 @@ public class Big2PokerHands
         return new CardInfo(HandType.None, HandRank.None, new List<CardModel>());
     }
 
+    public CardInfo CheckLowestPair(List<CardModel> hand)
+    {
+        var rankGroups = hand.GroupBy(card => card.CardRank);
+
+        // Debug the rank groups
+        foreach (var group in rankGroups)
+        {
+            // Debug.Log($"Group Key: {group.Key}, Count: {group.Count()}, Elements: {string.Join(", ", group)}");
+        }
+
+        var pairs = rankGroups.Where(grp => grp.Count() == 2).ToList();
+
+        // Debug the pairs
+        foreach (var pair in pairs)
+        {
+            // Debug.Log($"Pair Group: {pair.Key}, Count: {pair.Count()}, Elements: {string.Join(", ", pair)}");
+        }
+
+        List<CardModel> lowestPair = null;
+        int lowestPoints = int.MaxValue;
+
+        foreach (var pair in pairs)
+        {
+            var sortedPair = pair.OrderBy(card => (int)card.CardRank)
+                                .ThenBy(card => card.CardSuit)
+                                .ToList();
+
+            int pairPoints = sortedPair.Sum(card => ((int)card.CardRank));
+
+            if (pairPoints < lowestPoints)
+            {
+                lowestPair = sortedPair;
+                lowestPoints = pairPoints;
+            }
+        }
+
+        if (lowestPair != null)
+        {
+            // Ensure that the lowestPair list is sorted with the lowest suit at [0]
+            lowestPair = lowestPair.OrderBy(card => card.CardSuit).ToList();
+
+            Debug.Log($"Low Pair: Points: {lowestPoints}, Cards: {string.Join(", ", lowestPair)}");
+            return new CardInfo(HandType.Pair, HandRank.Pair, lowestPair);
+        }
+
+        return new CardInfo(HandType.None, HandRank.None, new List<CardModel>());
+    }
 
 
 
     #endregion
     #region High Card
-    public CardInfo CheckHighCard(List<CardModel> hand)
+    public CardInfo CheckHighCardForHighestValue(List<CardModel> hand)
     {
         if (hand.Count == 0)
         {
@@ -384,6 +459,21 @@ public class Big2PokerHands
         Debug.Log($"High Card: {highCard.CardRank} of {highCard.CardSuit}, Points: {cardPoints}");
         return new CardInfo(HandType.Single, HandRank.HighCard, new List<CardModel>() { highCard });
     }
+
+    public CardInfo CheckHighCardForLowestValue(List<CardModel> hand)
+    {
+        if (hand.Count == 0)
+        {
+            Debug.Log("The hand is empty, please check if something is wrong.");
+            return new CardInfo(HandType.None, HandRank.None, new List<CardModel>());
+        }
+
+        var lowCard = hand.OrderBy(card => card.CardRank).First();
+        int cardPoints = (int)lowCard.CardRank + (int)lowCard.CardSuit;
+        Debug.Log($"Low Card: {lowCard.CardRank} of {lowCard.CardSuit}, Points: {cardPoints}");
+        return new CardInfo(HandType.Single, HandRank.HighCard, new List<CardModel>() { lowCard });
+    }
+
     #endregion
     #region Helper
     // Adjusted IsStraight method to handle the Big Two rules

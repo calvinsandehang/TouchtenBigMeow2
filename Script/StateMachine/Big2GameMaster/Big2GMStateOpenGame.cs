@@ -21,9 +21,9 @@ public class Big2GMStateOpenGame : BaseState<GMState>
 
     }
 
-    public override GMState GetNextState()
+    public override GMState GetActiveState()
     {
-        return GMState.CloseGame;
+        return GMState.OpenGame;
     }
 
     public override void UpdateState()

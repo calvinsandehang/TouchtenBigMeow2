@@ -19,7 +19,7 @@ public class Big2PlayerStateWaiting :BaseState<PlayerState>
     {
     }
 
-    public override PlayerState GetNextState()
+    public override PlayerState GetActiveState()
     {
         return PlayerState.Waiting;
     }

@@ -47,19 +47,16 @@ public class UIPlayerSkipTurnButton : MonoBehaviour, ISubscriber
         skipTurnButton.interactable = true;
         buttonImage.color = allowedColor;
 
-        Debug.Log("OnAllowedToSkipTurn()");
     }
 
     private void OnNotAllowedToSkipTurn()
     {
-        Debug.Log("OnNotAllowedToSkipTurn()_1");
+        //Debug.Log("OnNotAllowedToSkipTurn()_1");
         if (playerStateMachine == null || playerType != PlayerType.Human) return;
 
         // Set the button not interactable and update the image color to notAllowedColor
         skipTurnButton.interactable = false;
         buttonImage.color = notAllowedColor;
-
-        Debug.Log("OnNotAllowedToSkipTurn()_2");
     }
 
     public void SubscribeEvent()

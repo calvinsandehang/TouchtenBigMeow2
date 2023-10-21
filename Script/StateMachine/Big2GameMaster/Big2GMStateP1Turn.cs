@@ -13,18 +13,22 @@ public class Big2GMStateP1Turn : BaseState<GMState>
     public override void EnterState()
     {
         Debug.Log("GM in P1 Turn State");
+        gmStateMachine.OrderPlayerToPlay(0);
     }
 
     public override void ExitState()
     {
     }
 
-    public override GMState GetNextState()
+    public override GMState GetActiveState()
     {
-        return GMState.CloseGame;
+        return GMState.P1Turn;
     }
 
     public override void UpdateState()
     {
     }
+
+   
+
 }

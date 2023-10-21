@@ -48,7 +48,6 @@ public class Big2GMStateMachine : StateManager<GMState>, ISubscriber
 
     private bool firstRound = true;
     private int currentPlayerIndex = 0;
-
     public bool IsInitialized { get; private set; }
 
     #region Initialization
@@ -66,7 +65,13 @@ public class Big2GMStateMachine : StateManager<GMState>, ISubscriber
         StateInitialization();
         ParameterInitialization();
     }
-  
+
+    private void Start()
+    {
+        CurrentState = States[GMState.OpenGame];
+        CurrentState.EnterState();
+    }
+
 
     public void InitializeGame() 
     {
@@ -145,6 +150,23 @@ public class Big2GMStateMachine : StateManager<GMState>, ISubscriber
         // Notify that the round winner has been declared.
         OnRoundWinnerDeclared?.Invoke(roundWinner);
     }
+
+    public void BroadcastPlayerTurn(int playerID) 
+    {
+        switch (playerID)
+        {
+            case 0:
+                break; 
+            case 1:
+                break;
+            case 2:
+                break;
+            case 3:
+                break;
+            default:
+                break;
+        }
+    }
     #endregion
 
     #region Initialization
@@ -164,10 +186,7 @@ public class Big2GMStateMachine : StateManager<GMState>, ISubscriber
         States[GMState.P2Turn] = new Big2GMStateP2Turn(GMState.P2Turn, this);
         States[GMState.P3Turn] = new Big2GMStateP3Turn(GMState.P3Turn, this);
         States[GMState.P4Turn] = new Big2GMStateP4Turn(GMState.P4Turn, this);
-
-        CurrentState = States[GMState.OpenGame];
-
-        Debug.Log("Current state = " + CurrentState);
+        
     }
 
     private void InitializePlayer()
@@ -180,7 +199,7 @@ public class Big2GMStateMachine : StateManager<GMState>, ISubscriber
 
             if (i == 0)
             {
-                playerHand.PlayerType = PlayerType.Human; Debug.Log("HumanPlayer");               
+                playerHand.PlayerType = PlayerType.Human;       
             }
             else
                 playerHand.PlayerType = PlayerType.AI;
@@ -216,36 +235,54 @@ public class Big2GMStateMachine : StateManager<GMState>, ISubscriber
     #endregion
 
     #region Order
+
+  
+
     private void Player1Turn() 
     {
-        TransitionToState(GMState.P1Turn);
+        // TransitionToState(GMState.P1Turn);
+        NextState = States[GMState.P1Turn];
+        Debug.Log("Current State : " + CurrentState);
     }
 
     private void Player2Turn() 
     {
-        TransitionToState(GMState.P2Turn);
+        //TransitionToState(GMState.P2Turn);
+        NextState = States[GMState.P2Turn];
+        Debug.Log("Current State : " + CurrentState);
     }
 
     private void Player3Turn() 
     {
-        TransitionToState(GMState.P3Turn);
+        //TransitionToState(GMState.P3Turn);
+        NextState = States[GMState.P2Turn];
+        Debug.Log("Current State : " + CurrentState);
     }
 
     private void Player4Turn()
     {
-        TransitionToState(GMState.P4Turn);
+        //TransitionToState(GMState.P4Turn);
+        NextState = States[GMState.P4Turn];
+        Debug.Log("Current State : " + CurrentState);
     }
 
     private void OnOpenGame() 
     {
         TransitionToState(GMState.OpenGame);
     }
+
+    public void OrderPlayerToPlay(int playerID)
+    {
+        Big2PlayerStateMachine playerStateMachine = playerHands[playerID].GetComponent<Big2PlayerStateMachine>();
+        playerStateMachine.MakePlayerPlay();
+        Debug.Log("OrderPlayerToPlay");
+    }
     #endregion
 
-    
+
     #endregion
 
-   
+
 
 
     #region Debugging

@@ -13,18 +13,31 @@ public class Big2GMStateP2Turn : BaseState<GMState>
     public override void EnterState()
     {
         Debug.Log("GM in P2 Turn State");
+        gmStateMachine.OrderPlayerToPlay(1);
     }
 
     public override void ExitState()
     {
     }
 
-    public override GMState GetNextState()
+    public override GMState GetActiveState()
     {
-        return GMState.CloseGame;
+        return GMState.P2Turn;
     }
 
     public override void UpdateState()
     {
+    }
+
+    public void OrderPlayerToPlay(int playerID)
+    {
+        Debug.Log("BOM");
+        Debug.Log("BOM");
+        Debug.Log("BOM");
+        Debug.Log("BOM");
+        Debug.Log("gmStateMachine");
+        Big2PlayerStateMachine playerStateMachine = gmStateMachine.playerHands[playerID].GetComponent<Big2PlayerStateMachine>();
+        playerStateMachine.MakePlayerPlay();
+        Debug.Log("OrderPlayerToPlay");
     }
 }

@@ -70,10 +70,10 @@ public class Big2PlayerHand : SubjectPlayer
         // Remove the cards from playerCards that match the criteria
         playerCards.RemoveAll(card => cardsToRemove.Contains(card));
 
+        UIPlayerHandManager.Instance.DisplayCards(playerCards, PlayerID);
         // Notify UI to update the displayed cards
         if (PlayerType == PlayerType.Human) 
         {
-            UIPlayerHandManager.Instance.DisplayCards(playerCards, PlayerID);
             CardEvaluator.Instance.DeregisterCard(removedCards);
             NotifyObserver(playerCards, PlayerID);
         }

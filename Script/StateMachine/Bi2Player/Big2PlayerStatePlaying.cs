@@ -12,16 +12,27 @@ public class Big2PlayerStatePlaying : BaseState<PlayerState>
 
     public override void EnterState()
     {
-        playerStateMachine.onPlayerIsPlaying?.Invoke();
+        int playerID = playerStateMachine.PlayerHand.PlayerID;
+        Debug.Log("Player " + (playerID + 1) + " is in Playing state");
+        
+        if (playerStateMachine.PlayerHand.PlayerType == GlobalDefine.PlayerType.Human) 
+        {
+            playerStateMachine.onPlayerIsPlaying?.Invoke();
+        }
+        else
+        {
+            playerStateMachine.big2AI.InitiateAiDecisionMaking();
+        }
+       
     }
 
     public override void ExitState()
     {
     }
 
-    public override PlayerState GetNextState()
+    public override PlayerState GetActiveState()
     {
-        return PlayerState.Waiting;
+        return PlayerState.Playing;
     }
 
     public override void UpdateState()

@@ -84,6 +84,50 @@ public class Big2CardSorter
         UpdateCardPosition(cardsObjectsInPlayerHand, cardModelsInPlayerHand, cardPool, cardParent);
     }
 
+   
+    public AiCardInfo SortPlayerHandByBestHand(List<CardModel> playerCard)
+    {
+        AiCardInfo aiCardInfo = new AiCardInfo();
+
+        Big2PokerHands pokerHandsChecker = new Big2PokerHands();
+        List<CardModel> tempCardModels = new List<CardModel>(playerCard);
+        List<CardModel> sortedCardModels = new List<CardModel>();
+
+        while (tempCardModels.Count > 0)
+        {
+            // Get the best hand from the remaining cards
+            CardInfo cardInfo = pokerHandsChecker.GetBestHand(tempCardModels);
+            List<CardModel> bestHandCards = cardInfo.CardComposition;
+
+            // Log for debugging
+            // Debug.Log("Best hand rank: " + cardInfo.HandRank.ToString());
+            foreach (var card in bestHandCards)
+            {
+                Debug.Log("Card in best hand: " + card.CardRank.ToString() + " of " + card.CardSuit.ToString());
+            }
+
+            // Add the best hand cards to the sorted list
+            sortedCardModels.AddRange(bestHandCards);
+            // Add the best hand cards to the card package
+            CardPackage cardPackage = new CardPackage();
+            cardPackage.CardPackageType = cardInfo.HandType;
+            cardPackage.CardPackageRank = cardInfo.HandRank;
+            cardPackage.CardPackageContent = cardInfo.CardComposition;
+
+            aiCardInfo.AddCardPackage(cardPackage);
+
+
+            // Remove the best hand cards from tempCardModels for the next iteration
+            foreach (var card in bestHandCards)
+            {
+                tempCardModels.Remove(card);
+            }
+        }        
+
+        return aiCardInfo;
+    }
+
+
     private void UpdateCardPosition(List<GameObject> cardsObjectsInPlayerHand, List<CardModel> cardModelsInPlayerHand, CardPool cardPool, Transform cardParent)
     {
         // Clear out the old cards.
@@ -115,3 +159,5 @@ public class Big2CardSorter
         }
     }
 }
+
+

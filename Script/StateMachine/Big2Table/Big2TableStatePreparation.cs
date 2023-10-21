@@ -24,7 +24,7 @@ public class Big2TableStatePreparation: BaseState<TableState>
 
     }
 
-    public override TableState GetNextState()
+    public override TableState GetActiveState()
     {
         return TableState.Preparation;
     }

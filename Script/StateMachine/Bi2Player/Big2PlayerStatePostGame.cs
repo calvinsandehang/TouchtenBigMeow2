@@ -18,7 +18,7 @@ public class Big2PlayerStatePostGame : BaseState<PlayerState>
     {
     }
 
-    public override PlayerState GetNextState()
+    public override PlayerState GetActiveState()
     {
         return PlayerState.Waiting;
     }

@@ -22,7 +22,7 @@ public class Big2TableStateStart : BaseState<TableState>
         Debug.Log("Table State : Exit Single State");
     }
 
-    public override TableState GetNextState()
+    public override TableState GetActiveState()
     {
         throw new System.NotImplementedException();
     }

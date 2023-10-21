@@ -142,7 +142,7 @@ public class UIPlayerHandManager : MonoBehaviour, IObserverPlayerHand
 
     public void AddSelfToSubjectList()
     {
-        Debug.Log(playerHand);
+       
         playerHand.AddObserver(this);
     }
 

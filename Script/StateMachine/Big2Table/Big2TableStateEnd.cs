@@ -18,7 +18,7 @@ public class Big2TableStateEnd : BaseState<TableState>
     {
     }
 
-    public override TableState GetNextState()
+    public override TableState GetActiveState()
     {
         return TableState.End;
     }

@@ -42,7 +42,7 @@ public class CardEvaluator : SubjectCardEvaluator
     #region Selecting & Deselecting card
     public void RegisterCard(CardModel card)
     {
-        Debug.Log("Register Card : " + card.CardRank +" "+ card.CardSuit);
+        //Debug.Log("Register Card : " + card.CardRank +" "+ card.CardSuit);
         // Check if a card with the same properties is already in the list
         if (!selectedCards.Any(c => c.Equals(card)))
         {

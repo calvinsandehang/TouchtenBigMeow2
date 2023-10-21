@@ -19,7 +19,7 @@ public class Big2GMStateCloseGame : BaseState<GMState>
     {
     }
 
-    public override GMState GetNextState()
+    public override GMState GetActiveState()
     {
         return GMState.CloseGame;
     }

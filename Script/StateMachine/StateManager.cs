@@ -7,6 +7,7 @@ public abstract class StateManager<Estate> : MonoBehaviour where Estate : Enum
 {
     protected Dictionary<Estate, BaseState<Estate>> States = new Dictionary<Estate, BaseState<Estate>>();
     protected BaseState<Estate> CurrentState;
+    protected BaseState<Estate> NextState;
     protected bool IsTransitioningState = false;
 
     private void Awake()
@@ -15,22 +16,26 @@ public abstract class StateManager<Estate> : MonoBehaviour where Estate : Enum
         ParameterInitialization();
     }
 
-    private void Start()
-    {
-        CurrentState.EnterState();
-    }
-
     private void Update()
     {
-        Estate nextStateKey = CurrentState.GetNextState();
+        if (NextState == null && CurrentState != null)
+        {
+            CurrentState.UpdateState();
+        }
 
-        if (!IsTransitioningState && nextStateKey.Equals(CurrentState.StateKey))
+        if (NextState == null) 
+        {
+            return;
+        }
+        Estate currentStateKey = CurrentState.GetActiveState();
+
+        if (!IsTransitioningState && currentStateKey.Equals(NextState.StateKey))
         {
             CurrentState.UpdateState();
         }
         else if (!IsTransitioningState)
         {
-            TransitionToState(nextStateKey);
+            TransitionToState(NextState.StateKey);
         }
     }
 
