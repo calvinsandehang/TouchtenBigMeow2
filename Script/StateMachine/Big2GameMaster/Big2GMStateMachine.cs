@@ -16,6 +16,7 @@ public enum GMState
     P4Turn
 }
 // Handle giving out card to the player
+[DefaultExecutionOrder(-9999)]
 public class Big2GMStateMachine : StateManager<GMState>, ISubscriber
 {
     public static Big2GMStateMachine Instance;
@@ -43,6 +44,7 @@ public class Big2GMStateMachine : StateManager<GMState>, ISubscriber
     private DeckModel deckModel;
     
     public event Action OnDealerFinishDealingCards;
+    public event Action<Big2PlayerHand> OnRoundWinnerDeclared;
 
     private bool firstRound = true;
     private int currentPlayerIndex = 0;
@@ -64,10 +66,7 @@ public class Big2GMStateMachine : StateManager<GMState>, ISubscriber
         StateInitialization();
         ParameterInitialization();
     }
-    private void Start()
-    {
-
-    }    
+  
 
     public void InitializeGame() 
     {
@@ -88,8 +87,6 @@ public class Big2GMStateMachine : StateManager<GMState>, ISubscriber
 
         if (!IsInitialized)        
             IsInitialized = true;
-        
-
 
         Debug.Log("Game master has initialized.");
     }
@@ -102,6 +99,7 @@ public class Big2GMStateMachine : StateManager<GMState>, ISubscriber
             {
                 currentPlayerIndex = playerHands.IndexOf(player);
                 SetTurn(currentPlayerIndex);
+                Debug.Log("The player that goes first is Player " + currentPlayerIndex );
                 break;
             }
         }
@@ -130,16 +128,35 @@ public class Big2GMStateMachine : StateManager<GMState>, ISubscriber
                 break;
         }
     }
+
+    public void NextTurn() 
+    {
+        // Increment currentPlayerIndex counterclockwise.
+        currentPlayerIndex = (currentPlayerIndex + 3) % 4;
+
+        SetTurn(currentPlayerIndex);
+    }
+
+    public void EndRound(Big2PlayerHand roundWinner)
+    {
+        // Update the currentPlayerIndex for the next round.
+        currentPlayerIndex = playerHands.IndexOf(roundWinner);
+
+        // Notify that the round winner has been declared.
+        OnRoundWinnerDeclared?.Invoke(roundWinner);
+    }
     #endregion
 
     #region Initialization
-    private void ParameterInitialization()
+    protected override void ParameterInitialization()
     {
 
     }
 
-    private void StateInitialization()
+    protected override void StateInitialization()
     {
+        Debug.Log("GM initialize states");
+
         States[GMState.AskPlayer] = new Big2GMStateAskPlayer(GMState.AskPlayer, this);
         States[GMState.OpenGame] = new Big2GMStateOpenGame(GMState.OpenGame, this);
         States[GMState.CloseGame] = new Big2GMStateCloseGame(GMState.CloseGame, this);
@@ -149,6 +166,8 @@ public class Big2GMStateMachine : StateManager<GMState>, ISubscriber
         States[GMState.P4Turn] = new Big2GMStateP4Turn(GMState.P4Turn, this);
 
         CurrentState = States[GMState.OpenGame];
+
+        Debug.Log("Current state = " + CurrentState);
     }
 
     private void InitializePlayer()
@@ -166,15 +185,13 @@ public class Big2GMStateMachine : StateManager<GMState>, ISubscriber
             else
                 playerHand.PlayerType = PlayerType.AI;
 
-            playerHand.PlayerID = i;
+            playerHand.InitializePlayerID(i);
             playerHands.Add(playerHand);
         }
     }
 
-    public List<Big2PlayerHand> DealCards()
+    public void DealCards()
     {
-        Debug.Log("Deal Cards");
-
         // Deal 13 cards to each player
         for (int i = 0; i < +_totalCardInHandPerPlayer; i++)
         {
@@ -183,20 +200,18 @@ public class Big2GMStateMachine : StateManager<GMState>, ISubscriber
                 CardModel card = deckModel.DrawCard();
 
                 if (card != null)
-                {
-                    playerHand.AddCard(card);
+                {                    
+                    playerHand.AddCard(card);                    
                 }
                 else
                 {
                     Debug.LogError("Not enough card on the deck");
-                    return null;
+                    return;
                 }
             }
-
         }
         OnDealerFinishDealingCards?.Invoke();
-
-        return playerHands;
+                
     }
     #endregion
 

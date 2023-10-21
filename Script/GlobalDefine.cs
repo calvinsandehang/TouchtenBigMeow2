@@ -46,6 +46,7 @@ public static class GlobalDefine
     public enum ButtonType
     {
         SubmitCard,
+        SkipTurn,
     }
 
     public delegate void OnCardInteract(CardModel card);

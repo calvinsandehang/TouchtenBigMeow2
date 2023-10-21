@@ -30,8 +30,6 @@ public class Big2PlayerHand : SubjectPlayer
         SubscribeEvent();
     }
 
-   
-
     private void SubscribeEvent() 
     {
         //dealer.OnDealerFinishDealingCards += EvaluateCardInHand; testing
@@ -47,8 +45,8 @@ public class Big2PlayerHand : SubjectPlayer
         playerCards.Add(card);
 
         // If this is the last card, notify that the hand is complete.
-        if (PlayerType == PlayerType.Human)
-            UIPlayerHandManager.Instance.DisplayCards(playerCards);
+        //if (PlayerType == PlayerType.Human)
+            UIPlayerHandManager.Instance.DisplayCards(playerCards, PlayerID);
 
         inFirstRound = gameMaster.CheckGameInFirstRound();
 
@@ -57,6 +55,11 @@ public class Big2PlayerHand : SubjectPlayer
             if (card.CardRank == Rank.Three && card.CardSuit == Suit.Diamonds)
                 hasThreeOfDiamonds = true;    
         }
+    }
+
+    public void InitializePlayerID(int index) 
+    {
+        PlayerID = index;
     }
 
     public void RemoveCards(List<CardModel> removedCards)
@@ -70,9 +73,9 @@ public class Big2PlayerHand : SubjectPlayer
         // Notify UI to update the displayed cards
         if (PlayerType == PlayerType.Human) 
         {
-            UIPlayerHandManager.Instance.DisplayCards(playerCards);
+            UIPlayerHandManager.Instance.DisplayCards(playerCards, PlayerID);
             CardEvaluator.Instance.DeregisterCard(removedCards);
-            NotifyObserver(playerCards);
+            NotifyObserver(playerCards, PlayerID);
         }
 
         CheckWinningCondition();

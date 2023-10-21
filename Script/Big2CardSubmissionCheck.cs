@@ -83,7 +83,6 @@ public class Big2CardSubmissionCheck : MonoBehaviour, IObserverCardEvaluator
         if (playerType == PlayerType.Human)
         {
             SetupSubmissionButton();
-            Debug.Log("Paw");
         }
 
         SubscribeEvent();
