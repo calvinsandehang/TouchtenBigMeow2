@@ -14,10 +14,10 @@ public class SubjectPlayer : MonoBehaviour
     {
         observers.Remove(observer);
     }
-    protected void NotifyObserver(List<CardModel> cardModels)
+    protected void NotifyObserver(List<CardModel> cardModels, int index)
     {
         observers.ForEach((observer) => {
-            observer.OnNotify(cardModels);
+            observer.OnNotify(cardModels, index);
         });
     }
 }

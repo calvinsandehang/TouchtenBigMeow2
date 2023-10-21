@@ -2,7 +2,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UIPlayerSubmissionButton : MonoBehaviour
+public class UIPlayerSubmissionButton : MonoBehaviour, ISubscriber
 {
     private Button submitButton;
     private Image buttonImage;
@@ -24,17 +24,16 @@ public class UIPlayerSubmissionButton : MonoBehaviour
     private void OnDisable()
     {
         // Unsubscribe from the events to prevent memory leaks
-        submissionCheck.AllowedToSubmitCard -= OnAllowedToSubmitCard;
-        submissionCheck.NotAllowedToSubmitCard -= OnNotAllowedToSubmitCard;
+        if (submissionCheck == null)
+            return;
+        UnsubscribeEvent();
     }
     public void InitializeButton(Big2CardSubmissionCheck big2CardSubmissionCheck) 
     {
         submissionCheck = big2CardSubmissionCheck;
-
-        // Subscribe to the events
-        submissionCheck.AllowedToSubmitCard += OnAllowedToSubmitCard;
-        submissionCheck.NotAllowedToSubmitCard += OnNotAllowedToSubmitCard;
+        SubscribeEvent();
     }
+
     private void OnAllowedToSubmitCard()
     {
         // Set the button interactable and update the image color to allowedColor
@@ -47,5 +46,17 @@ public class UIPlayerSubmissionButton : MonoBehaviour
         // Set the button not interactable and update the image color to notAllowedColor
         submitButton.interactable = false;
         buttonImage.color = notAllowedColor;
+    }
+
+    public void SubscribeEvent()
+    {
+        submissionCheck.AllowedToSubmitCard += OnAllowedToSubmitCard;
+        submissionCheck.NotAllowedToSubmitCard += OnNotAllowedToSubmitCard;
+    }
+
+    public void UnsubscribeEvent()
+    {
+        submissionCheck.AllowedToSubmitCard -= OnAllowedToSubmitCard;
+        submissionCheck.NotAllowedToSubmitCard -= OnNotAllowedToSubmitCard;
     }
 }

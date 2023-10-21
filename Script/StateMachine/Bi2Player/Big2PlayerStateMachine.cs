@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static GlobalDefine;
 
 public enum PlayerState 
 {
@@ -19,10 +20,9 @@ public class Big2PlayerStateMachine : StateManager<PlayerState>, ISubscriber
     private Big2PlayerHand playerHand;
     private Big2CardSubmissionCheck cardSubmissionCheck;
 
-
     public delegate void Big2PlayerStateMachineDelegate();
     public Big2PlayerStateMachineDelegate onPlayerIsPlaying;
-    public Big2PlayerStateMachineDelegate onPlayerIsWining;
+    public Big2PlayerStateMachineDelegate onPlayerIsWinning;
     public Big2PlayerStateMachineDelegate onPlayerIsLosing;
     public Big2PlayerStateMachineDelegate onPlayerIsWaiting;
 
@@ -34,7 +34,7 @@ public class Big2PlayerStateMachine : StateManager<PlayerState>, ISubscriber
         ParameterInitialization();
         SubscribeEvent();
 
-        CurrentState = States[PlayerState.Pregame];
+       
     }
 
     public void SubscribeEvent()
@@ -47,18 +47,20 @@ public class Big2PlayerStateMachine : StateManager<PlayerState>, ISubscriber
         playerHand.OnHandLastCardIsDropped -= MakePlayerWin;
     }
 
-    private void ParameterInitialization()
+    protected override void ParameterInitialization()
     {
         playerHand = GetComponent<Big2PlayerHand>();
         cardSubmissionCheck = GetComponent<Big2CardSubmissionCheck>();
     }
 
-    private void StateInitialization()
+    protected override void StateInitialization()
     {
         States[PlayerState.Pregame] = new Big2PlayerStatePreGame(PlayerState.Pregame, this);
         States[PlayerState.Playing] = new Big2PlayerStatePlaying(PlayerState.Playing, this);
         States[PlayerState.Waiting] = new Big2PlayerStatePlaying(PlayerState.Waiting, this);
         States[PlayerState.Postgame] = new Big2PlayerStatePostGame(PlayerState.Postgame, this);
+
+        CurrentState = States[PlayerState.Pregame];
     }
 
     #region Order
@@ -87,13 +89,23 @@ public class Big2PlayerStateMachine : StateManager<PlayerState>, ISubscriber
         // do player win stuff
     }
 
+    
+
     public PlayerState GetPlayerState() 
     {
         return PlayerState;
     }
 
-   
+    public PlayerType GetPlayerType() 
+    {
+        Debug.Log("playerHand.PlayerType : " + playerHand.PlayerType);
+        return playerHand.PlayerType;
+    }
+
+
     #endregion
+
+    
 
     #region Parameter
 

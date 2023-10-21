@@ -12,6 +12,7 @@ public class Big2GMStateP2Turn : BaseState<GMState>
 
     public override void EnterState()
     {
+        Debug.Log("GM in P2 Turn State");
     }
 
     public override void ExitState()

@@ -12,6 +12,7 @@ public class Big2PlayerStatePreGame : BaseState<PlayerState>
 
     public override void EnterState()
     {
+
     }
 
     public override void ExitState()

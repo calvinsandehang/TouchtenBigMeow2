@@ -10,7 +10,6 @@ public class UIButtonInjector : MonoBehaviour
 {
     public static UIButtonInjector Instance;
 
-
     [ShowInInspector]
     public Dictionary<ButtonType, Button> InjectedButtons { get; private set; } = new Dictionary<ButtonType, Button>();
 

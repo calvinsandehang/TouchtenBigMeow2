@@ -12,6 +12,7 @@ public class Big2GMStateOpenGame : BaseState<GMState>
 
     public override void EnterState()
     {
+        Debug.Log("GM in Open Game State");
        gmStateMachine.InitializeGame();
     }
 
