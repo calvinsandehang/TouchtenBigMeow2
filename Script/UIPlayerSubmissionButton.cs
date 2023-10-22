@@ -37,6 +37,7 @@ public class UIPlayerSubmissionButton : MonoBehaviour, ISubscriber
     private void OnAllowedToSubmitCard()
     {
         // Set the button interactable and update the image color to allowedColor
+        //Debug.Log("AllowedToSubmitCard()");
         submitButton.interactable = true;
         buttonImage.color = allowedColor;
     }
@@ -44,6 +45,7 @@ public class UIPlayerSubmissionButton : MonoBehaviour, ISubscriber
     private void OnNotAllowedToSubmitCard()
     {
         // Set the button not interactable and update the image color to notAllowedColor
+        //Debug.Log("NotAllowedToSubmitCard()");
         submitButton.interactable = false;
         buttonImage.color = notAllowedColor;
     }

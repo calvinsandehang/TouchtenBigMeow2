@@ -12,7 +12,10 @@ public class Big2PlayerStateWaiting :BaseState<PlayerState>
 
     public override void EnterState()
     {
-        playerStateMachine.onPlayerIsWaiting?.Invoke();
+        int playerID = playerStateMachine.PlayerHand.PlayerID;
+        Debug.Log("Player " + (playerID) + " is in Waiting state");
+
+        playerStateMachine.BroadcastPlayerIsWaiting();
     }
 
     public override void ExitState()

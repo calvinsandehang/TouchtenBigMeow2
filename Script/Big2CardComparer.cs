@@ -49,22 +49,9 @@ public class Big2CardComparer
 
     private bool CompareHighCards(List<CardModel> playerHand, List<CardModel> tableHand)
     {
-        // Sort both hands in descending order of card rank and then by suit in ascending order
-        playerHand.Sort((a, b) =>
-        {
-            int rankComparison = ((int)b.CardRank).CompareTo((int)a.CardRank);
-            if (rankComparison != 0)
-                return rankComparison;
-            return ((int)a.CardSuit).CompareTo((int)b.CardSuit);
-        });
-
-        tableHand.Sort((a, b) =>
-        {
-            int rankComparison = ((int)b.CardRank).CompareTo((int)a.CardRank);
-            if (rankComparison != 0)
-                return rankComparison;
-            return ((int)a.CardSuit).CompareTo((int)b.CardSuit);
-        });
+        // Sort both hands in descending order of card rank
+        playerHand.Sort((a, b) => ((int)b.CardRank).CompareTo((int)a.CardRank));
+        tableHand.Sort((a, b) => ((int)b.CardRank).CompareTo((int)a.CardRank));
 
         for (int i = 0; i < playerHand.Count; i++)
         {
@@ -78,22 +65,25 @@ public class Big2CardComparer
             {
                 return false; // Table's card is higher by rank
             }
-            else // If ranks are equal, compare the suits
+        }
+
+        // If ranks are equal, compare the suits
+        for (int i = 0; i < playerHand.Count; i++)
+        {
+            int suitComparison = playerHand[i].CardSuit.CompareTo(tableHand[i].CardSuit);
+            if (suitComparison > 0)
             {
-                int suitComparison = playerHand[i].CardSuit.CompareTo(tableHand[i].CardSuit);
-                if (suitComparison > 0)
-                {
-                    return true; // Player's card is higher by suit
-                }
-                else if (suitComparison < 0)
-                {
-                    return false; // Table's card is higher by suit
-                }
+                return true; // Player's card is higher by suit
+            }
+            else if (suitComparison < 0)
+            {
+                return false; // Table's card is higher by suit
             }
         }
 
         return false; // Hands are equal, return false
     }
+
 
 
 

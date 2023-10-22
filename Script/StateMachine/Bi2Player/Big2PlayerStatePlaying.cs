@@ -13,11 +13,12 @@ public class Big2PlayerStatePlaying : BaseState<PlayerState>
     public override void EnterState()
     {
         int playerID = playerStateMachine.PlayerHand.PlayerID;
-        Debug.Log("Player " + (playerID + 1) + " is in Playing state");
+        Debug.Log("Player " + (playerID) + " is in Playing state");
         
         if (playerStateMachine.PlayerHand.PlayerType == GlobalDefine.PlayerType.Human) 
         {
-            playerStateMachine.onPlayerIsPlaying?.Invoke();
+            playerStateMachine.BroadcastPlayerIsPlaying();
+            Debug.Log("playerStateMachine.onPlayerIsPlaying?.Invoke();");
         }
         else
         {

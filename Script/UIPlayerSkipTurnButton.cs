@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -19,11 +20,24 @@ public class UIPlayerSkipTurnButton : MonoBehaviour, ISubscriber
     private Big2PlayerStateMachine playerStateMachine;
     private PlayerType playerType;
 
+    private Big2TableManager tableManager;
+    private HandType currentTableType;
+
     private void Awake()
     {
         buttonImage = GetComponent<Image>();
         skipTurnButton = GetComponent<Button>();
         
+    }
+
+    private void Start()
+    {
+        ParameterInitialization();
+    }
+
+    private void ParameterInitialization()
+    {
+        tableManager = Big2TableManager.Instance;
     }
 
     private void OnDisable()
@@ -34,44 +48,57 @@ public class UIPlayerSkipTurnButton : MonoBehaviour, ISubscriber
     }
     public void InitializeButton(Big2PlayerStateMachine playerStateMachine)
     {
+        
         this.playerStateMachine = playerStateMachine;
         playerType = playerStateMachine.GetPlayerType();
-
+        
+        if (playerStateMachine == null || playerType != PlayerType.Human) return;
+        Debug.Log("playerStateMachine : " + playerStateMachine);
+        Debug.Log("playerType  : " + playerType);
         SubscribeEvent();
         OnNotAllowedToSkipTurn();
     }
     private void OnAllowedToSkipTurn()
     {
-        if (playerStateMachine == null || playerType != PlayerType.Human) return;
+        currentTableType = tableManager.TableHandType;
+
+        if (currentTableType == HandType.None)
+            return;
+
+        //if (playerStateMachine == null || playerType != PlayerType.Human) return;
         // Set the button interactable and update the image color to allowedColor
         skipTurnButton.interactable = true;
         buttonImage.color = allowedColor;
+
+        Debug.Log("Allowed to skip");
 
     }
 
     private void OnNotAllowedToSkipTurn()
     {
         //Debug.Log("OnNotAllowedToSkipTurn()_1");
-        if (playerStateMachine == null || playerType != PlayerType.Human) return;
+        //if (playerStateMachine == null || playerType != PlayerType.Human) return;
 
         // Set the button not interactable and update the image color to notAllowedColor
         skipTurnButton.interactable = false;
         buttonImage.color = notAllowedColor;
+
+        Debug.Log("Not Allowed to skip");
     }
 
     public void SubscribeEvent()
     {
-        playerStateMachine.onPlayerIsPlaying += OnAllowedToSkipTurn;
-        playerStateMachine.onPlayerIsLosing += OnNotAllowedToSkipTurn;
-        playerStateMachine.onPlayerIsWinning += OnNotAllowedToSkipTurn;
-        playerStateMachine.onPlayerIsWaiting += OnNotAllowedToSkipTurn;
+        playerStateMachine.OnPlayerIsPlaying += OnAllowedToSkipTurn;
+        playerStateMachine.OnPlayerIsLosing += OnNotAllowedToSkipTurn;
+        playerStateMachine.OnPlayerIsWinning += OnNotAllowedToSkipTurn;
+        playerStateMachine.OnPlayerIsWaiting += OnNotAllowedToSkipTurn;
     }
 
     public void UnsubscribeEvent()
     {
-        playerStateMachine.onPlayerIsPlaying -= OnAllowedToSkipTurn;
-        playerStateMachine.onPlayerIsLosing -= OnNotAllowedToSkipTurn;
-        playerStateMachine.onPlayerIsWinning -= OnNotAllowedToSkipTurn;
-        playerStateMachine.onPlayerIsWaiting -= OnNotAllowedToSkipTurn;
+        playerStateMachine.OnPlayerIsPlaying -= OnAllowedToSkipTurn;
+        playerStateMachine.OnPlayerIsLosing -= OnNotAllowedToSkipTurn;
+        playerStateMachine.OnPlayerIsWinning -= OnNotAllowedToSkipTurn;
+        playerStateMachine.OnPlayerIsWaiting -= OnNotAllowedToSkipTurn;
     }
 }

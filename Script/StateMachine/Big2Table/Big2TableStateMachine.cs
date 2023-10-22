@@ -36,7 +36,7 @@ public class Big2TableStateMachine : StateManager<TableState>
         CurrentState = States[TableState.Preparation];
     }
 
-    private void StateInitialization()
+    protected override void StateInitialization()
     {
         States[TableState.Preparation] = new Big2TableStatePreparation(TableState.Preparation, this);
         States[TableState.Start] = new Big2TableStateStart(TableState.Start, this);

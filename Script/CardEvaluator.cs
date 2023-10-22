@@ -12,18 +12,19 @@ public class CardEvaluator : SubjectCardEvaluator
     public static CardEvaluator Instance { get;  private set; }
     public List<CardModel> selectedCards = new List<CardModel>();
     private List<Tuple<HandRank, List<CardModel>, int>> rankedHands = new List<Tuple<HandRank, List<CardModel>, int>>();
-
-    [SerializeField]
-    private TextMeshProUGUI _text;
-
+    
+    /*
     public delegate void CardEvaluation (List<CardModel> evaluatedCard);
     public static event CardEvaluation OnSingleCardEvaluated;
     public static event CardEvaluation OnPairCardEvaluated;
     public static event CardEvaluation OnThreeOfAKindCardEvaluated;
     public static event CardEvaluation OnFiveCardsEvaluated;
+    */
 
     // Define a dictionary to map TableState to events
-    private Dictionary<HandType, CardEvaluation> stateToEvent = new Dictionary<HandType, CardEvaluation>();
+    //private Dictionary<HandType, CardEvaluation> stateToEvent = new Dictionary<HandType, CardEvaluation>();
+
+    public Big2CardSubmissionCheck playerSubmissionCheck; 
 
     private void Awake()
     {
@@ -36,9 +37,10 @@ public class CardEvaluator : SubjectCardEvaluator
             Destroy(Instance);
         }
 
-        InitializeDictionary();
-    }   
-
+        //InitializeDictionary();
+    }
+  
+   
     #region Selecting & Deselecting card
     public void RegisterCard(CardModel card)
     {
@@ -47,20 +49,18 @@ public class CardEvaluator : SubjectCardEvaluator
         if (!selectedCards.Any(c => c.Equals(card)))
         {
             selectedCards.Add(card);
-
-            // For testing
-            DisplayHandCombination(selectedCards);
         }
         else
         {
             Debug.LogWarning("Attempted to register a card that is already registered: " + card.ToString());
         }
 
-        NotifyObserverAboutEvaluatedCard(selectedCards);
+        playerSubmissionCheck.SubmissionCheck(selectedCards);
     }
 
     public void DeregisterCard(CardModel card)
     {
+        //Debug.Log("DeregisterCard");
 
         // Find the card in the list that matches the specific properties
         var foundCard = selectedCards.FirstOrDefault(c => c.Equals(card));
@@ -68,17 +68,18 @@ public class CardEvaluator : SubjectCardEvaluator
         {
             selectedCards.Remove(foundCard);
 
-            if (selectedCards.Count <= 0)
-                return;
-            DisplayHandCombination(selectedCards);
+            playerSubmissionCheck.SubmissionCheck(selectedCards);
+
+            // for testing
+            //DisplayHandCombination(selectedCards); 
         }
         else
         {
             Debug.LogWarning("Attempted to deregister a card that isn't registered: " + card.ToString());
         }
-
-        NotifyObserverAboutEvaluatedCard(selectedCards);
-        CheckDisplayNothing();
+        
+        // for testing
+        //CheckDisplayNothing();
     }
 
     public void DeregisterCard(List<CardModel> cardsToRemove)
@@ -89,17 +90,29 @@ public class CardEvaluator : SubjectCardEvaluator
         // Check if there are any cards left in selectedCards
         if (selectedCards.Count <= 0)
         {
-            //DisplayHandCombination(selectedCards);
-            //NotifyObserverAboutEvaluatedCard(selectedCards);
-            CheckDisplayNothing();
+            
+            playerSubmissionCheck.SubmissionCheck(selectedCards);
+            // for testing
+            //CheckDisplayNothing();
+            //DisplayHandCombination(selectedCards); 
         }
         else
         {
-            DisplayHandCombination(selectedCards);
-            NotifyObserverAboutEvaluatedCard(selectedCards);
+            playerSubmissionCheck.SubmissionCheck(selectedCards);
+            // for testing
+            //DisplayHandCombination(selectedCards); //testing
         }
     }
 
+    
+
+    #endregion
+
+    #region Testing
+    /*
+
+    [SerializeField]
+    private TextMeshProUGUI _text;
 
     private void CheckDisplayNothing()
     {
@@ -108,8 +121,6 @@ public class CardEvaluator : SubjectCardEvaluator
             _text.text = "";
         }
     }
-    #endregion
-
     private void DisplayHandCombination(List<CardModel> selectedCards)
     {
         var result = EvaluateHand(selectedCards);
@@ -120,6 +131,8 @@ public class CardEvaluator : SubjectCardEvaluator
 
         _text.text = evaluationText;
     }
+    */
+    #endregion
 
     public CardInfo EvaluateHand(List<CardModel> cards)
     {
@@ -133,15 +146,22 @@ public class CardEvaluator : SubjectCardEvaluator
     {
         HandType currentCombinationTableState = bestHand.Item1;
 
+        /*
         if (stateToEvent.ContainsKey(currentCombinationTableState))
         {
             stateToEvent[currentCombinationTableState]?.Invoke(bestHand.Item3);
         }
+        */
 
         return currentCombinationTableState;
     }
 
     #region Helper
+    public void InitializeCardEvaluator(Big2CardSubmissionCheck submissionCheck) 
+    {
+        playerSubmissionCheck = submissionCheck;
+    }
+    /*
     private void InitializeDictionary()
     {
         // Initialize the dictionary with mappings
@@ -150,5 +170,6 @@ public class CardEvaluator : SubjectCardEvaluator
         stateToEvent[HandType.ThreeOfAKind] = OnThreeOfAKindCardEvaluated;
         stateToEvent[HandType.FiveCards] = OnFiveCardsEvaluated;
     }
+    */
     #endregion
 }

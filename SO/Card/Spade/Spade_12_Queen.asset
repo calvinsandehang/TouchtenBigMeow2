@@ -14,4 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _suit: 3
   _rank: 10
-  _cardSprite: {fileID: 21300002, guid: 74cffbd888b8c8d43a35abcbce7eec5b, type: 3}
+  _cardSprite: {fileID: -722328899, guid: e6e467f5916f74a4e9ded144bf210538, type: 3}

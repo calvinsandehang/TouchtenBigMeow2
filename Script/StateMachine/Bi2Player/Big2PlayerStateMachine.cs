@@ -21,13 +21,15 @@ public class Big2PlayerStateMachine : StateManager<PlayerState>, ISubscriber
     private Big2CardSubmissionCheck cardSubmissionCheck;
     public Big2SimpleAI big2AI { get; private set; }
 
-    public delegate void Big2PlayerStateMachineDelegate();
-    public Big2PlayerStateMachineDelegate onPlayerIsPlaying { get; set; }
-    public Big2PlayerStateMachineDelegate onPlayerIsWinning;
-    public Big2PlayerStateMachineDelegate onPlayerIsLosing;
-    public Big2PlayerStateMachineDelegate onPlayerIsWaiting;
+    
+    public event Action OnPlayerIsPlaying;
+    public event Action OnPlayerIsWinning;
+    public event Action OnPlayerIsLosing;
+    public event Action OnPlayerIsWaiting;
 
     public bool Test;    
+
+    
 
     private void Awake()
     {       
@@ -45,11 +47,15 @@ public class Big2PlayerStateMachine : StateManager<PlayerState>, ISubscriber
     public void SubscribeEvent()
     {
         PlayerHand.OnHandLastCardIsDropped += MakePlayerWin;
+        cardSubmissionCheck.OnPlayerFinishTurnLocal += MakePlayerWait;
+        big2AI.OnAIFinishTurnLocal += MakePlayerWait;
     }
 
     public void UnsubscribeEvent()
     {
         PlayerHand.OnHandLastCardIsDropped -= MakePlayerWin;
+        cardSubmissionCheck.OnPlayerFinishTurnLocal += MakePlayerWait;
+        big2AI.OnAIFinishTurnLocal -= MakePlayerWait;
     }
 
     protected override void ParameterInitialization()
@@ -63,33 +69,35 @@ public class Big2PlayerStateMachine : StateManager<PlayerState>, ISubscriber
     {
         States[PlayerState.Pregame] = new Big2PlayerStatePreGame(PlayerState.Pregame, this);
         States[PlayerState.Playing] = new Big2PlayerStatePlaying(PlayerState.Playing, this);
-        States[PlayerState.Waiting] = new Big2PlayerStatePlaying(PlayerState.Waiting, this);
+        States[PlayerState.Waiting] = new Big2PlayerStateWaiting(PlayerState.Waiting, this);
         States[PlayerState.Postgame] = new Big2PlayerStatePostGame(PlayerState.Postgame, this);
+        States[PlayerState.Winning] = new Big2PlayerStateWinning(PlayerState.Winning, this);
+        States[PlayerState.Losing] = new Big2PlayerStateLosing(PlayerState.Losing, this);
     }
 
     #region Order
     public void MakePlayerWait() 
     {
-        TransitionToState(PlayerState.Waiting);
+        NextState = States[PlayerState.Waiting];
     }
 
     public void MakePlayerPlay() 
     {
-        TransitionToState(PlayerState.Playing);
-        
+        NextState = States[PlayerState.Playing];
+
         // Card evaluator can be used
         // can submit
         // can pass
     }
     public void MakePlayerLose() 
     {
-        TransitionToState(PlayerState.Losing);
+        NextState = States[PlayerState.Losing];
         // do player lose stuff
     }
 
     public void MakePlayerWin() 
     {
-        TransitionToState(PlayerState.Winning);
+        NextState = States[PlayerState.Winning];
         // do player win stuff
     }
 
@@ -127,7 +135,7 @@ public class Big2PlayerStateMachine : StateManager<PlayerState>, ISubscriber
             // if yes, submit card
         // remove the submitted card
     }
-    
+
     #endregion
 
 
@@ -135,6 +143,20 @@ public class Big2PlayerStateMachine : StateManager<PlayerState>, ISubscriber
 
     #endregion
 
+    #region event
+    public void BroadcastPlayerIsPlaying() 
+    {
+        OnPlayerIsPlaying?.Invoke();
+        Debug.Log("BroadcastPlayerIsPlaying() ");
+    }
+
+    public void BroadcastPlayerIsWaiting()
+    {
+        OnPlayerIsWaiting?.Invoke();
+        Debug.Log("BroadcastPlayerIsWaiting() ");
+    }
+
+    #endregion
 
 
 

@@ -103,7 +103,7 @@ public class Big2CardSorter
             // Debug.Log("Best hand rank: " + cardInfo.HandRank.ToString());
             foreach (var card in bestHandCards)
             {
-                Debug.Log("Card in best hand: " + card.CardRank.ToString() + " of " + card.CardSuit.ToString());
+                //Debug.Log("Card in best hand: " + card.CardRank.ToString() + " of " + card.CardSuit.ToString());
             }
 
             // Add the best hand cards to the sorted list
@@ -123,6 +123,50 @@ public class Big2CardSorter
                 tempCardModels.Remove(card);
             }
         }        
+
+        return aiCardInfo;
+    }
+
+    public AiCardInfo SortPlayerHandByLowestHand(List<CardModel> playerCard)
+    {
+        AiCardInfo aiCardInfo = new AiCardInfo();
+
+        Big2PokerHands pokerHandsChecker = new Big2PokerHands();
+        List<CardModel> tempCardModels = new List<CardModel>(playerCard);
+        List<CardModel> sortedCardModels = new List<CardModel>();
+
+        while (tempCardModels.Count > 0)
+        {
+            // Find the lowest hand from the remaining cards
+            CardInfo lowestCardInfo = null;
+            foreach (var card in tempCardModels)
+            {
+                List<CardModel> singleCardList = new List<CardModel> { card };
+                CardInfo cardInfo = pokerHandsChecker.GetBestHand(singleCardList);
+
+                if (lowestCardInfo == null || cardInfo.HandRank < lowestCardInfo.HandRank)
+                {
+                    lowestCardInfo = cardInfo;
+                }
+            }
+
+            // Add the lowest hand cards to the sorted list
+            sortedCardModels.AddRange(lowestCardInfo.CardComposition);
+
+            // Add the lowest hand cards to the card package
+            CardPackage cardPackage = new CardPackage();
+            cardPackage.CardPackageType = lowestCardInfo.HandType;
+            cardPackage.CardPackageRank = lowestCardInfo.HandRank;
+            cardPackage.CardPackageContent = lowestCardInfo.CardComposition;
+
+            aiCardInfo.AddCardPackage(cardPackage);
+
+            // Remove the lowest hand cards from tempCardModels for the next iteration
+            foreach (var card in lowestCardInfo.CardComposition)
+            {
+                tempCardModels.Remove(card);
+            }
+        }
 
         return aiCardInfo;
     }

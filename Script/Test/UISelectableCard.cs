@@ -94,8 +94,9 @@ public class UISelectableCard : SubjectCard, IPointerClickHandler // Implementin
     {
         cardImage.color = initialColor;
         NotifyObserver(CardState.Deselected);
-            
+
         // this many instances refer to one instance => Singleton
+        //Debug.Log("DeselectCard()");
         CardEvaluator.Instance.DeregisterCard(cardModel);
     }
 }

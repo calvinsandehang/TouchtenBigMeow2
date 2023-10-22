@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using static GlobalDefine;
 
-public class Big2TableManager : SubjectTable
+public class Big2TableManager : SubjectTable, ISubscriber
 {
     public static Big2TableManager Instance;
     [ShowInInspector]
@@ -29,14 +29,15 @@ public class Big2TableManager : SubjectTable
         }
 
         ParameterInitialization();
-
     }
 
     private void ParameterInitialization()
     {
-        this.TableHandType = HandType.None;
+        TableHandType = HandType.None;
         TableHandRank = HandRank.None;
         TableCards = new List<CardModel>();
+
+        SubscribeEvent();
     }
 
     public CardInfo TableLookUp()
@@ -57,6 +58,25 @@ public class Big2TableManager : SubjectTable
         
     }
 
-    
+    private void CleanTable() 
+    {
+        Debug.Log("CleanTable");
+        TableHandType = HandType.None;
+        TableHandRank = HandRank.None;
+        TableCards = new List<CardModel>();
 
+        CardInfo tableInfo = new CardInfo(HandType.None, HandRank.None, new List<CardModel>());
+        NotifyObserver(tableInfo);
+
+    }
+
+    public void SubscribeEvent()
+    {
+        Big2GMStateMachine.OnRoundHasConcluded += CleanTable;
+    }
+
+    public void UnsubscribeEvent()
+    {
+        Big2GMStateMachine.OnRoundHasConcluded -= CleanTable;
+    }
 }

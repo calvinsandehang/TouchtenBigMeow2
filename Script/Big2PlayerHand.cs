@@ -15,8 +15,8 @@ public class Big2PlayerHand : SubjectPlayer
     private const int playerHandSize = 13;
 
     private Big2GMStateMachine gameMaster;
-    private PlayerHandEvaluator handEvaluator;
     private UIPlayerHandManager uiPlayerHandManager;
+    private Big2CardSubmissionCheck cardSubmissionCheck;
 
     private bool inFirstRound;
     private bool hasThreeOfDiamonds;
@@ -25,9 +25,23 @@ public class Big2PlayerHand : SubjectPlayer
 
     private void Awake()
     {
-        ParameterInitialization();
+        ParameterInitialization();        
        
         SubscribeEvent();
+    }
+
+    private void Start()
+    {
+        ComponentInitialization();
+
+    }
+    private void ComponentInitialization()
+    {
+        if (PlayerType == PlayerType.Human) 
+        {
+            CardEvaluator cardEvaluator = this.gameObject.AddComponent<CardEvaluator>();
+            cardEvaluator.InitializeCardEvaluator(cardSubmissionCheck);
+        }        
     }
 
     private void SubscribeEvent() 
@@ -60,6 +74,7 @@ public class Big2PlayerHand : SubjectPlayer
     public void InitializePlayerID(int index) 
     {
         PlayerID = index;
+        Debug.Log("Initialize Player : " + index);  
     }
 
     public void RemoveCards(List<CardModel> removedCards)
@@ -93,9 +108,8 @@ public class Big2PlayerHand : SubjectPlayer
     #region Helper
     private void ParameterInitialization()
     {
-        handEvaluator = GetComponent<PlayerHandEvaluator>();
-        gameMaster = Big2GMStateMachine.Instance;        
-
+        gameMaster = Big2GMStateMachine.Instance;
+        cardSubmissionCheck = GetComponent<Big2CardSubmissionCheck>();
         // Injecting this instance to the UIPlayerHandManager
         if (PlayerType == PlayerType.Human)
         {

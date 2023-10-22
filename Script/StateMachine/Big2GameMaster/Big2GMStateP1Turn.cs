@@ -13,7 +13,7 @@ public class Big2GMStateP1Turn : BaseState<GMState>
     public override void EnterState()
     {
         Debug.Log("GM in P1 Turn State");
-        gmStateMachine.OrderPlayerToPlay(0);
+        gmStateMachine.OrderPlayerToPlay(1);
     }
 
     public override void ExitState()
@@ -30,5 +30,4 @@ public class Big2GMStateP1Turn : BaseState<GMState>
     }
 
    
-
 }

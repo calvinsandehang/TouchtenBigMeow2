@@ -13,7 +13,7 @@ public class Big2PlayerStatePreGame : BaseState<PlayerState>
     public override void EnterState()
     {
         int playerID = playerStateMachine.PlayerHand.PlayerID;
-        Debug.Log("Player " + (playerID+1) + " is in PreGame state");
+        //Debug.Log("Player " + (playerID) + " is in PreGame state");
     }
 
     public override void ExitState()

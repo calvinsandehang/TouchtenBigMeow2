@@ -13,7 +13,7 @@ public class Big2GMStateP3Turn : BaseState<GMState>
     public override void EnterState()
     {
         Debug.Log("GM in P3 Turn State");
-        gmStateMachine.OrderPlayerToPlay(2);
+        gmStateMachine.OrderPlayerToPlay(3);
     }
 
     public override void ExitState()
@@ -28,15 +28,6 @@ public class Big2GMStateP3Turn : BaseState<GMState>
     public override void UpdateState()
     {
     }
-    public void OrderPlayerToPlay(int playerID)
-    {
-        Debug.Log("BOM");
-        Debug.Log("BOM");
-        Debug.Log("BOM");
-        Debug.Log("BOM");
-        Debug.Log("gmStateMachine");
-        Big2PlayerStateMachine playerStateMachine = gmStateMachine.playerHands[playerID].GetComponent<Big2PlayerStateMachine>();
-        playerStateMachine.MakePlayerPlay();
-        Debug.Log("OrderPlayerToPlay");
-    }
+
+  
 }

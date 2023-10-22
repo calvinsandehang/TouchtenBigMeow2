@@ -31,7 +31,7 @@ public class FiveCardTemplate
     public Image CardImage5;
 }
 
-public class UIBig2TableCards : MonoBehaviour, IObserverTable
+public class UIBig2TableCards : MonoBehaviour, IObserverTable, ISubscriber
 {
     [SerializeField]
     private GameObject _singleTable;
@@ -75,6 +75,7 @@ public class UIBig2TableCards : MonoBehaviour, IObserverTable
 
         AddSelfToSubjectList();
         InitializeImageTemplate();
+        SubscribeEvent();
 
         for (int i = 0; i < 4; i++)
         {
@@ -92,6 +93,11 @@ public class UIBig2TableCards : MonoBehaviour, IObserverTable
         _threeOfKindTable.SetActive(true);
         _fiveTable.SetActive(true);
 
+        ResetImageTemplate();
+    }
+
+    private void ResetImageTemplate() 
+    {
         // Set alpha to 0 for single table images
         for (int i = 0; i < _singleTableImages.Length; i++)
         {
@@ -158,8 +164,6 @@ public class UIBig2TableCards : MonoBehaviour, IObserverTable
         }
     }
 
-
-
     #region Table Observer
     public void AddSelfToSubjectList()
     {
@@ -175,6 +179,7 @@ public class UIBig2TableCards : MonoBehaviour, IObserverTable
 
     public void OnNotifyAssigningCard(CardInfo cardInfo)
     {
+        Debug.Log("OnNotifyAssigningCard");
         currentTableState = cardInfo.HandType;
 
         switch (currentTableState)
@@ -185,22 +190,18 @@ public class UIBig2TableCards : MonoBehaviour, IObserverTable
             case HandType.Single:
                 EnableCertainTableType(_singleTable);
                 HandleAssigningForSingleCard(cardInfo.CardComposition);
-                Debug.Log("OnNotify");
                 break;
             case HandType.Pair:
                 EnableCertainTableType(_pairTable);
                 HandleAssigningCardForPair(cardInfo.CardComposition);
-                Debug.Log("OnNotify");
                 break;
             case HandType.ThreeOfAKind:
                 EnableCertainTableType(_threeOfKindTable);
                 HandleAssigningForThreeOfKindCard(cardInfo.CardComposition);
-                Debug.Log("OnNotify");
                 break;
             case HandType.FiveCards:
                 EnableCertainTableType(_fiveTable);
                 HandleAssigningForFiveCard(cardInfo.CardComposition);
-                Debug.Log("OnNotify");
                 break;
         }
     }   
@@ -209,6 +210,8 @@ public class UIBig2TableCards : MonoBehaviour, IObserverTable
     {
         _singleTable.SetActive(false);
         _pairTable.SetActive(false);
+        _threeOfKindTable.SetActive(false);
+        _fiveTable.SetActive(false);
 
         if (enabledGameObject!=null)        
             enabledGameObject.SetActive(true);
@@ -277,7 +280,7 @@ public class UIBig2TableCards : MonoBehaviour, IObserverTable
             Sprite cardSprite1 = submittedTableCardModel[i].CardSprite;
             Sprite cardSprite2 = submittedTableCardModel[i + 1].CardSprite;
 
-            Debug.Log("j : " + j);
+            //Debug.Log("j : " + j);
 
             _pairCardTemplate[j].CardImage1.sprite = cardSprite1;
             _pairCardTemplate[j].CardImage2.sprite = cardSprite2;
@@ -384,12 +387,6 @@ public class UIBig2TableCards : MonoBehaviour, IObserverTable
         }
     }
 
-
-    public void ResetSubmittedCards() 
-    {
-        submittedTableCardModel.Clear();
-    }
-
     private PairCardTemplate FindAvailablePairTemplate(List<PairCardTemplate> assignedTemplates)
     {
         // Iterate through the pair templates and find the first available template
@@ -421,7 +418,23 @@ public class UIBig2TableCards : MonoBehaviour, IObserverTable
         }
     }
 
+
+
     #endregion
 
+    public void SubscribeEvent()
+    {
+        Big2GMStateMachine.OnRoundHasConcluded += ClearTableUI;
+    }
 
+    private void ClearTableUI()
+    {
+        submittedTableCardModel.Clear();
+        ResetImageTemplate();
+    }
+
+    public void UnsubscribeEvent()
+    {
+        Big2GMStateMachine.OnRoundHasConcluded -= ClearTableUI;
+    }
 }

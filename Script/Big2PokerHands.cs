@@ -94,7 +94,7 @@ public class Big2PokerHands
             // Sort the bestStraightFlush in descending order so that the highest card is at index [0]
             bestStraightFlush = bestStraightFlush.OrderByDescending(card => card.CardRank).ThenByDescending(card => card.CardSuit).ToList();
 
-            Debug.Log($"Straight Flush: Points: {highestPoints}, Cards: {string.Join(", ", bestStraightFlush)}");
+            //Debug.Log($"Straight Flush: Points: {highestPoints}, Cards: {string.Join(", ", bestStraightFlush)}");
             return new CardInfo(HandType.FiveCards, HandRank.StraightFlush, bestStraightFlush);
         }
 
@@ -132,7 +132,7 @@ public class Big2PokerHands
                 .ThenByDescending(card => card.CardSuit)
                 .ToList();
 
-            Debug.Log($"Four of a Kind: Points: {fourPoints}, Cards: {string.Join(", ", bestHand)}");
+            //Debug.Log($"Four of a Kind: Points: {fourPoints}, Cards: {string.Join(", ", bestHand)}");
 
             return new CardInfo(HandType.FiveCards, HandRank.FourOfAKind, bestHand);
         }
@@ -188,7 +188,7 @@ public class Big2PokerHands
 
         if (bestFullHouse != null)
         {
-            Debug.Log($"Full House: Points: {highestPoints}, Cards: {string.Join(", ", bestFullHouse)}");
+            //Debug.Log($"Full House: Points: {highestPoints}, Cards: {string.Join(", ", bestFullHouse)}");
             return new CardInfo(HandType.FiveCards, HandRank.FullHouse, bestFullHouse);
         }
 
@@ -223,7 +223,7 @@ public class Big2PokerHands
 
         if (bestFlushCards != null)
         {
-            Debug.Log($"Flush: Points: {highestPoints}, Cards: {string.Join(", ", bestFlushCards)}");
+            //Debug.Log($"Flush: Points: {highestPoints}, Cards: {string.Join(", ", bestFlushCards)}");
             return new CardInfo(HandType.FiveCards, HandRank.Flush, bestFlushCards);
         }
 
@@ -297,7 +297,7 @@ public class Big2PokerHands
             // Sort in descending order based on CardRank and Suit
             bestStraight = bestStraight.OrderByDescending(card => card.CardRank).ThenByDescending(card => card.CardSuit).ToList();
 
-            Debug.Log($"Straight: Points: {highestPoints}, Cards: {string.Join(", ", bestStraight)}");
+            //Debug.Log($"Straight: Points: {highestPoints}, Cards: {string.Join(", ", bestStraight)}");
 
             return new CardInfo(HandType.FiveCards, HandRank.Straight, bestStraight);
         }
@@ -334,7 +334,7 @@ public class Big2PokerHands
             bestThreeOfAKind = bestThreeOfAKind.OrderByDescending(card => card.CardSuit).ToList();
 
             // Debug log for the combination and points
-            Debug.Log($"Three of a Kind: Points: {highestPoints}, Cards: {string.Join(", ", bestThreeOfAKind)}");
+            //Debug.Log($"Three of a Kind: Points: {highestPoints}, Cards: {string.Join(", ", bestThreeOfAKind)}");
 
             return new CardInfo(HandType.ThreeOfAKind, HandRank.ThreeOfAKind, bestThreeOfAKind);
         }
@@ -387,7 +387,7 @@ public class Big2PokerHands
             // Ensure that the bestPair list is sorted with the highest suit at [0]
             bestPair = bestPair.OrderByDescending(card => card.CardSuit).ToList();
 
-            Debug.Log($"One Pair: Points: {highestPoints}, Cards: {string.Join(", ", bestPair)}");
+            //Debug.Log($"One Pair: Points: {highestPoints}, Cards: {string.Join(", ", bestPair)}");
             return new CardInfo(HandType.Pair, HandRank.Pair, bestPair);
         }
 
@@ -435,7 +435,7 @@ public class Big2PokerHands
             // Ensure that the lowestPair list is sorted with the lowest suit at [0]
             lowestPair = lowestPair.OrderBy(card => card.CardSuit).ToList();
 
-            Debug.Log($"Low Pair: Points: {lowestPoints}, Cards: {string.Join(", ", lowestPair)}");
+            //Debug.Log($"Low Pair: Points: {lowestPoints}, Cards: {string.Join(", ", lowestPair)}");
             return new CardInfo(HandType.Pair, HandRank.Pair, lowestPair);
         }
 
@@ -450,13 +450,13 @@ public class Big2PokerHands
     {
         if (hand.Count == 0)
         {
-            Debug.Log("The hand is empty, please check if something wrong");
+            //Debug.Log("The hand is empty, please check if something wrong");
             return new CardInfo(HandType.None, HandRank.None, new List<CardModel>());
         }
 
         var highCard = hand.OrderByDescending(card => card.CardRank).First();
         int cardPoints = (int)highCard.CardRank + (int)highCard.CardSuit;
-        Debug.Log($"High Card: {highCard.CardRank} of {highCard.CardSuit}, Points: {cardPoints}");
+        //Debug.Log($"High Card: {highCard.CardRank} of {highCard.CardSuit}, Points: {cardPoints}");
         return new CardInfo(HandType.Single, HandRank.HighCard, new List<CardModel>() { highCard });
     }
 
@@ -464,17 +464,40 @@ public class Big2PokerHands
     {
         if (hand.Count == 0)
         {
-            Debug.Log("The hand is empty, please check if something is wrong.");
+            //Debug.Log("The hand is empty, please check if something is wrong.");
             return new CardInfo(HandType.None, HandRank.None, new List<CardModel>());
         }
 
         var lowCard = hand.OrderBy(card => card.CardRank).First();
         int cardPoints = (int)lowCard.CardRank + (int)lowCard.CardSuit;
-        Debug.Log($"Low Card: {lowCard.CardRank} of {lowCard.CardSuit}, Points: {cardPoints}");
+        //Debug.Log($"Low Card: {lowCard.CardRank} of {lowCard.CardSuit}, Points: {cardPoints}");
         return new CardInfo(HandType.Single, HandRank.HighCard, new List<CardModel>() { lowCard });
     }
 
     #endregion
+    public CardInfo GetThreeOfDiamonds(List<CardModel> hand)
+    {
+        List<CardModel> threeOfDiamondsList = new List<CardModel>();
+
+        foreach (var card in hand)
+        {
+            if (card.CardRank == GlobalDefine.Rank.Three && card.CardSuit == GlobalDefine.Suit.Diamonds)
+            {
+                threeOfDiamondsList.Add(card);
+            }
+        }
+
+        if (threeOfDiamondsList.Count > 0)
+        {
+            return new CardInfo(GlobalDefine.HandType.Single, GlobalDefine.HandRank.HighCard, threeOfDiamondsList);
+        }
+        else
+        {
+            return new CardInfo(GlobalDefine.HandType.None, GlobalDefine.HandRank.None, new List<CardModel>());
+        }
+    }
+
+
     #region Helper
     // Adjusted IsStraight method to handle the Big Two rules
     public bool IsStraight(List<CardModel> cards)
