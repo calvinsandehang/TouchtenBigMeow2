@@ -147,13 +147,14 @@ public class Big2PlayerStateMachine : StateManager<PlayerState>, ISubscriber
     public void BroadcastPlayerIsPlaying() 
     {
         OnPlayerIsPlaying?.Invoke();
-        Debug.Log("BroadcastPlayerIsPlaying() ");
+       
+        //Debug.Log("BroadcastPlayerIsPlaying() ");
     }
 
     public void BroadcastPlayerIsWaiting()
     {
         OnPlayerIsWaiting?.Invoke();
-        Debug.Log("BroadcastPlayerIsWaiting() ");
+        //Debug.Log("BroadcastPlayerIsWaiting() ");
     }
 
     #endregion

@@ -170,10 +170,12 @@ public class Big2GMStateMachine : StateManager<GMState>, ISubscriber
         Big2PlayerHand lastNonSkippingPlayer = null;
         skippingPlayers.Add(skippingPlayer);
 
+        /*
         for (int i = 0; i < skippingPlayers.Count; i++)
         {
             Debug.Log("Skipping players: " + string.Join(", ", skippingPlayers[i].PlayerID));
         }
+        */
 
         // Check if all other players have skipped
         if (skippingPlayers.Count == playerHands.Count - 1)
@@ -184,7 +186,7 @@ public class Big2GMStateMachine : StateManager<GMState>, ISubscriber
                 if (!skippingPlayers.Contains(player))
                 {
                     lastNonSkippingPlayer = player;
-                    Debug.Log(" lastNonSkippingPlayer : " + lastNonSkippingPlayer.PlayerID);
+                    //Debug.Log(" lastNonSkippingPlayer : " + lastNonSkippingPlayer.PlayerID);
                     break;
                 }
             }
@@ -210,12 +212,12 @@ public class Big2GMStateMachine : StateManager<GMState>, ISubscriber
         int lastNonSkippingPlayerIndex = playerHands.IndexOf(lastNonSkippingPlayer);
         currentPlayerIndex = lastNonSkippingPlayerIndex;
         SetTurn(lastNonSkippingPlayerIndex);
-        Debug.Log(" SetTurn(lastNonSkippingPlayerIndex)");
+        //Debug.Log(" SetTurn(lastNonSkippingPlayerIndex)");
     }
 
     public void ResetSkippingPlayers() 
     {
-        Debug.Log("ResetSkippingPlayers() ");
+        //Debug.Log("ResetSkippingPlayers() ");
         skippingPlayers.Clear();
     }
 

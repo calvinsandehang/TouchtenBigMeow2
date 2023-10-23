@@ -57,7 +57,7 @@ public class Big2SimpleAI : MonoBehaviour
     public void InitiateAiDecisionMaking()
     {
         // reference the owned cards
-        Debug.Log("InitiateAiDecisionMaking()");
+        //Debug.Log("InitiateAiDecisionMaking()");
         aiCards = playerHand.GetPlayerCards();
         // sort the hand by best hand
         // make a list of possible hand rank and the corresponding card
@@ -66,7 +66,7 @@ public class Big2SimpleAI : MonoBehaviour
         // check if it is higher/suittable for the table
         Big2TableLookUp();
 
-        Debug.Log("currentTableHandRank : " + currentTableHandRank);
+        //Debug.Log("currentTableHandRank : " + currentTableHandRank);
         // IF THERE IS NO ANOTHER CARD ON THE TABLE
         if (currentTableHandRank == HandRank.None)
         {
@@ -77,12 +77,12 @@ public class Big2SimpleAI : MonoBehaviour
                 CardInfo lowestHandInfo = big2PokerHands.GetThreeOfDiamonds(aiCards);
                 List<CardModel> lowestHandCards = lowestHandInfo.CardComposition;
                 OnSubmitCard(lowestHandInfo, lowestHandCards);
-                StartCoroutine(DelayedAction(EndTurn, 2f));
+                StartCoroutine(DelayedAction(EndTurn, 1f));
             }
             else
             {
                 // choose the lowest card
-                Debug.Log("No card on the Table, AI is thinking...");
+                //Debug.Log("No card on the Table, AI is thinking...");
                 Big2PokerHands big2PokerHands = new Big2PokerHands();
                 CardInfo lowestHandInfo = big2PokerHands.GetLowestHand(aiCards);
                 List<CardModel> lowestHandCards = lowestHandInfo.CardComposition;
@@ -91,7 +91,7 @@ public class Big2SimpleAI : MonoBehaviour
                     Debug.Log(lowestHandCards[i]);
                 }
                 OnSubmitCard(lowestHandInfo, lowestHandCards);
-                StartCoroutine(DelayedAction(EndTurn, 2f));
+                StartCoroutine(DelayedAction(EndTurn, 1f));
             }
             
         }
@@ -131,12 +131,12 @@ public class Big2SimpleAI : MonoBehaviour
                 // card is suitable, submit card
                 CardInfo submittedCardInfo = EvaluateSelectedCards(cardPackageComposition);
                 OnSubmitCard(submittedCardInfo, cardPackageComposition);
-                StartCoroutine(DelayedAction(EndTurn, 2f));
+                StartCoroutine(DelayedAction(EndTurn, 1f));
                 return;              
             }
 
             // skip turn when no card packages is suitable
-            StartCoroutine(DelayedAction(SkipTurn, 2f));
+            StartCoroutine(DelayedAction(SkipTurn, 1f));
         }
 
         // if not, skip turn

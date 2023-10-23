@@ -70,7 +70,7 @@ public class UIPlayerSkipTurnButton : MonoBehaviour, ISubscriber
         skipTurnButton.interactable = true;
         buttonImage.color = allowedColor;
 
-        Debug.Log("Allowed to skip");
+        //Debug.Log("Allowed to skip");
 
     }
 
@@ -83,7 +83,7 @@ public class UIPlayerSkipTurnButton : MonoBehaviour, ISubscriber
         skipTurnButton.interactable = false;
         buttonImage.color = notAllowedColor;
 
-        Debug.Log("Not Allowed to skip");
+        //Debug.Log("Not Allowed to skip");
     }
 
     public void SubscribeEvent()

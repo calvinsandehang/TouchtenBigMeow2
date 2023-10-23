@@ -2,6 +2,7 @@ using Sirenix.OdinInspector;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel.Design.Serialization;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -95,12 +96,19 @@ public class Big2CardSubmissionCheck : MonoBehaviour
     {
         if (selectedCard.Count == 0)
         {
-            //Debug.Log("0 card selected, return");
             NotAllowedToSubmitCard?.Invoke();
             return;
         }
-        
-        
+
+        // Check if the selected cards contain the three of diamonds at the initial round
+        if (Big2GMStateMachine.DetermineWhoGoFirst &&
+            !selectedCard.Exists(card => card.CardRank == Rank.Three && card.CardSuit == Suit.Diamonds)
+            )
+        {            
+            NotAllowedToSubmitCard?.Invoke();
+            return;
+        }
+
         Big2TableLookUp(); 
         // Check if the hand type of the selected cards is allowed
         if (!CompareHandType(selectedCard) && currentTableHandType != HandType.None)
@@ -116,12 +124,14 @@ public class Big2CardSubmissionCheck : MonoBehaviour
         submittedCardInfo = EvaluateSelectedCards(selectedCard);
 
         // Check if the hand rank of the selected cards is allowed
-        if (!CompareHandRank(submittedCardInfo.HandRank) || !CheckCardCount(submittedCardInfo))
+        if (!CompareHandRank(submittedCardInfo.HandRank) || !CheckCardCount(selectedCard, submittedCardInfo))
         {
             NotAllowedToSubmitCard?.Invoke();
             //Debug.Log("Selected card hand rank is lower than the table card / not suitable");
             return;
         }
+
+        //Debug.Log(CheckCardCount(submittedCardInfo));
 
         // Compare the selected cards with the current table cards
         if (!CompareSelectedCardsWithTableCards(submittedCardInfo.CardComposition))
@@ -129,9 +139,7 @@ public class Big2CardSubmissionCheck : MonoBehaviour
             NotAllowedToSubmitCard?.Invoke();
             //Debug.Log("Selected cards value is lower than the table cards");
             return;
-        }
-
-       
+        }       
 
         // If all checks pass, add the selected cards to the submitted cards
         AddNewSubmittedCardToSubmittedCardList();
@@ -139,25 +147,32 @@ public class Big2CardSubmissionCheck : MonoBehaviour
         AllowedToSubmitCard?.Invoke();
     }
 
-    private bool CheckCardCount(CardInfo cardInfo)
+    private bool CheckCardCount(List<CardModel> selectedCards, CardInfo cardInfo)
     {
-        int cardCount = cardInfo.CardComposition.Count;
+        int bestHandCardCount = cardInfo.CardComposition.Count;
+        int selectedCardCount = selectedCards.Count;
 
+        if (bestHandCardCount != selectedCardCount)
+            return false;
+        else
+            return true;
+        /*
         switch (cardInfo.HandType)
         {
             case HandType.None:
                 return false;
             case HandType.Single:
-                return cardCount == 1;
+                return bestHandCardCount == 1;
             case HandType.Pair:
-                return cardCount == 2;
+                return bestHandCardCount == 2;
             case HandType.ThreeOfAKind:
-                return cardCount == 3;
+                return bestHandCardCount == 3;
             case HandType.FiveCards:
-                return cardCount == 5;
+                return bestHandCardCount == 5;
             default:
                 return false;
         }
+        */
     }
 
 

@@ -12,6 +12,8 @@ public class Big2PlayerStateWinning : BaseState<PlayerState>
 
     public override void EnterState()
     {
+        int playerID = playerStateMachine.PlayerHand.PlayerID;
+        Debug.Log("Player " + (playerID) + " is in Winning state");
     }
 
     public override void ExitState()
