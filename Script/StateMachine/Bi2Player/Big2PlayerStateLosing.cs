@@ -12,6 +12,8 @@ public class Big2PlayerStateLosing : BaseState<PlayerState>
 
     public override void EnterState()
     {
+        int playerID = playerStateMachine.PlayerHand.PlayerID;
+        Debug.Log("Player " + (playerID) + " is in Losing state");
     }
 
     public override void ExitState()
@@ -20,7 +22,7 @@ public class Big2PlayerStateLosing : BaseState<PlayerState>
 
     public override PlayerState GetActiveState()
     {
-        return PlayerState.Waiting;
+        return PlayerState.Losing;
     }
 
     public override void UpdateState()

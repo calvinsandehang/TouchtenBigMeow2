@@ -86,10 +86,12 @@ public class Big2SimpleAI : MonoBehaviour
                 Big2PokerHands big2PokerHands = new Big2PokerHands();
                 CardInfo lowestHandInfo = big2PokerHands.GetLowestHand(aiCards);
                 List<CardModel> lowestHandCards = lowestHandInfo.CardComposition;
+                /*
                 for (int i = 0; i < lowestHandCards.Count; i++)
                 {
                     Debug.Log(lowestHandCards[i]);
                 }
+                */
                 OnSubmitCard(lowestHandInfo, lowestHandCards);
                 StartCoroutine(DelayedAction(EndTurn, 1f));
             }
@@ -249,9 +251,17 @@ public class Big2SimpleAI : MonoBehaviour
 
     private void EndTurn()
     {
-        Debug.Log("Player " + (playerHand.PlayerID) + " End Turn");
-        OnAIFinishTurnGlobal?.Invoke();
-        OnAIFinishTurnLocal?.Invoke();
+        if (!Big2GMStateMachine.WinnerIsDetermined)
+        {
+            Debug.Log($"AI {playerHand.PlayerID} end turn, redirect to waiting state");
+            OnAIFinishTurnGlobal?.Invoke();
+            OnAIFinishTurnLocal?.Invoke();
+        }
+        else
+        {
+            Debug.Log("AI {playerHand.PlayerID} end turn, but not redirect to waiting state");
+        }
+       
     }
 
     private void SkipTurn() 

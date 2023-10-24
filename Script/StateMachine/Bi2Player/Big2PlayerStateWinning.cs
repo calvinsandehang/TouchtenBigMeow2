@@ -22,7 +22,7 @@ public class Big2PlayerStateWinning : BaseState<PlayerState>
 
     public override PlayerState GetActiveState()
     {
-        return PlayerState.Waiting;
+        return PlayerState.Winning;
     }
 
     public override void UpdateState()

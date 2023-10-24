@@ -21,15 +21,13 @@ public class Big2PlayerStateMachine : StateManager<PlayerState>, ISubscriber
     private Big2CardSubmissionCheck cardSubmissionCheck;
     public Big2SimpleAI big2AI { get; private set; }
 
-    
+    //Subs : Big2CardSubmissionCheck, UIPlayerSkipTurnButton
     public event Action OnPlayerIsPlaying;
-    public event Action OnPlayerIsWinning;
+    // Subs : Big2GMStateMachine
     public event Action OnPlayerIsLosing;
     public event Action OnPlayerIsWaiting;
 
-    public bool Test;    
-
-    
+    public bool Test;        
 
     private void Awake()
     {       
@@ -46,14 +44,12 @@ public class Big2PlayerStateMachine : StateManager<PlayerState>, ISubscriber
 
     public void SubscribeEvent()
     {
-        PlayerHand.OnHandLastCardIsDropped += MakePlayerWin;
         cardSubmissionCheck.OnPlayerFinishTurnLocal += MakePlayerWait;
         big2AI.OnAIFinishTurnLocal += MakePlayerWait;
     }
 
     public void UnsubscribeEvent()
     {
-        PlayerHand.OnHandLastCardIsDropped -= MakePlayerWin;
         cardSubmissionCheck.OnPlayerFinishTurnLocal += MakePlayerWait;
         big2AI.OnAIFinishTurnLocal -= MakePlayerWait;
     }
@@ -101,7 +97,13 @@ public class Big2PlayerStateMachine : StateManager<PlayerState>, ISubscriber
         // do player win stuff
     }
 
-    
+    public void MakePlayerInPostGame()
+    {
+        NextState = States[PlayerState.Postgame];
+        // do player win stuff
+    }
+
+
 
     public PlayerState GetPlayerState() 
     {
@@ -147,15 +149,13 @@ public class Big2PlayerStateMachine : StateManager<PlayerState>, ISubscriber
     public void BroadcastPlayerIsPlaying() 
     {
         OnPlayerIsPlaying?.Invoke();
-       
-        //Debug.Log("BroadcastPlayerIsPlaying() ");
     }
 
     public void BroadcastPlayerIsWaiting()
     {
         OnPlayerIsWaiting?.Invoke();
-        //Debug.Log("BroadcastPlayerIsWaiting() ");
     }
+
 
     #endregion
 

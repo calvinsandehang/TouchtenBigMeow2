@@ -5,6 +5,7 @@ using UnityEngine;
 [CustomEditor(typeof(Big2GMStateMachine))]
 public class DealerEditor : Editor
 {
+    /*
     private const int CardsPerRow = 5; // Number of card images per row
     private const float CardImageWidth = 70; // Width of the card image
     private const float CardImageHeight = 100; // Height of the card image
@@ -23,13 +24,13 @@ public class DealerEditor : Editor
         }
 
         // Check if the hands have been dealt and the dealer is initialized
-        if (dealer.IsInitialized && dealer.playerHands != null) // Check if dealer is initialized
+        if (dealer.IsInitialized && dealer.PlayerHands != null) // Check if dealer is initialized
         {
-            for (int i = 0; i < dealer.playerHands.Count; i++)
+            for (int i = 0; i < dealer.PlayerHands.Count; i++)
             {
                 EditorGUILayout.LabelField($"Player {i + 1}'s Hand:", EditorStyles.boldLabel);
 
-                List<CardModel> cards = dealer.playerHands[i].GetPlayerCards();
+                List<CardModel> cards = dealer.PlayerHands[i].GetPlayerCards();
                 DisplayCardGrid(cards);
             }
         }
@@ -86,4 +87,5 @@ public class DealerEditor : Editor
         }
         GUILayout.EndHorizontal();
     }
+    */
 }

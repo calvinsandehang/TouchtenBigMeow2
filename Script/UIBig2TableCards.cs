@@ -179,7 +179,7 @@ public class UIBig2TableCards : MonoBehaviour, IObserverTable, ISubscriber
 
     public void OnNotifyAssigningCard(CardInfo cardInfo)
     {
-        Debug.Log("OnNotifyAssigningCard");
+        //Debug.Log("OnNotifyAssigningCard");
         currentTableState = cardInfo.HandType;
 
         switch (currentTableState)
@@ -424,7 +424,8 @@ public class UIBig2TableCards : MonoBehaviour, IObserverTable, ISubscriber
 
     public void SubscribeEvent()
     {
-        Big2GMStateMachine.OnRoundHasConcluded += ClearTableUI;
+        Big2GMStateMachine.OnRoundHasEnded += ClearTableUI;
+        Big2GMStateMachine.OnGameHasEnded += ClearTableUI;
     }
 
     private void ClearTableUI()
@@ -435,6 +436,7 @@ public class UIBig2TableCards : MonoBehaviour, IObserverTable, ISubscriber
 
     public void UnsubscribeEvent()
     {
-        Big2GMStateMachine.OnRoundHasConcluded -= ClearTableUI;
+        Big2GMStateMachine.OnRoundHasEnded -= ClearTableUI;
+        Big2GMStateMachine.OnGameHasEnded -= ClearTableUI;
     }
 }

@@ -90,7 +90,6 @@ public class UIPlayerSkipTurnButton : MonoBehaviour, ISubscriber
     {
         playerStateMachine.OnPlayerIsPlaying += OnAllowedToSkipTurn;
         playerStateMachine.OnPlayerIsLosing += OnNotAllowedToSkipTurn;
-        playerStateMachine.OnPlayerIsWinning += OnNotAllowedToSkipTurn;
         playerStateMachine.OnPlayerIsWaiting += OnNotAllowedToSkipTurn;
     }
 
@@ -98,7 +97,6 @@ public class UIPlayerSkipTurnButton : MonoBehaviour, ISubscriber
     {
         playerStateMachine.OnPlayerIsPlaying -= OnAllowedToSkipTurn;
         playerStateMachine.OnPlayerIsLosing -= OnNotAllowedToSkipTurn;
-        playerStateMachine.OnPlayerIsWinning -= OnNotAllowedToSkipTurn;
         playerStateMachine.OnPlayerIsWaiting -= OnNotAllowedToSkipTurn;
     }
 }
