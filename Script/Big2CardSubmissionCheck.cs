@@ -94,6 +94,8 @@ public class Big2CardSubmissionCheck : MonoBehaviour
     // Receive selected card from PlayerSelectedCardEvaluator
     public void SubmissionCheck(List<CardModel> selectedCard)
     {
+        NotAllowedToSubmitCard?.Invoke();
+
         if (selectedCard.Count == 0)
         {
             NotAllowedToSubmitCard?.Invoke();
@@ -278,9 +280,17 @@ public class Big2CardSubmissionCheck : MonoBehaviour
 
     private void EndTurn()
     {
-        Debug.Log("player end turn");
-        OnPlayerFinishTurnGlobal?.Invoke();
-        OnPlayerFinishTurnLocal?.Invoke();
+        if (!Big2GMStateMachine.WinnerIsDetermined)
+        {
+            Debug.Log("player end turn, redirect to waiting state");
+            OnPlayerFinishTurnGlobal?.Invoke();
+            OnPlayerFinishTurnLocal?.Invoke();
+        }
+        else
+        {
+            Debug.Log("player end turn, but not redirect to waiting state");
+        }
+           
     }
  
     #endregion

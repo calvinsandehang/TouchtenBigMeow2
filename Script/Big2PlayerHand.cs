@@ -21,7 +21,7 @@ public class Big2PlayerHand : SubjectPlayer
     private bool inFirstRound;
     private bool hasThreeOfDiamonds;
 
-    public event Action OnHandLastCardIsDropped;
+    public static event Action<Big2PlayerHand> OnPlayerLastCardIsDropped;
 
     private void Awake()
     {
@@ -47,6 +47,7 @@ public class Big2PlayerHand : SubjectPlayer
     private void SubscribeEvent() 
     {
         //dealer.OnDealerFinishDealingCards += EvaluateCardInHand; testing
+        OnPlayerLastCardIsDropped += ResetPlayerCard;
     }
 
     private void UnsubscribeEvent()
@@ -77,6 +78,12 @@ public class Big2PlayerHand : SubjectPlayer
         Debug.Log("Initialize Player : " + index);  
     }
 
+    // temporary
+    private void ResetPlayerCard(Big2PlayerHand playerHand) 
+    {
+        playerCards.Clear();
+    }
+
     public void RemoveCards(List<CardModel> removedCards)
     {
         // Create a HashSet of cards to be removed based on their rank and suit
@@ -100,7 +107,8 @@ public class Big2PlayerHand : SubjectPlayer
     {
         if (playerCards.Count == 0)
         {
-            OnHandLastCardIsDropped?.Invoke();
+            Debug.Log($"Player {PlayerID} drop his last card");
+            OnPlayerLastCardIsDropped?.Invoke(this);
         }
     }
 
