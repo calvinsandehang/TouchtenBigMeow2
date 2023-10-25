@@ -63,7 +63,11 @@ public class UISkipNotification : MonoBehaviour, ISubscriber
 
     public void UnsubscribeEvent()
     {
-        simpleAI.UIOnAISkipTurn -= ShowAndFadeOut;
+        if (simpleAI != null)
+        {
+            simpleAI.UIOnAISkipTurn -= ShowAndFadeOut;
+        }
+        
     }
 
     private void OnDisable()

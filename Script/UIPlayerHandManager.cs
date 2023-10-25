@@ -14,7 +14,7 @@ public class PlayerCard
 }
 
 [DefaultExecutionOrder(-9999)]
-public class UIPlayerHandManager : MonoBehaviour, IObserverPlayerHand
+public class UIPlayerHandManager : MonoBehaviour
 {
     public static UIPlayerHandManager Instance;
 
@@ -28,61 +28,43 @@ public class UIPlayerHandManager : MonoBehaviour, IObserverPlayerHand
     private List<GameObject> _playerCardsParent;
 
     [SerializeField]
-    private Button _sortByRankButton, _sortBySuitButton, _sortByBestHandButton;
-
-    [SerializeField]
     private CardPool cardPool;
 
    private List<PlayerCard> PlayerCards = new List<PlayerCard>();
-
-    public Big2PlayerHand playerHand;
+   
     private SortCriteria currentSortCriteria;
 
     #region MonoBehaviour
     private void OnDisable()
     {
-        RemoveSelfToSubjectList();
 
     }
     private void Awake()
     {
-        if (Instance == null)
-        {
+        if (Instance == null)   
             Instance = this;
-        }
         else
-        {
             Destroy(Instance);
-        }
 
         PlayerCardInitialization();
-
-        ButtonInitialization();
         ParameterInitialization();
     }
 
     private void PlayerCardInitialization()
     {
-        for (int i = 0; i < 4; i++)
-        {
-            PlayerCards.Add(new PlayerCard());
-        }
+        for (int i = 0; i < 4; i++)        
+            PlayerCards.Add(new PlayerCard());        
     }
 
     private void Start()
     {
     }
     #endregion
-
-
-    private void ButtonInitialization()
-    {
-        _sortByRankButton.onClick.AddListener(() => SortPlayerHand(SortCriteria.Rank, 0)); // only human  player that will have a sorting button, thus ID = 0
-        _sortBySuitButton.onClick.AddListener(() => SortPlayerHand(SortCriteria.Suit, 0));
-        _sortByBestHandButton.onClick.AddListener(() => SortPlayerHand(SortCriteria.BestHand, 0));
-    }
+   
     public void DisplayCards(List<CardModel> cards, int playerID)
     {
+        Debug.Log($"Display Card, Player {playerID}");
+
         PlayerCards[playerID].CardModelsInPlayerHand.Clear();
         PlayerCards[playerID].CardModelsInPlayerHand = cards.ToList();
 
@@ -99,10 +81,13 @@ public class UIPlayerHandManager : MonoBehaviour, IObserverPlayerHand
         {
             GameObject cardGO = cardPool.GetCard();
             cardGO.transform.SetParent(_playerCardsParent[playerID].transform, false);
+            cardGO.transform.localRotation = Quaternion.identity;  // Reset rotation to 0,0,0
             UISelectableCard selectableCard = cardGO.GetComponent<UISelectableCard>();
-            selectableCard.Initialize(cardModel); // Adjust this if necessary to match CardModel structure.
+            selectableCard.Initialize(cardModel);  // Adjust this if necessary to match CardModel structure.
             PlayerCards[playerID].CardsObjectsInPlayerHand.Add(cardGO);
         }
+
+        Debug.Log(_playerCardsParent[playerID].transform);
 
         SortPlayerHand(currentSortCriteria, playerID);
     }    
@@ -123,12 +108,13 @@ public class UIPlayerHandManager : MonoBehaviour, IObserverPlayerHand
                 break;
             case SortCriteria.BestHand:
                 currentSortCriteria = SortCriteria.BestHand;
-                cardSorter.SortPlayerHandByBestHand(PlayerCards[playerID].CardsObjectsInPlayerHand, cardPool, cardParent);
+                cardSorter.SortPlayerHandByBestHand(PlayerCards[playerID].CardsObjectsInPlayerHand, cardPool, _playerCardsParent[playerID].transform);
                 break;
         }
     }
 
     #region Observer Pattern
+    /*
     public void InitialializedPlayerHand(Big2PlayerHand playerHand) 
     {
         this.playerHand = playerHand;
@@ -137,7 +123,7 @@ public class UIPlayerHandManager : MonoBehaviour, IObserverPlayerHand
 
     public void OnNotify(List<CardModel> cardModels, int index)
     {
-        DisplayCards(cardModels, index);
+        //DisplayCards(cardModels, index);
     }
 
     public void AddSelfToSubjectList()
@@ -160,7 +146,7 @@ public class UIPlayerHandManager : MonoBehaviour, IObserverPlayerHand
     {
         AddSelfToSubjectList();
     }
-
+    */
     private void ParameterInitialization()
     {
         currentSortCriteria = SortCriteria.Rank;

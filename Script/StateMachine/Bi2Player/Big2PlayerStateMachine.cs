@@ -26,6 +26,7 @@ public class Big2PlayerStateMachine : StateManager<PlayerState>, ISubscriber
     // Subs : Big2GMStateMachine
     public event Action OnPlayerIsLosing;
     public event Action OnPlayerIsWaiting;
+    public event Action OnPlayerIsWinning;
 
     public bool Test;        
 
@@ -112,7 +113,6 @@ public class Big2PlayerStateMachine : StateManager<PlayerState>, ISubscriber
 
     public PlayerType GetPlayerType() 
     {
-        //Debug.Log("playerHand.PlayerType : " + PlayerHand.PlayerType);
         return PlayerHand.PlayerType;
     }
 
@@ -155,6 +155,18 @@ public class Big2PlayerStateMachine : StateManager<PlayerState>, ISubscriber
     {
         OnPlayerIsWaiting?.Invoke();
     }
+
+    public void BroadcastPlayerIsWinning()
+    {
+        OnPlayerIsWinning?.Invoke();
+    }
+
+    public void BroadcastPlayerIsLosing()
+    {
+        OnPlayerIsLosing?.Invoke();
+    }
+
+
 
 
     #endregion

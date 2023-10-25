@@ -8,4 +8,5 @@ using UnityEngine.UI;
 public class PlayerUIComponent 
 {
     public UISkipNotification SkipNotification;
+    public Big2PlayerProfilePictureManager ProfilePicture;
 }

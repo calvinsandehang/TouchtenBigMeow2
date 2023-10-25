@@ -53,8 +53,7 @@ public class UIPlayerSkipTurnButton : MonoBehaviour, ISubscriber
         playerType = playerStateMachine.GetPlayerType();
         
         if (playerStateMachine == null || playerType != PlayerType.Human) return;
-        Debug.Log("playerStateMachine : " + playerStateMachine);
-        Debug.Log("playerType  : " + playerType);
+      
         SubscribeEvent();
         OnNotAllowedToSkipTurn();
     }

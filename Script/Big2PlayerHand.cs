@@ -22,6 +22,7 @@ public class Big2PlayerHand : SubjectPlayer
     private bool hasThreeOfDiamonds;
 
     public static event Action<Big2PlayerHand> OnPlayerLastCardIsDropped;
+    public static event Action OnPlayerCardLessThanSix;
 
     private void Awake()
     {
@@ -100,7 +101,16 @@ public class Big2PlayerHand : SubjectPlayer
             NotifyObserver(playerCards, PlayerID);
         }
 
+        CheckCardBelowSix();
         CheckWinningCondition();
+    }
+
+    private void CheckCardBelowSix()
+    {
+        if (playerCards.Count < 6) 
+        {
+            OnPlayerCardLessThanSix?.Invoke();
+        }
     }
 
     private void CheckWinningCondition()
@@ -121,8 +131,8 @@ public class Big2PlayerHand : SubjectPlayer
         // Injecting this instance to the UIPlayerHandManager
         if (PlayerType == PlayerType.Human)
         {
-            uiPlayerHandManager = UIPlayerHandManager.Instance;
-            uiPlayerHandManager.InitialializedPlayerHand(this);
+            //uiPlayerHandManager = UIPlayerHandManager.Instance;
+            //uiPlayerHandManager.InitialializedPlayerHand(this);
         }
     }
 

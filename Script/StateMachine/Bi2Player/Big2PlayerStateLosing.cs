@@ -4,16 +4,18 @@ using UnityEngine;
 
 public class Big2PlayerStateLosing : BaseState<PlayerState>
 {
-    private Big2PlayerStateMachine playerStateMachine;
+    private Big2PlayerStateMachine PSM;
     public Big2PlayerStateLosing(PlayerState key, Big2PlayerStateMachine stateMachine) : base(key)
     {
-        playerStateMachine = stateMachine;
+        PSM = stateMachine;
     }
 
     public override void EnterState()
     {
-        int playerID = playerStateMachine.PlayerHand.PlayerID;
+        int playerID = PSM.PlayerHand.PlayerID;
         Debug.Log("Player " + (playerID) + " is in Losing state");
+
+        PSM.BroadcastPlayerIsLosing();
     }
 
     public override void ExitState()

@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e60499b1673d3ac419e5d89e5d773228, type: 3}
+  m_Name: UserPicture_CatBlack
+  m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes: []
+  Normal: {fileID: 104031193, guid: 30c28fd26816a354db3dd512cfc631f1, type: 3}
+  Excited: {fileID: -1275258490, guid: 30c28fd26816a354db3dd512cfc631f1, type: 3}
+  Happy: {fileID: 834298158, guid: 30c28fd26816a354db3dd512cfc631f1, type: 3}
+  Sad: {fileID: -950139763, guid: 30c28fd26816a354db3dd512cfc631f1, type: 3}
+  Angry: {fileID: 16879423, guid: 30c28fd26816a354db3dd512cfc631f1, type: 3}

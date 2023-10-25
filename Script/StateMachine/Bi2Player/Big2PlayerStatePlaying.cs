@@ -4,27 +4,22 @@ using UnityEngine;
 
 public class Big2PlayerStatePlaying : BaseState<PlayerState>
 {
-    private Big2PlayerStateMachine playerStateMachine;
+    private Big2PlayerStateMachine PSM;
     public Big2PlayerStatePlaying(PlayerState key, Big2PlayerStateMachine stateMachine) : base(key)
     {
-        playerStateMachine = stateMachine;
+        PSM = stateMachine;
     }
 
     public override void EnterState()
     {
-        int playerID = playerStateMachine.PlayerHand.PlayerID;
+        int playerID = PSM.PlayerHand.PlayerID;
         Debug.Log("Player " + (playerID) + " is in Playing state");
-        
-        if (playerStateMachine.PlayerHand.PlayerType == GlobalDefine.PlayerType.Human) 
-        {
-            playerStateMachine.BroadcastPlayerIsPlaying();
-            Debug.Log("playerStateMachine.onPlayerIsPlaying?.Invoke();");
-        }
-        else
-        {
-            playerStateMachine.big2AI.InitiateAiDecisionMaking();
-        }
-       
+
+        PSM.BroadcastPlayerIsPlaying();
+
+        if (PSM.PlayerHand.PlayerType != GlobalDefine.PlayerType.Human)
+            PSM.big2AI.InitiateAiDecisionMaking();
+
     }
 
     public override void ExitState()
