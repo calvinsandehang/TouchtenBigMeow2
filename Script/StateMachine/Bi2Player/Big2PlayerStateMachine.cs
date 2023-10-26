@@ -19,7 +19,7 @@ public class Big2PlayerStateMachine : StateManager<PlayerState>, ISubscriber
     public PlayerState PlayerState { get; private set; }
     public Big2PlayerHand PlayerHand { get; private set; }
     private Big2CardSubmissionCheck cardSubmissionCheck;
-    public Big2SimpleAI big2AI { get; private set; }
+    public Big2SimpleAI Big2AI { get; private set; }
 
     //Subs : Big2CardSubmissionCheck, UIPlayerSkipTurnButton
     public event Action OnPlayerIsPlaying;
@@ -46,20 +46,24 @@ public class Big2PlayerStateMachine : StateManager<PlayerState>, ISubscriber
     public void SubscribeEvent()
     {
         cardSubmissionCheck.OnPlayerFinishTurnLocal += MakePlayerWait;
-        big2AI.OnAIFinishTurnLocal += MakePlayerWait;
+        Big2SimpleAI.OnAISkipTurn += MakePlayerWait;
+        Big2SimpleAI.OnAIFinishTurnGlobal += MakePlayerWait;
+        Big2PlayerSkipTurnHandler.OnPlayerSkipTurnGlobal += MakePlayerWait;
     }
 
     public void UnsubscribeEvent()
     {
-        cardSubmissionCheck.OnPlayerFinishTurnLocal += MakePlayerWait;
-        big2AI.OnAIFinishTurnLocal -= MakePlayerWait;
+        cardSubmissionCheck.OnPlayerFinishTurnLocal -= MakePlayerWait;
+        Big2SimpleAI.OnAISkipTurn -= MakePlayerWait;
+        Big2SimpleAI.OnAIFinishTurnGlobal -= MakePlayerWait;
+        Big2PlayerSkipTurnHandler.OnPlayerSkipTurnGlobal -= MakePlayerWait;
     }
 
     protected override void ParameterInitialization()
     {
         PlayerHand = GetComponent<Big2PlayerHand>();
         cardSubmissionCheck = GetComponent<Big2CardSubmissionCheck>();
-        big2AI = GetComponent<Big2SimpleAI>();
+        Big2AI = GetComponent<Big2SimpleAI>();
     }
 
     protected override void StateInitialization()
@@ -73,8 +77,10 @@ public class Big2PlayerStateMachine : StateManager<PlayerState>, ISubscriber
     }
 
     #region Order
-    public void MakePlayerWait() 
+    public void MakePlayerWait(Big2PlayerHand playerHand) 
     {
+        if (playerHand != PlayerHand) return;
+
         NextState = States[PlayerState.Waiting];
     }
 

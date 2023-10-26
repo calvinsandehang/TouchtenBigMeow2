@@ -8,6 +8,7 @@ public class CardModel
     public Suit CardSuit { get;}
     public Rank CardRank { get;}
     public Sprite CardSprite { get;}
+    public Sprite BacksideSprite { get; }
 
     //constructor
     public CardModel (CardSO cardSO)
@@ -15,6 +16,7 @@ public class CardModel
         CardSuit = cardSO.Suit;
         CardRank = cardSO.Rank;
         CardSprite = cardSO.CardSprite;
+        BacksideSprite = cardSO.BacksideSprite;
     }
 
     public override string ToString()

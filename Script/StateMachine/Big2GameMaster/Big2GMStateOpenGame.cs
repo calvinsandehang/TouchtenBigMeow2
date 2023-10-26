@@ -86,7 +86,7 @@ public class Big2GMStateOpenGame : BaseState<GMState>
             GameObject playerHandObject = GMSM.InstantiatePlayer();
             Big2PlayerHand playerHand = playerHandObject.GetComponent<Big2PlayerHand>();
             Big2PlayerUIManager playerUIManager = playerHandObject.GetComponent<Big2PlayerUIManager>();
-            
+
             if (i == 0)            
                 playerHand.PlayerType = PlayerType.Human;            
             else
@@ -97,6 +97,7 @@ public class Big2GMStateOpenGame : BaseState<GMState>
             // initialize UI Elements
             playerUIManager.SetupSkipNotificationButton(GMSM.PlayerUIComponents[i].SkipNotification);
             playerUIManager.SetupProfilePicture(GMSM.PlayerUIComponents[i].ProfilePicture);
+            playerUIManager.SetupCardParent(GMSM.PlayerUIComponents[i].CardParent);
 
             GMSM.PlayerHands.Add(playerHand);
         }

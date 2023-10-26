@@ -49,13 +49,14 @@ public class Big2TableManager : SubjectTable, ISubscriber
 
     public void UpdateTableCards(CardInfo cardInfo)
     {
+        Debug.Log("UpdateTableCards");
         TableHandType = cardInfo.HandType;
         TableHandRank = cardInfo.HandRank;
         TableCards.Clear();
         TableCards.AddRange(cardInfo.CardComposition);
-        NotifyObserver(cardInfo);
+        NotifyObserverAssigningCard(cardInfo);
+        NotifyTableState(TableHandType, TableHandRank);
         //OnTableUpdated?.Invoke(cardInfo);
-        
     }
 
     private void CleanTable() 
@@ -66,8 +67,8 @@ public class Big2TableManager : SubjectTable, ISubscriber
         TableCards = new List<CardModel>();
 
         CardInfo tableInfo = new CardInfo(HandType.None, HandRank.None, new List<CardModel>());
-        NotifyObserver(tableInfo);
-
+        NotifyObserverAssigningCard(tableInfo);
+        NotifyTableState(TableHandType, TableHandRank);
     }
 
     public void SubscribeEvent()

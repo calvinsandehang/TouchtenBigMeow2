@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 46b946c566916e74bb5ed7aa376b738c, type: 3}
+  m_Name: AudioClipList_Winning
+  m_EditorClassIdentifier: 
+  audioClips:
+  - {fileID: 8300000, guid: 7863f39f25807104d8e57fa2fb5bbccd, type: 3}
+  - {fileID: 8300000, guid: 711c68b34af848d4e9099141d5d1eede, type: 3}
+  - {fileID: 8300000, guid: 850b76e5c4b06d641923700b7a351dca, type: 3}
+  - {fileID: 8300000, guid: 8a377086721c62048bf4ab83af904702, type: 3}
+  - {fileID: 8300000, guid: ca0c70de6571f3846aff4773dacb7caf, type: 3}

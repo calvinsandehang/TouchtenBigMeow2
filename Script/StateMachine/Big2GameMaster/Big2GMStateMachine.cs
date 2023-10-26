@@ -60,8 +60,8 @@ public class Big2GMStateMachine : StateManager<GMState>, ISubscriber
     
     
     [SerializeField]
-    private List<PlayerUIComponent> _playerUIComponent;
-    public List<PlayerUIComponent> PlayerUIComponents => _playerUIComponent;
+    private List<PlayerComponents> _playerUIComponent;
+    public List<PlayerComponents> PlayerUIComponents => _playerUIComponent;
     public DeckModel DeckModel { get; set; }
     
     public event Action OnDealerFinishDealingCards;
@@ -130,7 +130,7 @@ public class Big2GMStateMachine : StateManager<GMState>, ISubscriber
         }
     }
 
-    public void NextTurn() 
+    public void NextTurn(Big2PlayerHand playerHand) 
     {
         // Increment currentPlayerIndex counterclockwise.
         Debug.Log("GM called Next Turn");
@@ -370,7 +370,7 @@ public class Big2GMStateMachine : StateManager<GMState>, ISubscriber
     {
         Big2SimpleAI.OnAIFinishTurnGlobal += NextTurn;
         Big2SimpleAI.OnAISkipTurn += SkipTurn;
-        Big2PlayerSkipTurnHandler.OnPlayerSkipTurn += SkipTurn;
+        Big2PlayerSkipTurnHandler.OnPlayerSkipTurnGlobal += SkipTurn;
         Big2CardSubmissionCheck.OnPlayerFinishTurnGlobal += NextTurn;
         Big2PlayerHand.OnPlayerLastCardIsDropped += EndGame;
     }
@@ -380,7 +380,7 @@ public class Big2GMStateMachine : StateManager<GMState>, ISubscriber
     {
         Big2SimpleAI.OnAIFinishTurnGlobal -= NextTurn;
         Big2SimpleAI.OnAISkipTurn -= SkipTurn;
-        Big2PlayerSkipTurnHandler.OnPlayerSkipTurn -= SkipTurn;
+        Big2PlayerSkipTurnHandler.OnPlayerSkipTurnGlobal -= SkipTurn;
         Big2CardSubmissionCheck.OnPlayerFinishTurnGlobal -= NextTurn;
         Big2PlayerHand.OnPlayerLastCardIsDropped -= EndGame;    
     }

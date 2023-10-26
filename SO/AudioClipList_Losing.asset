@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 46b946c566916e74bb5ed7aa376b738c, type: 3}
+  m_Name: AudioClipList_Losing
+  m_EditorClassIdentifier: 
+  audioClips:
+  - {fileID: 8300000, guid: 380aa0ee4649ba64ebff55244deafe33, type: 3}
+  - {fileID: 8300000, guid: f61d423c35b42074e94d75fbec0a40af, type: 3}
+  - {fileID: 8300000, guid: cc74c5ac3f3c25940a225e3295829334, type: 3}
+  - {fileID: 8300000, guid: b4508d6f7d5315d489be4f1bbde98915, type: 3}
+  - {fileID: 8300000, guid: 7bd44fda799e47e4da784f9c8dde4945, type: 3}

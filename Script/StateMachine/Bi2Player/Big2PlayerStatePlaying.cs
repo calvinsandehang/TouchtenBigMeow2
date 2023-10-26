@@ -18,7 +18,7 @@ public class Big2PlayerStatePlaying : BaseState<PlayerState>
         PSM.BroadcastPlayerIsPlaying();
 
         if (PSM.PlayerHand.PlayerType != GlobalDefine.PlayerType.Human)
-            PSM.big2AI.InitiateAiDecisionMaking();
+            PSM.Big2AI.InitiateAiDecisionMaking();
 
     }
 
