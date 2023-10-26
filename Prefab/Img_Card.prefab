@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 4737154434437046166}
   - component: {fileID: 606334758025741378}
   - component: {fileID: 6056286917115088933}
-  - component: {fileID: 7742086647934484437}
   - component: {fileID: 6534351467738571917}
   m_Layer: 5
   m_Name: Img_Card
@@ -92,20 +91,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   initialColor: {r: 0.3301887, g: 0.3301887, b: 0.3301887, a: 1}
   selectedColor: {r: 1, g: 1, b: 1, a: 1}
-  cardDeselectedSound: {fileID: 8300000, guid: a57ad2acc3ffe6a4c8f4a96178e40321, type: 3}
-  cardSelectSound: {fileID: 8300000, guid: a57ad2acc3ffe6a4c8f4a96178e40321, type: 3}
---- !u!114 &7742086647934484437
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4691521513262490833}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cd3e652117eb2434ca92cedcb6c3a155, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
   cardDeselectedSound: {fileID: 8300000, guid: a57ad2acc3ffe6a4c8f4a96178e40321, type: 3}
   cardSelectSound: {fileID: 8300000, guid: a57ad2acc3ffe6a4c8f4a96178e40321, type: 3}
 --- !u!82 &6534351467738571917
