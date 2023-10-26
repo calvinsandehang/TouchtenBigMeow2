@@ -13,13 +13,15 @@ public class Big2PlayerSkipTurnHandler : MonoBehaviour
     private Big2PlayerHand playerHand;
     private Button skipTurnButton;
 
-    public static event Action<Big2PlayerHand> OnPlayerSkipTurn;
+    public static event Action<Big2PlayerHand> OnPlayerSkipTurnGlobal; // subs : Big2GMStateMachine
+    public static event Action OnPlayerSkipTurnLocal;
 
     private void Awake()
     {
         gMStateMachine = GetComponent<Big2GMStateMachine>();   
         playerStateMachine = GetComponent<Big2PlayerStateMachine>();
-        playerHand = GetComponent<Big2PlayerHand>();            
+        playerHand = GetComponent<Big2PlayerHand>(); 
+        
     }
 
     private void Start()
@@ -34,30 +36,27 @@ public class Big2PlayerSkipTurnHandler : MonoBehaviour
     {
         skipTurnButton = UIButtonInjector.Instance.GetButton(ButtonType.SkipTurn);
         skipTurnButton.onClick.AddListener(TellGMToGoNextTurn);
-        skipTurnButton.onClick.AddListener(MakePlayerInWaitingState);
 
         UIPlayerSkipTurnButton skipTurnButtonBehaviour = skipTurnButton.GetComponent<UIPlayerSkipTurnButton>();
         skipTurnButtonBehaviour.InitializeButton(playerStateMachine);
     }
 
-    // Assuming skipTurnButton ad waitButton are your buttons
-    
+    private void InitializeUIElement() 
+    {
+        
+    }
+
+    // Assuming skipTurnButton ad waitButton are your buttons    
 
     private void TellGMToGoNextTurn()
     {
         StartCoroutine(DelayedAction()); 
     }
 
-    private void MakePlayerInWaitingState()
-    {
-        // Call the MakePlayerWait method on the player state machine
-        playerStateMachine.MakePlayerWait();
-    }
-
     private IEnumerator DelayedAction() 
     {
-        yield return new WaitForSeconds(2f);
-        OnPlayerSkipTurn?.Invoke(playerHand);
+        yield return new WaitForSeconds(0.1f);
+        OnPlayerSkipTurnGlobal?.Invoke(playerHand);
     }
 
 }

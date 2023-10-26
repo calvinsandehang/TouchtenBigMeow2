@@ -35,8 +35,8 @@ public class Big2CardSubmissionCheck : MonoBehaviour
 
     private bool isAllowedToCheck = false;
 
-    public static event Action OnPlayerFinishTurnGlobal; // Subs : Big2GMStateMachine
-    public event Action OnPlayerFinishTurnLocal; // subs : Big2PlayerStateMachine
+    public static event Action<Big2PlayerHand> OnPlayerFinishTurnGlobal; // Subs : Big2GMStateMachine
+    public event Action<Big2PlayerHand> OnPlayerFinishTurnLocal; // subs : Big2PlayerStateMachine
    
 
     private void Awake()
@@ -283,8 +283,8 @@ public class Big2CardSubmissionCheck : MonoBehaviour
         if (!Big2GMStateMachine.WinnerIsDetermined)
         {
             Debug.Log("player end turn, redirect to waiting state");
-            OnPlayerFinishTurnGlobal?.Invoke();
-            OnPlayerFinishTurnLocal?.Invoke();
+            OnPlayerFinishTurnGlobal?.Invoke(playerHand);
+            OnPlayerFinishTurnLocal?.Invoke(playerHand);
         }
         else
         {

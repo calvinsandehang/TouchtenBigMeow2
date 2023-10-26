@@ -4,42 +4,46 @@ using UnityEngine.UI;
 
 public class UISkipNotification : MonoBehaviour, ISubscriber
 {
-    public float fadeInDuration = 1.0f;  // Duration for fading in
-    public float fadeOutDuration = 1.0f; // Duration for fading out
-    public float displayDuration = 1.0f; // Duration for displaying
+    public float fadeInDuration = 0.5f;
+    public float fadeOutDuration = 0.5f;
+    public float displayDuration = 1.0f; 
 
-    private Image image;
+    private CanvasGroup canvasGroup;
 
-    private Big2SimpleAI simpleAI; 
+    private Big2PlayerSkipTurnHandler playerSkipHandler;
+    private Big2PlayerHand playerHand;
 
     private void Awake()
     {
-        image = GetComponent<Image>();
+        canvasGroup = GetComponent<CanvasGroup>();
+        
     }
 
     private void Start()
     {
-        // Hide the image initially
-        image.color = new Color(image.color.r, image.color.g, image.color.b, 0f);
-    }
-
-    public void InitializeUIElement(Big2SimpleAI simpleAI)
-    {
-        this.simpleAI = simpleAI;
+        // Hide the element initially
+        canvasGroup.alpha = 0f;
         SubscribeEvent();
     }
 
-    // Method to instantly show the image and then fade out after a delay
-    public void ShowAndFadeOut()
+    public void InitializeUIElement(Big2PlayerSkipTurnHandler playerSkipHandler, Big2PlayerHand playerHand ) 
     {
+        this.playerSkipHandler = playerSkipHandler;
+        this.playerHand = playerHand;
+    }
+
+    // Method to instantly show the element and then fade out after a delay
+    private void ShowAndFadeOut(Big2PlayerHand playerHand) 
+    {
+        if (this.playerHand != playerHand) return;
         StartCoroutine(ShowAndFadeOutCoroutine());
     }
 
     private IEnumerator ShowAndFadeOutCoroutine()
     {
         // Fade in
-        float elapsedTime = 0f;        
-        image.color = new Color(image.color.r, image.color.g, image.color.b, 1f);
+        float elapsedTime = 0f;
+        canvasGroup.alpha = 1f;
 
         // Display for a specified duration
         yield return new WaitForSeconds(displayDuration);
@@ -49,25 +53,23 @@ public class UISkipNotification : MonoBehaviour, ISubscriber
         while (elapsedTime < fadeOutDuration)
         {
             float alpha = Mathf.Lerp(1f, 0f, elapsedTime / fadeOutDuration);
-            image.color = new Color(image.color.r, image.color.g, image.color.b, alpha);
+            canvasGroup.alpha = alpha;
             elapsedTime += Time.deltaTime;
             yield return null;
         }
-        image.color = new Color(image.color.r, image.color.g, image.color.b, 0f);
+        canvasGroup.alpha = 0f;
     }
 
     public void SubscribeEvent()
     {
-        simpleAI.UIOnAISkipTurn += ShowAndFadeOut;
+        Big2SimpleAI.OnAISkipTurn += ShowAndFadeOut;
+        Big2PlayerSkipTurnHandler.OnPlayerSkipTurnGlobal += ShowAndFadeOut;
     }
 
     public void UnsubscribeEvent()
     {
-        if (simpleAI != null)
-        {
-            simpleAI.UIOnAISkipTurn -= ShowAndFadeOut;
-        }
-        
+        Big2SimpleAI.OnAISkipTurn -= ShowAndFadeOut;
+        Big2PlayerSkipTurnHandler.OnPlayerSkipTurnGlobal -= ShowAndFadeOut;
     }
 
     private void OnDisable()

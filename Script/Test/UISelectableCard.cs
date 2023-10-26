@@ -21,7 +21,13 @@ public class UISelectableCard : SubjectCard, IPointerClickHandler // Implementin
     private bool isSelected = false; // Flag to check if the card is selected or not
     private CardModel cardModel;
 
-    // Start is called before the first frame update
+    [SerializeField] 
+    private AudioClip cardDeselectedSound;
+    [SerializeField]
+    private AudioClip cardSelectSound;
+
+    private AudioSource audioSource;
+   
     public CardModel GetCardModel() 
     {
         return cardModel;
@@ -33,14 +39,27 @@ public class UISelectableCard : SubjectCard, IPointerClickHandler // Implementin
     void Awake()
     {
         cardImage = GetComponent<Image>();
+        audioSource = GetComponent<AudioSource>();
+
+        if (audioSource == null)
+            gameObject.AddComponent<AudioSource>();
     }
 
-    public void Initialize(CardModel card)
+    public void Initialize(CardModel card, PlayerType playerType)
     {
         cardModel = card;
-        Sprite cardSprite = cardModel.CardSprite;
+        Sprite cardSprite;
+        if (playerType == PlayerType.Human)
+        {
+            cardSprite = cardModel.CardSprite;
+        }
+        else
+        {
+            cardSprite = cardModel.BacksideSprite;
+        }
+       
 
-        DisplayCard(cardSprite);
+        DisplayCard(cardSprite, playerType);
     }
 
 
@@ -55,10 +74,19 @@ public class UISelectableCard : SubjectCard, IPointerClickHandler // Implementin
         }
     }
 
-    public void DisplayCard(Sprite cardSprite)
+    public void DisplayCard(Sprite cardSprite, PlayerType playerType)
     {
         cardImage.sprite = cardSprite;
         cardImage.color = initialColor;
+
+        if (playerType == PlayerType.Human)
+        {
+            cardImage.raycastTarget = true;
+        }
+        else
+        {
+            cardImage.raycastTarget = false;
+        }
 
         if (cardImage.sprite == null)
         {
@@ -83,6 +111,12 @@ public class UISelectableCard : SubjectCard, IPointerClickHandler // Implementin
 
     public void SelectCard()
     {
+        if (cardSelectSound != null)
+        {
+            audioSource.clip = cardSelectSound;
+            audioSource.Play();
+        }
+
         cardImage.color = selectedColor;
         NotifyObserver(CardState.Selected);
 
@@ -92,11 +126,17 @@ public class UISelectableCard : SubjectCard, IPointerClickHandler // Implementin
 
     public void DeselectCard()
     {
+        if (cardDeselectedSound != null)
+        {
+            audioSource.clip = cardDeselectedSound;
+            audioSource.Play();
+        }
+
         cardImage.color = initialColor;
         NotifyObserver(CardState.Deselected);
 
         // this many instances refer to one instance => Singleton
         //Debug.Log("DeselectCard()");
         CardEvaluator.Instance.DeregisterCard(cardModel);
-    }
+    }   
 }

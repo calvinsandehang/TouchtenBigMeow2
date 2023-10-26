@@ -7,7 +7,8 @@ using static GlobalDefine;
 
 public class Big2CardSorter
 {
-    public void SortPlayerHandByRank(List<GameObject> cardsObjectsInPlayerHand)
+    public void SortPlayerHandByRank(List<GameObject> cardsObjectsInPlayerHand
+        , PlayerType playerType)
     {
         cardsObjectsInPlayerHand.Sort((card1, card2) =>
         {
@@ -22,7 +23,8 @@ public class Big2CardSorter
         UpdateCardPositions(cardsObjectsInPlayerHand);
     }
 
-    public void SortPlayerHandBySuit(List<GameObject> cardsObjectsInPlayerHand)
+    public void SortPlayerHandBySuit(List<GameObject> cardsObjectsInPlayerHand
+        , PlayerType playerType)
     {
         cardsObjectsInPlayerHand.Sort((card1, card2) =>
         {
@@ -37,7 +39,8 @@ public class Big2CardSorter
         UpdateCardPositions(cardsObjectsInPlayerHand);
     }
 
-    public void SortPlayerHandByBestHand(List<GameObject> cardsObjectsInPlayerHand, CardPool cardPool, Transform cardParent)
+    public void SortPlayerHandByBestHand(List<GameObject> cardsObjectsInPlayerHand, 
+        CardPool cardPool, Transform cardParent, PlayerType playerType)
     {
         List<CardModel> cardModelsInPlayerHand = new List<CardModel>();
 
@@ -60,10 +63,12 @@ public class Big2CardSorter
 
             // Log for debugging
             //Debug.Log("Best hand rank: " + cardInfo.HandRank.ToString());
+            /*
             foreach (var card in bestHandCards)
             {
                 Debug.Log("Card in best hand: " + card.CardRank.ToString() + " of " + card.CardSuit.ToString());
             }
+            */
 
             // Add the best hand cards to the sorted list
             sortedCardModels.AddRange(bestHandCards);
@@ -81,7 +86,7 @@ public class Big2CardSorter
         cardModelsInPlayerHand = new List<CardModel>(sortedCardModels); // Replace the list, don't clear and re-add
         cardModelsInPlayerHand.Reverse();
 
-        UpdateCardPosition(cardsObjectsInPlayerHand, cardModelsInPlayerHand, cardPool, cardParent);
+        UpdateCardPosition(cardsObjectsInPlayerHand, cardModelsInPlayerHand, cardPool, cardParent, playerType);
     }
 
    
@@ -172,7 +177,9 @@ public class Big2CardSorter
     }
 
 
-    private void UpdateCardPosition(List<GameObject> cardsObjectsInPlayerHand, List<CardModel> cardModelsInPlayerHand, CardPool cardPool, Transform cardParent)
+    private void UpdateCardPosition(List<GameObject> cardsObjectsInPlayerHand, 
+        List<CardModel> cardModelsInPlayerHand, CardPool cardPool, 
+        Transform cardParent, PlayerType playerType)
     {
         // Clear out the old cards.
         while (cardsObjectsInPlayerHand.Count > 0)
@@ -186,12 +193,14 @@ public class Big2CardSorter
         {
             GameObject cardGO = cardPool.GetCard();
             cardGO.transform.SetParent(cardParent, false);
+            cardGO.transform.localRotation = Quaternion.identity;  // Reset rotation to 0,0,0
             cardGO.transform.SetSiblingIndex(i);
             UISelectableCard selectableCard = cardGO.GetComponent<UISelectableCard>();
-            selectableCard.Initialize(cardModelsInPlayerHand[i]); // Adjust this if necessary to match CardModel structure.
+            selectableCard.Initialize(cardModelsInPlayerHand[i], playerType); // Adjust this if necessary to match CardModel structure.
             cardsObjectsInPlayerHand.Add(cardGO);
         }
     }
+
 
     private void UpdateCardPositions(List<GameObject> cardGameObjects)
     {

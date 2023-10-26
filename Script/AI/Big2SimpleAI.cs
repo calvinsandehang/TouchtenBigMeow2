@@ -11,6 +11,8 @@ using static GlobalDefine;
 [DefaultExecutionOrder(1)]
 public class Big2SimpleAI : MonoBehaviour
 {
+    [SerializeField]
+    private float _turnDelay = 3f;
     private Big2PlayerHand playerHand;
     private Big2PlayerStateMachine playerStateMachine;
     private Big2CardSubmissionCheck cardSubmissionCheck;
@@ -29,12 +31,9 @@ public class Big2SimpleAI : MonoBehaviour
 
     public bool IsStartingTheTurn { get; set; }
 
-    public static event Action OnAIFinishTurnGlobal;
-    public event Action OnAIFinishTurnLocal;
+    public static event Action<Big2PlayerHand> OnAIFinishTurnGlobal;
 
     public static event Action<Big2PlayerHand> OnAISkipTurn;
-    public event Action UIOnAISkipTurn;
-
 
     private void Awake()
     {
@@ -56,6 +55,8 @@ public class Big2SimpleAI : MonoBehaviour
 
     public void InitiateAiDecisionMaking()
     {
+        StartCoroutine(AIDecisionMaking());
+        /*
         // reference the owned cards
         //Debug.Log("InitiateAiDecisionMaking()");
         aiCards = playerHand.GetPlayerCards();
@@ -77,7 +78,7 @@ public class Big2SimpleAI : MonoBehaviour
                 CardInfo lowestHandInfo = big2PokerHands.GetThreeOfDiamonds(aiCards);
                 List<CardModel> lowestHandCards = lowestHandInfo.CardComposition;
                 OnSubmitCard(lowestHandInfo, lowestHandCards);
-                StartCoroutine(DelayedAction(EndTurn, 1f));
+                StartCoroutine(DelayedAction(EndTurn, _turnDelay));
             }
             else
             {
@@ -86,14 +87,14 @@ public class Big2SimpleAI : MonoBehaviour
                 Big2PokerHands big2PokerHands = new Big2PokerHands();
                 CardInfo lowestHandInfo = big2PokerHands.GetLowestHand(aiCards);
                 List<CardModel> lowestHandCards = lowestHandInfo.CardComposition;
-                /*
+            
                 for (int i = 0; i < lowestHandCards.Count; i++)
                 {
                     Debug.Log(lowestHandCards[i]);
                 }
-                */
+                
                 OnSubmitCard(lowestHandInfo, lowestHandCards);
-                StartCoroutine(DelayedAction(EndTurn, 1f));
+                StartCoroutine(DelayedAction(EndTurn, _turnDelay));
             }
             
         }
@@ -133,20 +134,89 @@ public class Big2SimpleAI : MonoBehaviour
                 // card is suitable, submit card
                 CardInfo submittedCardInfo = EvaluateSelectedCards(cardPackageComposition);
                 OnSubmitCard(submittedCardInfo, cardPackageComposition);
-                StartCoroutine(DelayedAction(EndTurn, 1f));
+                StartCoroutine(DelayedAction(EndTurn, _turnDelay));
                 return;              
             }
 
             // skip turn when no card packages is suitable
-            StartCoroutine(DelayedAction(SkipTurn, 1f));
+            StartCoroutine(DelayedAction(SkipTurn, _turnDelay));
         }
 
         // if not, skip turn
         // if yes, submit card
         // remove the submitted card
+        */
     }
 
-   
+    private IEnumerator AIDecisionMaking()
+    {
+        yield return new WaitForSeconds(_turnDelay);
+
+        // Reference the owned cards
+        aiCards = playerHand.GetPlayerCards();
+
+        // Sort the hand by best hand
+        aiCardInfo = cardSorter.SortPlayerHandByLowestHand(aiCards);
+
+        Big2TableLookUp();
+
+        Big2PokerHands big2PokerHands = new Big2PokerHands();
+
+        if (currentTableHandRank == HandRank.None)
+        {
+            if (Big2GMStateMachine.DetermineWhoGoFirst)
+            {
+                HandleThreeOfDiamonds(big2PokerHands);
+            }
+            else
+            {
+                HandleLowestHand(big2PokerHands);
+            }
+            //yield return new WaitForSeconds(_turnDelay);
+            EndTurn();
+            yield break;
+        }
+
+        foreach (var cardPackage in aiCardInfo.CardPackages)
+        {
+            if (IsCardPackageSuitable(cardPackage))
+            {
+                CardInfo submittedCardInfo = EvaluateSelectedCards(cardPackage.CardPackageContent);
+                OnSubmitCard(submittedCardInfo, cardPackage.CardPackageContent);
+                //yield return new WaitForSeconds(_turnDelay);
+                EndTurn();
+                yield break;
+            }
+        }
+
+        // Skip turn when no card packages are suitable
+        //yield return new WaitForSeconds(_turnDelay);
+        SkipTurn();
+    }
+
+    private void HandleThreeOfDiamonds(Big2PokerHands big2PokerHands)
+    {
+        CardInfo lowestHandInfo = big2PokerHands.GetThreeOfDiamonds(aiCards);
+        OnSubmitCard(lowestHandInfo, lowestHandInfo.CardComposition);
+    }
+
+    private void HandleLowestHand(Big2PokerHands big2PokerHands)
+    {
+        CardInfo lowestHandInfo = big2PokerHands.GetLowestHand(aiCards);
+        OnSubmitCard(lowestHandInfo, lowestHandInfo.CardComposition);
+    }
+
+    private bool IsCardPackageSuitable(CardPackage cardPackage)
+    {
+        if (!CompareHandType(cardPackage.CardPackageContent) && currentTableHandType != HandType.None) return false;
+        if (!CompareHandRank(cardPackage.CardPackageRank)) return false;
+        if (!CompareSelectedCardsWithTableCards(cardPackage.CardPackageContent)) return false;
+
+        return true;
+    }
+
+
+
 
     private void Big2TableLookUp()
     {
@@ -254,8 +324,7 @@ public class Big2SimpleAI : MonoBehaviour
         if (!Big2GMStateMachine.WinnerIsDetermined)
         {
             Debug.Log($"AI {playerHand.PlayerID} end turn, redirect to waiting state");
-            OnAIFinishTurnGlobal?.Invoke();
-            OnAIFinishTurnLocal?.Invoke();
+            OnAIFinishTurnGlobal?.Invoke(playerHand);
         }
         else
         {
@@ -267,12 +336,7 @@ public class Big2SimpleAI : MonoBehaviour
     private void SkipTurn() 
     {
         Debug.Log("Player " + (playerHand.PlayerID) + " Skip Turn");
-        //OnAIFinishTurn?.Invoke();
-
         OnAISkipTurn?.Invoke(playerHand);
-        UIOnAISkipTurn?.Invoke();
-
-        OnAIFinishTurnLocal?.Invoke();
     }
 
     private IEnumerator DelayedAction(Action action, float delay)

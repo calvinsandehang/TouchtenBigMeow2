@@ -15,3 +15,4 @@ MonoBehaviour:
   _suit: 2
   _rank: 7
   _cardSprite: {fileID: 1433742098, guid: e6e467f5916f74a4e9ded144bf210538, type: 3}
+  _backsideSprite: {fileID: 1480980450, guid: e6e467f5916f74a4e9ded144bf210538, type: 3}

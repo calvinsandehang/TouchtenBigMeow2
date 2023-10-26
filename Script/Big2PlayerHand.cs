@@ -62,7 +62,7 @@ public class Big2PlayerHand : SubjectPlayer
 
         // If this is the last card, notify that the hand is complete.
         //if (PlayerType == PlayerType.Human)
-            UIPlayerHandManager.Instance.DisplayCards(playerCards, PlayerID);
+            UIPlayerHandManager.Instance.DisplayCards(playerCards, PlayerID, PlayerType);
 
         inFirstRound = gameMaster.CheckGameInFirstRound();
 
@@ -93,7 +93,7 @@ public class Big2PlayerHand : SubjectPlayer
         // Remove the cards from playerCards that match the criteria
         playerCards.RemoveAll(card => cardsToRemove.Contains(card));
 
-        UIPlayerHandManager.Instance.DisplayCards(playerCards, PlayerID);
+        UIPlayerHandManager.Instance.DisplayCards(playerCards, PlayerID, PlayerType);
         // Notify UI to update the displayed cards
         if (PlayerType == PlayerType.Human) 
         {

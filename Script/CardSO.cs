@@ -12,10 +12,13 @@ public class CardSO : ScriptableObject
     private Rank _rank;
     [SerializeField]
     private Sprite _cardSprite;
-    
+    [SerializeField]
+    private Sprite _backsideSprite;
+
     public Suit Suit => _suit;
     public Rank Rank => _rank;
     public Sprite CardSprite => _cardSprite;
+    public Sprite BacksideSprite => _backsideSprite;
 
     public CardModel CreateNewCardModel()
     {

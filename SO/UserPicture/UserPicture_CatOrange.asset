@@ -22,7 +22,7 @@ MonoBehaviour:
     PrefabModifications: []
     SerializationNodes: []
   Normal: {fileID: -1610828149, guid: 30c28fd26816a354db3dd512cfc631f1, type: 3}
-  Excited: {fileID: -2096060330, guid: 30c28fd26816a354db3dd512cfc631f1, type: 3}
+  Excited: {fileID: -1238234607, guid: 30c28fd26816a354db3dd512cfc631f1, type: 3}
   Happy: {fileID: 94040234, guid: 30c28fd26816a354db3dd512cfc631f1, type: 3}
   Sad: {fileID: -1595990642, guid: 30c28fd26816a354db3dd512cfc631f1, type: 3}
   Angry: {fileID: -2096060330, guid: 30c28fd26816a354db3dd512cfc631f1, type: 3}

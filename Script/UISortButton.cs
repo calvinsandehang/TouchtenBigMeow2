@@ -39,7 +39,7 @@ public class UISortButton : MonoBehaviour
     {
         Debug.Log("SortByBestHand() ");
         // sort by best hand
-        UIPlayerHandManager.Instance.SortPlayerHand(SortCriteria.BestHand, 0);
+        UIPlayerHandManager.Instance.SortPlayerHand(SortCriteria.BestHand, 0, PlayerType.Human);
         // change text
         _buttonText.text = rank;
     }
@@ -48,7 +48,7 @@ public class UISortButton : MonoBehaviour
     {
         Debug.Log("SortByRank() ");
         // sort by best rank
-        UIPlayerHandManager.Instance.SortPlayerHand(SortCriteria.Rank, 0);
+        UIPlayerHandManager.Instance.SortPlayerHand(SortCriteria.Rank, 0, PlayerType.Human);
         // change text
         _buttonText.text = suit;
     }
@@ -57,7 +57,7 @@ public class UISortButton : MonoBehaviour
     {
         Debug.Log("SortBySuit()");
         // sort by suit
-        UIPlayerHandManager.Instance.SortPlayerHand(SortCriteria.Suit, 0);
+        UIPlayerHandManager.Instance.SortPlayerHand(SortCriteria.Suit, 0, PlayerType.Human);
         // change text
         _buttonText.text = bestHand;
     }

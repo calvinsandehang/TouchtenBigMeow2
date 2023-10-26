@@ -61,7 +61,7 @@ public class UIPlayerHandManager : MonoBehaviour
     }
     #endregion
    
-    public void DisplayCards(List<CardModel> cards, int playerID)
+    public void DisplayCards(List<CardModel> cards, int playerID, PlayerType playerType)
     {
         Debug.Log($"Display Card, Player {playerID}");
 
@@ -83,16 +83,16 @@ public class UIPlayerHandManager : MonoBehaviour
             cardGO.transform.SetParent(_playerCardsParent[playerID].transform, false);
             cardGO.transform.localRotation = Quaternion.identity;  // Reset rotation to 0,0,0
             UISelectableCard selectableCard = cardGO.GetComponent<UISelectableCard>();
-            selectableCard.Initialize(cardModel);  // Adjust this if necessary to match CardModel structure.
+            selectableCard.Initialize(cardModel, playerType);  // Adjust this if necessary to match CardModel structure.
             PlayerCards[playerID].CardsObjectsInPlayerHand.Add(cardGO);
         }
 
         Debug.Log(_playerCardsParent[playerID].transform);
 
-        SortPlayerHand(currentSortCriteria, playerID);
+        SortPlayerHand(currentSortCriteria, playerID, playerType);
     }    
 
-    public void SortPlayerHand(SortCriteria criteria, int playerID)
+    public void SortPlayerHand(SortCriteria criteria, int playerID, PlayerType playerType)
     {
         Big2CardSorter cardSorter = new Big2CardSorter();
 
@@ -100,15 +100,15 @@ public class UIPlayerHandManager : MonoBehaviour
         {
             case SortCriteria.Rank:
                 currentSortCriteria = SortCriteria.Rank;
-                cardSorter.SortPlayerHandByRank(PlayerCards[playerID].CardsObjectsInPlayerHand);
+                cardSorter.SortPlayerHandByRank(PlayerCards[playerID].CardsObjectsInPlayerHand, playerType);
                 break;
             case SortCriteria.Suit:
                 currentSortCriteria = SortCriteria.Suit;
-                cardSorter.SortPlayerHandBySuit(PlayerCards[playerID].CardsObjectsInPlayerHand);
+                cardSorter.SortPlayerHandBySuit(PlayerCards[playerID].CardsObjectsInPlayerHand, playerType);
                 break;
             case SortCriteria.BestHand:
                 currentSortCriteria = SortCriteria.BestHand;
-                cardSorter.SortPlayerHandByBestHand(PlayerCards[playerID].CardsObjectsInPlayerHand, cardPool, _playerCardsParent[playerID].transform);
+                cardSorter.SortPlayerHandByBestHand(PlayerCards[playerID].CardsObjectsInPlayerHand, cardPool, _playerCardsParent[playerID].transform, playerType);
                 break;
         }
     }
