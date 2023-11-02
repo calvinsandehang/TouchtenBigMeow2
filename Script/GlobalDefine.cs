@@ -58,5 +58,11 @@ public static class GlobalDefine
         OrangeCat,
         WhiteCat
     }
-    
+
+    public enum GameScene
+    {
+        None = -1 // This will be overwritten by the generated list
+    }
+
+
 }

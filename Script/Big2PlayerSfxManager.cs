@@ -4,7 +4,7 @@ using UnityEngine;
 using static GlobalDefine;
 
 [RequireComponent(typeof(AudioSource))]
-public class Big2PlayerAudioManager : MonoBehaviour, ISubscriber
+public class Big2PlayerSfxManager : MonoBehaviour, ISubscriber
 {
     [SerializeField] 
     private AudioClipListSO _winningClips;
@@ -61,7 +61,7 @@ public class Big2PlayerAudioManager : MonoBehaviour, ISubscriber
 
     public void SubscribeEvent()
     {
-        playerSM.OnPlayerIsWinning += PlayRandomWinningClip;
+        Big2CustomEvent.OnPlayerIsWinning += PlayRandomWinningClip;
         playerSM.OnPlayerIsLosing += PlayRandomLosingClip;
     }
 

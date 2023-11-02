@@ -1,97 +1,80 @@
+using System.Collections;
 using UnityEngine;
 
+/// <summary>
+/// Manages music playback for the Big2 game.
+/// </summary>
 [RequireComponent(typeof(AudioSource))]
-public class Big2GameMusicManager : MonoBehaviour, ISubscriber
+public class Big2GameMusicManager : MonoBehaviour
 {
-    public AudioClip[] normalMusicClips;
-    public AudioClip[] rushMusicClips;
-    private AudioSource audioSource;
-    private int currentNormalClipIndex;
-    private int currentRushClipIndex;
-    private bool isRushMode;
-    public float fadeOutTime = 2.0f; // Time to fade out in seconds
+    /// <summary>
+    /// Gets the singleton instance of the Big2GameMusicManager.
+    /// </summary>
+    public static Big2GameMusicManager Instance { get; private set; }
 
-    void Start()
+    [SerializeField] private AudioSource audioSource;
+    [Range(0f, 1f)] public float volume = 1.0f; // Exposed volume control
+    public float fadeOutTime = 2.0f;
+
+    private void Awake()
+    {
+        // Singleton pattern: Ensure there is only one instance of Big2GameMusicManager.
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else if (Instance != this)
+        {
+            // If an instance already exists, destroy this GameObject.
+            Destroy(gameObject);
+        }
+    }
+
+    private void Start()
     {
         audioSource = GetComponent<AudioSource>();
-        
-        isRushMode = false;
-
-        PlayNormalMusic(null);
-        SubscribeEvent();
+        audioSource.volume = volume; // Bind the volume from the inspector to the audio source.
     }
 
-    void Update()
+    private void Update()
     {
-        if (!audioSource.isPlaying)
+        // Check if the volume has been modified in the inspector.
+        if (audioSource.volume != volume)
         {
-            if (isRushMode)
-            {
-                PlayNextRushClip();
-            }
-            else
-            {
-                PlayNextNormalClip();
-            }
-        }
-
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            StartRushMusic();
-        }
-
-        // Check if the music is about to end and start fading out
-        if (audioSource.isPlaying && audioSource.time > audioSource.clip.length - fadeOutTime)
-        {
-            StartCoroutine(FadeOut());
+            audioSource.volume = volume;
         }
     }
 
-    private void PlayNormalMusic(Big2PlayerHand playerHand) 
+    /// <summary>
+    /// Plays a music clip.
+    /// </summary>
+    /// <param name="clip">The audio clip to play.</param>
+    public void PlayMusicClip(AudioClip clip)
     {
-        isRushMode = false ;
-
-        if (normalMusicClips.Length > 0)
+        if (clip != null)
         {
-            currentNormalClipIndex = Random.Range(0, normalMusicClips.Length);
-            PlayMusicClip(normalMusicClips, currentNormalClipIndex);
-        }
-    }
-    public void PlayMusicClip(AudioClip[] musicClips, int clipIndex)
-    {
-        if (clipIndex >= 0 && clipIndex < musicClips.Length)
-        {
-            audioSource.clip = musicClips[clipIndex];
-            audioSource.volume = 1f; // Reset the volume
+            audioSource.clip = clip;
             audioSource.Play();
         }
     }
 
-    public void PlayNextNormalClip()
+    /// <summary>
+    /// Plays the next music clip from an array of music clips.
+    /// </summary>
+    /// <param name="musicClips">The array of audio clips to cycle through.</param>
+    /// <param name="currentClipIndex">The index of the current clip.</param>
+    public void PlayNextClip(AudioClip[] musicClips, ref int currentClipIndex)
     {
-        currentNormalClipIndex = (currentNormalClipIndex + 1) % normalMusicClips.Length;
-        PlayMusicClip(normalMusicClips, currentNormalClipIndex);
+        currentClipIndex = (currentClipIndex + 1) % musicClips.Length;
+        PlayMusicClip(musicClips[currentClipIndex]);
     }
 
-    public void StartRushMusic()
-    {
-        if (isRushMode) return;
-
-        isRushMode = true;
-        if (rushMusicClips.Length > 0)
-        {
-            currentRushClipIndex = Random.Range(0, rushMusicClips.Length);
-            PlayMusicClip(rushMusicClips, currentRushClipIndex);
-        }
-    }
-
-    public void PlayNextRushClip()
-    {
-        currentRushClipIndex = (currentRushClipIndex + 1) % rushMusicClips.Length;
-        PlayMusicClip(rushMusicClips, currentRushClipIndex);
-    }
-
-    System.Collections.IEnumerator FadeOut()
+    /// <summary>
+    /// Fades out the currently playing music.
+    /// </summary>
+    /// <returns>An IEnumerator for the fading process.</returns>
+    public IEnumerator FadeOut()
     {
         float startVolume = audioSource.volume;
 
@@ -103,22 +86,5 @@ public class Big2GameMusicManager : MonoBehaviour, ISubscriber
 
         audioSource.Stop();
         audioSource.volume = startVolume;
-    }
-
-    public void SubscribeEvent()
-    {
-        Big2PlayerHand.OnPlayerCardLessThanSix += StartRushMusic;
-        Big2PlayerHand.OnPlayerLastCardIsDropped += PlayNormalMusic;
-    }
-
-    public void UnsubscribeEvent()
-    {
-        Big2PlayerHand.OnPlayerCardLessThanSix -= StartRushMusic;
-        Big2PlayerHand.OnPlayerLastCardIsDropped -= PlayNormalMusic;
-    }
-
-    private void OnDisable()
-    {
-        UnsubscribeEvent();
     }
 }

@@ -5,12 +5,13 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using static GlobalDefine;
 
+/// <summary>
+/// Manages player profile pictures and their behaviors.
+/// </summary>
 public class Big2PlayerProfilePictureManager : MonoBehaviour, ISubscriber
 {
-    [SerializeField]
-    private List<PlayerUserPictureSO> _userPictures;
-    [SerializeField]
-    private Image _profilePictureHolder;
+    [SerializeField] private List<PlayerUserPictureSO> _userPictures;
+    [SerializeField] private Image _profilePictureHolder;
 
     private const string ProfilePictureKey = "ProfilePictureIndex"; // Key used for PlayerPrefs
 
@@ -23,16 +24,23 @@ public class Big2PlayerProfilePictureManager : MonoBehaviour, ISubscriber
         InitializePlayerProfile();
     }
 
+    /// <summary>
+    /// Initializes the player's profile picture.
+    /// </summary>
     public void InitializePlayerProfile()
     {
         LoadProfilePicture();
         SubscribeEvent();
     }
 
+    /// <summary>
+    /// Initializes the player's profile picture with the specified state machine.
+    /// </summary>
+    /// <param name="playerSM">The player's state machine.</param>
     public void InitializePlayerProfile(Big2PlayerStateMachine playerSM)
     {
         this.playerSM = playerSM;
-        PlayerType playerType = this.playerSM.GetPlayerType();
+        playerType = this.playerSM.GetPlayerType();
         LoadProfilePicture(playerType);
         SubscribeEvent();
     }
@@ -41,7 +49,6 @@ public class Big2PlayerProfilePictureManager : MonoBehaviour, ISubscriber
     {
         if (playerType == PlayerType.Human)
         {
-            Debug.Log("Load Profile Picture");
             AvatarType savedAvatar = (AvatarType)PlayerPrefs.GetInt(ProfilePictureKey, 0); // Default to the first avatar if not found
             int savedAvatarID = PlayerPrefs.GetInt(ProfilePictureKey);
             Debug.Log($"Retrieved saved AvatarID from PlayerPrefs: {savedAvatarID}");
@@ -60,7 +67,6 @@ public class Big2PlayerProfilePictureManager : MonoBehaviour, ISubscriber
 
     private void LoadProfilePicture()
     {
-        Debug.Log("Load Profile Picture");
         AvatarType savedAvatar = (AvatarType)PlayerPrefs.GetInt(ProfilePictureKey, 0); // Default to the first avatar if not found
 
         currentProfilePicture = FindUserPictureByAvatarType(savedAvatar);
@@ -81,7 +87,7 @@ public class Big2PlayerProfilePictureManager : MonoBehaviour, ISubscriber
         return null;
     }
 
-    private void SetProfilePicture() 
+    private void SetProfilePicture()
     {
         _profilePictureHolder.sprite = currentProfilePicture.Normal;
     }
@@ -108,13 +114,16 @@ public class Big2PlayerProfilePictureManager : MonoBehaviour, ISubscriber
     private void SetHappyProfilePicture()
     {
         _profilePictureHolder.sprite = currentProfilePicture.Happy;
-    }   
+    }
 
     private void SetExcitedProfilePicture()
     {
         _profilePictureHolder.sprite = currentProfilePicture.Excited;
     }
 
+    /// <summary>
+    /// Subscribes to relevant events.
+    /// </summary>
     public void SubscribeEvent()
     {
         Big2CustomEvent.OnAvatarIsSet += LoadProfilePicture;
@@ -126,9 +135,19 @@ public class Big2PlayerProfilePictureManager : MonoBehaviour, ISubscriber
             playerSM.OnPlayerIsWaiting += SetNormalProfilePicture;
             playerSM.OnPlayerIsWinning += SetHappyProfilePicture;
         }
-           
     }
 
+    /// <summary>
+    /// Unsubscribes from events when the object is disabled.
+    /// </summary>
+    private void OnDisable()
+    {
+        UnsubscribeEvent();
+    }
+
+    /// <summary>
+    /// Unsubscribes from relevant events.
+    /// </summary>
     public void UnsubscribeEvent()
     {
         Big2CustomEvent.OnAvatarIsSet -= LoadProfilePicture;
@@ -140,13 +159,5 @@ public class Big2PlayerProfilePictureManager : MonoBehaviour, ISubscriber
             playerSM.OnPlayerIsWaiting -= SetNormalProfilePicture;
             playerSM.OnPlayerIsWinning -= SetHappyProfilePicture;
         }
-        
     }
-
-    private void OnDisable()
-    {
-       UnsubscribeEvent();
-    }
-
-   
 }
