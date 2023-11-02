@@ -21,6 +21,7 @@ MonoBehaviour:
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes: []
+  AvatarID: 1
   Normal: {fileID: 1353523926, guid: 30c28fd26816a354db3dd512cfc631f1, type: 3}
   Excited: {fileID: 2052046312, guid: 30c28fd26816a354db3dd512cfc631f1, type: 3}
   Happy: {fileID: -1113090650, guid: 30c28fd26816a354db3dd512cfc631f1, type: 3}

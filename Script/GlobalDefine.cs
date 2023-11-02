@@ -51,5 +51,12 @@ public static class GlobalDefine
 
     public delegate void OnCardInteract(CardModel card);
 
+    public enum AvatarType 
+    {
+        BlackCat,
+        BlueCat,
+        OrangeCat,
+        WhiteCat
+    }
     
 }

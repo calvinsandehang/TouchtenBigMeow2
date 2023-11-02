@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using static GlobalDefine;
 
@@ -17,6 +18,17 @@ public class Big2PlayerProfilePictureManager : MonoBehaviour, ISubscriber
     private Big2PlayerStateMachine playerSM;
     private PlayerType playerType;
 
+    private void Awake()
+    {
+        InitializePlayerProfile();
+    }
+
+    public void InitializePlayerProfile()
+    {
+        LoadProfilePicture();
+        SubscribeEvent();
+    }
+
     public void InitializePlayerProfile(Big2PlayerStateMachine playerSM)
     {
         this.playerSM = playerSM;
@@ -27,24 +39,47 @@ public class Big2PlayerProfilePictureManager : MonoBehaviour, ISubscriber
 
     private void LoadProfilePicture(PlayerType playerType)
     {
-        if (playerType == PlayerType.Human) 
+        if (playerType == PlayerType.Human)
         {
-            int savedIndex = PlayerPrefs.GetInt(ProfilePictureKey, 0); // Default to 0 if not found
+            Debug.Log("Load Profile Picture");
+            AvatarType savedAvatar = (AvatarType)PlayerPrefs.GetInt(ProfilePictureKey, 0); // Default to the first avatar if not found
+            int savedAvatarID = PlayerPrefs.GetInt(ProfilePictureKey);
+            Debug.Log($"Retrieved saved AvatarID from PlayerPrefs: {savedAvatarID}");
 
-            currentProfilePicture = _userPictures[savedIndex];
+            currentProfilePicture = FindUserPictureByAvatarType(savedAvatar);
             SetProfilePicture();
         }
-        else 
+        else
         {
-            int rand = Random.Range(0, 4);
+            AvatarType randomAvatar = (AvatarType)Random.Range(0, System.Enum.GetValues(typeof(AvatarType)).Length);
 
-            currentProfilePicture = _userPictures[rand];
+            currentProfilePicture = FindUserPictureByAvatarType(randomAvatar);
             SetProfilePicture();
         }
-       
     }
 
-    
+    private void LoadProfilePicture()
+    {
+        Debug.Log("Load Profile Picture");
+        AvatarType savedAvatar = (AvatarType)PlayerPrefs.GetInt(ProfilePictureKey, 0); // Default to the first avatar if not found
+
+        currentProfilePicture = FindUserPictureByAvatarType(savedAvatar);
+        SetProfilePicture();
+    }
+
+    private PlayerUserPictureSO FindUserPictureByAvatarType(AvatarType avatarType)
+    {
+        foreach (var userPicture in _userPictures)
+        {
+            if (userPicture.AvatarID == avatarType)
+            {
+                return userPicture;
+            }
+        }
+
+        // Return null or a default picture if not found
+        return null;
+    }
 
     private void SetProfilePicture() 
     {
@@ -82,14 +117,22 @@ public class Big2PlayerProfilePictureManager : MonoBehaviour, ISubscriber
 
     public void SubscribeEvent()
     {
-        playerSM.OnPlayerIsLosing += SetSadProfilePicture;
-        playerSM.OnPlayerIsPlaying += SetExcitedProfilePicture;
-        playerSM.OnPlayerIsWaiting += SetNormalProfilePicture;
-        playerSM.OnPlayerIsWinning += SetHappyProfilePicture;
+        Big2CustomEvent.OnAvatarIsSet += LoadProfilePicture;
+
+        if (playerSM != null)
+        {
+            playerSM.OnPlayerIsLosing += SetSadProfilePicture;
+            playerSM.OnPlayerIsPlaying += SetExcitedProfilePicture;
+            playerSM.OnPlayerIsWaiting += SetNormalProfilePicture;
+            playerSM.OnPlayerIsWinning += SetHappyProfilePicture;
+        }
+           
     }
 
     public void UnsubscribeEvent()
     {
+        Big2CustomEvent.OnAvatarIsSet -= LoadProfilePicture;
+
         if (playerSM != null)
         {
             playerSM.OnPlayerIsLosing -= SetSadProfilePicture;
@@ -104,4 +147,6 @@ public class Big2PlayerProfilePictureManager : MonoBehaviour, ISubscriber
     {
        UnsubscribeEvent();
     }
+
+   
 }
