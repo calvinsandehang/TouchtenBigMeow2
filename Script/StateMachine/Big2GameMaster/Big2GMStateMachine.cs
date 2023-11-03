@@ -154,7 +154,7 @@ public class Big2GMStateMachine : StateManager<GMState>, ISubscriber
         Debug.Log("skippingPlayers.Count =  " + skippingPlayers.Count);
         for (int i = 0; i < skippingPlayers.Count; i++)
         {
-            Debug.Log("Skipping players: " + skippingPlayers[i].PlayerID);
+            Debug.Log("Skipping players: " + string.Join(", ", skippingPlayers[i].PlayerID));
         }
         
 
