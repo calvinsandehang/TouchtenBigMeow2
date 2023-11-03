@@ -53,12 +53,12 @@ public class UIContinueButton : MonoBehaviour, ISubscriber
 
     public void SubscribeEvent()
     {
-        Big2GMStateMachine.OnGameHasEnded += ShowButton;
+        Big2GlobalEvent.SubscribeGameHasEnded(ShowButton);
     }
    
     public void UnsubscribeEvent()
     {
-        Big2GMStateMachine.OnGameHasEnded -= ShowButton;
+        Big2GlobalEvent.UnsubscribeGameHasEnded(ShowButton);
     }
 
     private void OnDisable()

@@ -2,57 +2,81 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Represents a deck of cards.
+/// </summary>
 public class DeckModel : MonoBehaviour
 {
-    private List<CardModel> deck;
+    /// <summary>
+    /// Optimization
+    /// referenceDeck is used as a reference to avoid repeating the deck initialization process in subsequent games.
+    /// </summary>
+    private List<CardModel> referenceDeck;
+    public List<CardModel> currentDeck;
 
-    // constructor that takes a DeckSO and create CardModels for each CardSO
-    public DeckModel(DeckSO deckSO) 
+    /// <summary>
+    /// Initializes a new instance of the DeckModel class using a DeckSO.
+    /// </summary>
+    /// <param name="deckSO">The DeckSO containing card definitions.</param>
+    public DeckModel(DeckSO deckSO)
     {
-        deck = new List<CardModel>();
+        // Create a reference deck from DeckSO
+        referenceDeck = new List<CardModel>();
         foreach (var cardSO in deckSO.Cards)
         {
-            deck.Add(cardSO.CreateNewCardModel());
+            referenceDeck.Add(cardSO.CreateNewCardModel());
+        }
+
+        // Set the current deck as the reference deck
+        currentDeck = referenceDeck;
+    }
+
+    /// <summary>
+    /// Shuffles the current deck using the Knuth shuffle algorithm.
+    /// </summary>
+    public void Shuffle()
+    {
+        for (int currentIndex = 0; currentIndex < currentDeck.Count; currentIndex++)
+        {
+            int randomIndex = Random.Range(currentIndex, currentDeck.Count);
+            CardModel tempCard = currentDeck[currentIndex];
+
+            currentDeck[currentIndex] = currentDeck[randomIndex];
+            currentDeck[randomIndex] = tempCard;
         }
     }
 
-    // Method to shuffle the deck
-    public void Shuffle() 
+    /// <summary>
+    /// Draws the top card from the current deck.
+    /// Returns null if the deck is empty.
+    /// </summary>
+    /// <returns>The top card from the deck.</returns>
+    public CardModel DrawCard()
     {
-        // simple Knuth shuffle algorithm
-        for (int currentIndex = 0; currentIndex < deck.Count; currentIndex++) 
+        if (currentDeck.Count > 0)
         {
-            int randomIndex = Random.Range(currentIndex, deck.Count);
-            CardModel tempCard = deck[currentIndex];
-            
-            deck[currentIndex] = deck[randomIndex];
-            deck[randomIndex] = tempCard;
-
-        }
-    }
-
-    // Method to draw the top card from the deck
-    // Returns null if the dec is empty
-    public CardModel DrawCard() 
-    {
-        if (deck.Count > 0) 
-        {
-            CardModel topCard = deck[0];
-            deck.RemoveAt(0); // remove the card model from the deck
+            CardModel topCard = currentDeck[0];
+            currentDeck.RemoveAt(0); // Remove the card model from the deck
             return topCard;
         }
 
         return null;
     }
 
-    public List<CardModel> GetCurrentDeck() 
+    /// <summary>
+    /// Gets the current number of cards in the reference deck.
+    /// </summary>
+    /// <returns>The number of cards in the reference deck.</returns>
+    public int CardRemaining()
     {
-        return deck;
+        return referenceDeck.Count;
     }
 
-    // Method to get the current number of cards in the deck
-    public int CardRemaining() 
+    /// <summary>
+    /// Resets the current deck to the reference deck.
+    /// </summary>
+    public void ResetDeck()
     {
-        return deck.Count;
+        currentDeck = referenceDeck;
     }
 }

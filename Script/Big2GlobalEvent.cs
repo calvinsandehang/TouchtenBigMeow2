@@ -4,17 +4,8 @@ using static GlobalDefine;
 
 public static class Big2GlobalEvent
 {
-    private static List<Action<PlayerType>> avatarIsSetListeners = new List<Action<PlayerType>>();
-    private static List<Action> playerCardLessThanSixListeners = new List<Action>();
-    private static List<Action<Big2PlayerHand>> playerLastCardDroppedListeners = new List<Action<Big2PlayerHand>>();
-    private static List<Action<Big2PlayerHand>> playerFinishTurnGlobalListeners = new List<Action<Big2PlayerHand>>();
-    private static List<Action> cardSubmissionAllowedListeners = new List<Action>();
-    private static List<Action> cardSubmissionNotAllowedListeners = new List<Action>();
-    private static List<Action<Big2PlayerHand>> playerSkipTurnGlobalListeners = new List<Action<Big2PlayerHand>>();
-    private static List<Action<Big2PlayerHand>> aiFinishTurnGlobalListeners = new List<Action<Big2PlayerHand>>();
-    private static List<Action<Big2PlayerHand>> aiSkipTurnGlobalListeners = new List<Action<Big2PlayerHand>>();
-
     #region Event : AvatarIsSet
+    private static List<Action<PlayerType>> avatarIsSetListeners = new List<Action<PlayerType>>();
     public static void SubscribeAvatarIsSet(Action<PlayerType> listener)
     {
         if (!avatarIsSetListeners.Contains(listener))
@@ -40,6 +31,7 @@ public static class Big2GlobalEvent
     }
     #endregion
     #region Event : CardLessThanSix
+    private static List<Action> playerCardLessThanSixListeners = new List<Action>();
     public static void SubscribePlayerCardLessThanSix(Action listener)
     {
         if (!playerCardLessThanSixListeners.Contains(listener))
@@ -65,6 +57,7 @@ public static class Big2GlobalEvent
     }
     #endregion
     #region Event : PlayerDropLastCard
+    private static List<Action<Big2PlayerHand>> playerLastCardDroppedListeners = new List<Action<Big2PlayerHand>>();
     public static void SubscribePlayerDropLastCard(Action<Big2PlayerHand> listener)
     {
         if (!playerLastCardDroppedListeners.Contains(listener))
@@ -90,6 +83,7 @@ public static class Big2GlobalEvent
     }
     #endregion
     #region Event : PlayerFinishTurn
+    private static List<Action<Big2PlayerHand>> playerFinishTurnGlobalListeners = new List<Action<Big2PlayerHand>>();
     public static void SubscribePlayerFinishTurnGlobal(Action<Big2PlayerHand> listener)
     {
         if (!playerFinishTurnGlobalListeners.Contains(listener))
@@ -115,6 +109,7 @@ public static class Big2GlobalEvent
     }
     #endregion
     #region Event : CardSubmissionAllowed
+    private static List<Action> cardSubmissionAllowedListeners = new List<Action>();
     public static void SubscribeCardSubmissionAllowed(Action listener)
     {
         if (!cardSubmissionAllowedListeners.Contains(listener))
@@ -140,6 +135,7 @@ public static class Big2GlobalEvent
     }
     #endregion
     #region Event : CardSubmissionNotAllowed
+    private static List<Action> cardSubmissionNotAllowedListeners = new List<Action>();
     public static void SubscribeCardSubmissionNotAllowed(Action listener)
     {
         if (!cardSubmissionNotAllowedListeners.Contains(listener))
@@ -165,6 +161,7 @@ public static class Big2GlobalEvent
     }
     #endregion
     #region Event : PlayerSkipTurnGlobal
+    private static List<Action<Big2PlayerHand>> playerSkipTurnGlobalListeners = new List<Action<Big2PlayerHand>>();
     public static void SubscribePlayerSkipTurnGlobal(Action<Big2PlayerHand> listener)
     {
         if (!playerSkipTurnGlobalListeners.Contains(listener))
@@ -190,6 +187,7 @@ public static class Big2GlobalEvent
     }
     #endregion
     #region Event : AIFinishTurnGlobal
+    private static List<Action<Big2PlayerHand>> aiFinishTurnGlobalListeners = new List<Action<Big2PlayerHand>>();
     public static void SubscribeAIFinishTurnGlobal(Action<Big2PlayerHand> listener)
     {
         if (!aiFinishTurnGlobalListeners.Contains(listener))
@@ -215,6 +213,8 @@ public static class Big2GlobalEvent
     }
     #endregion
     #region Event : AISkipTurnGlobal
+    private static List<Action<Big2PlayerHand>> aiSkipTurnGlobalListeners = new List<Action<Big2PlayerHand>>();
+
     public static void SubscribeAISkipTurnGlobal(Action<Big2PlayerHand> listener)
     {
         if (!aiSkipTurnGlobalListeners.Contains(listener))
@@ -239,7 +239,115 @@ public static class Big2GlobalEvent
         }
     }
     #endregion
+    #region Event : RoundHasEnded
+    private static List<Action> roundHasEndedListeners = new List<Action>();
+
+    public static void SubscribeRoundHasEnded(Action listener)
+    {
+        if (!roundHasEndedListeners.Contains(listener))
+        {
+            roundHasEndedListeners.Add(listener);
+        }
+    }
+
+    public static void UnsubscribeRoundHasEnded(Action listener)
+    {
+        if (roundHasEndedListeners.Contains(listener))
+        {
+            roundHasEndedListeners.Remove(listener);
+        }
+    }
+
+    public static void BroadcastRoundHasEnded()
+    {
+        foreach (var listener in roundHasEndedListeners)
+        {
+            listener.Invoke();
+        }
+    }
+    #endregion
+    #region Event : GameHasEnded
+    private static List<Action> gameHasEndedListeners = new List<Action>();
+
+    public static void SubscribeGameHasEnded(Action listener)
+    {
+        if (!gameHasEndedListeners.Contains(listener))
+        {
+            gameHasEndedListeners.Add(listener);
+        }
+    }
+
+    public static void UnsubscribeGameHasEnded(Action listener)
+    {
+        if (gameHasEndedListeners.Contains(listener))
+        {
+            gameHasEndedListeners.Remove(listener);
+        }
+    }
+
+    public static void BroadcastGameHasEnded()
+    {
+        foreach (var listener in gameHasEndedListeners)
+        {
+            listener.Invoke();
+        }
+    }
+    #endregion
+    #region Event : AskPlayerInPostGame
+    private static List<Action> askPlayerInPostGameListeners = new List<Action>();
+
+    public static void SubscribeAskPlayerInPostGame(Action listener)
+    {
+        if (!askPlayerInPostGameListeners.Contains(listener))
+        {
+            askPlayerInPostGameListeners.Add(listener);
+        }
+    }
+
+    public static void UnsubscribeAskPlayerInPostGame(Action listener)
+    {
+        if (askPlayerInPostGameListeners.Contains(listener))
+        {
+            askPlayerInPostGameListeners.Remove(listener);
+        }
+    }
+
+    public static void BroadcastAskPlayerInPostGame()
+    {
+        foreach (var listener in askPlayerInPostGameListeners)
+        {
+            listener.Invoke();
+        }
+    }
+    #endregion
 
 
+    #region Event : RestartGame
+    private static List<Action> restartGameListeners = new List<Action>();
+
+    public static void SubscribeRestartGame(Action listener)
+    {
+        if (!restartGameListeners.Contains(listener))
+        {
+            restartGameListeners.Add(listener);
+        }
+    }
+
+    public static void UnsubscribeRestartGame(Action listener)
+    {
+        if (restartGameListeners.Contains(listener))
+        {
+            restartGameListeners.Remove(listener);
+        }
+    }
+
+    public static void BroadcastRestartGame()
+    {
+        foreach (var listener in restartGameListeners)
+        {
+            listener.Invoke();
+        }
+    }
+    #endregion
 
 }

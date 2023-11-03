@@ -1,19 +1,21 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Net.Security;
 using UnityEngine;
 using static GlobalDefine;
 
 public class Big2GMStateOpenGame : BaseState<GMState>
 {
     private Big2GMStateMachine GMSM;
+
     public Big2GMStateOpenGame(GMState key, Big2GMStateMachine stateMachine) : base(key)
     {
         GMSM = stateMachine;
     }
 
+    /// <summary>
+    /// Enter the Open Game state.
+    /// </summary>
     public override void EnterState()
     {
         Debug.Log("GM in Open Game State");
@@ -22,7 +24,7 @@ public class Big2GMStateOpenGame : BaseState<GMState>
 
     public override void ExitState()
     {
-
+        // Cleanup or additional logic when exiting the state
     }
 
     public override GMState GetActiveState()
@@ -32,35 +34,39 @@ public class Big2GMStateOpenGame : BaseState<GMState>
 
     public override void UpdateState()
     {
-
+        // Additional state-specific update logic if needed
     }
 
-    private void InitializeGame() 
+    /// <summary>
+    /// Initialize the game state.
+    /// </summary>
+    private void InitializeGame()
     {
         Big2GMStateMachine.WinnerIsDetermined = false;
 
         InitializeDeck();
-        DeckShuffle();
+       
 
         if (!GMSM.IsInitialized)
             InitializePlayer();
-        else
-            ResetPlayerCard();        
 
         DealCards();
 
+        // Determining player turn
         if (!GMSM.IsInitialized)
         {
             GMSM.IsInitialized = true;
             DetermineWhoPlayFirst();
         }
-
-        if (GMSM.IsInitialized)
+        else
         {
             PreviousWinnerGoFirst();
         }
     }
 
+    /// <summary>
+    /// Determine the player who won the previous game and let them go first.
+    /// </summary>
     private void PreviousWinnerGoFirst()
     {
         int winnerPlayerIndex = GMSM.FindElementIndex(GMSM.PlayerHands, GMSM.WinnerPlayer);
@@ -68,33 +74,51 @@ public class Big2GMStateOpenGame : BaseState<GMState>
         GMSM.SetTurn(winnerPlayerIndex);
     }
 
+    /// <summary>
+    /// Initialize the deck for the game.
+    /// </summary>
     private void InitializeDeck()
     {
-        GMSM.DeckModel = new DeckModel(GMSM.Deck);
+        if (GMSM.DeckModel == null)
+        {
+            GMSM.DeckModel = new DeckModel(GMSM.Deck);
+        }
+        else
+        {
+            GMSM.DeckModel.ResetDeck(); // Reset the deck for a new game
+        }
+
+        ShuffleDeck();
     }
 
-    private void DeckShuffle()
+    /// <summary>
+    /// Shuffle the deck.
+    /// </summary>
+    private void ShuffleDeck()
     {
         GMSM.DeckModel.Shuffle();
     }
 
+    /// <summary>
+    /// Initialize player hands and UI components.
+    /// </summary>
     private void InitializePlayer()
     {
-        // create hands for each player
+        // Create hands for each player
         for (int i = 0; i < GMSM.PlayerNumber; i++)
         {
             GameObject playerHandObject = GMSM.InstantiatePlayer();
             Big2PlayerHand playerHand = playerHandObject.GetComponent<Big2PlayerHand>();
             Big2PlayerUIManager playerUIManager = playerHandObject.GetComponent<Big2PlayerUIManager>();
 
-            if (i == 0)            
-                playerHand.PlayerType = PlayerType.Human;            
+            if (i == 0)
+                playerHand.PlayerType = PlayerType.Human;
             else
                 playerHand.PlayerType = PlayerType.AI;
 
-            // initializae ID
+            // Initialize ID
             playerHand.InitializePlayerID(i);
-            // initialize UI Elements
+            // Initialize UI Elements
             playerUIManager.SetupSkipNotificationButton(GMSM.PlayerUIComponents[i].SkipNotification);
             playerUIManager.SetupProfilePicture(GMSM.PlayerUIComponents[i].ProfilePicture);
             playerUIManager.SetupCardParent(GMSM.PlayerUIComponents[i].CardParent);
@@ -103,6 +127,9 @@ public class Big2GMStateOpenGame : BaseState<GMState>
         }
     }
 
+    /// <summary>
+    /// Deal cards to each player.
+    /// </summary>
     private void DealCards()
     {
         // Deal 13 cards to each player
@@ -118,15 +145,16 @@ public class Big2GMStateOpenGame : BaseState<GMState>
                 }
                 else
                 {
-                    Debug.LogError("Not enough card on the deck");
+                    Debug.LogError("Not enough cards in the deck");
                     return;
                 }
             }
         }
-        GMSM.BroadcastCardHasBeenDealt();
-
     }
 
+    /// <summary>
+    /// Determine the player who plays first based on having the three of diamonds.
+    /// </summary>
     private void DetermineWhoPlayFirst()
     {
         foreach (var player in GMSM.PlayerHands)
@@ -140,11 +168,4 @@ public class Big2GMStateOpenGame : BaseState<GMState>
             }
         }
     }
-
-    private void ResetPlayerCard() 
-    {
-        
-    }
-
-
 }

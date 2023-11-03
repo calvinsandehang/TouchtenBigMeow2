@@ -424,8 +424,8 @@ public class UIBig2TableCards : MonoBehaviour, IObserverTable, ISubscriber
 
     public void SubscribeEvent()
     {
-        Big2GMStateMachine.OnRoundHasEnded += ClearTableUI;
-        Big2GMStateMachine.OnGameHasEnded += ClearTableUI;
+        Big2GlobalEvent.SubscribeGameHasEnded(ClearTableUI);
+        Big2GlobalEvent.SubscribeRoundHasEnded(ClearTableUI);
     }
 
     private void ClearTableUI()
@@ -436,7 +436,7 @@ public class UIBig2TableCards : MonoBehaviour, IObserverTable, ISubscriber
 
     public void UnsubscribeEvent()
     {
-        Big2GMStateMachine.OnRoundHasEnded -= ClearTableUI;
-        Big2GMStateMachine.OnGameHasEnded -= ClearTableUI;
+        Big2GlobalEvent.UnsubscribeGameHasEnded(ClearTableUI);
+        Big2GlobalEvent.UnsubscribeRoundHasEnded(ClearTableUI);
     }
 }

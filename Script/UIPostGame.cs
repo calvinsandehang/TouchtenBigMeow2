@@ -3,55 +3,65 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// Handles the post-game UI, including continue and exit buttons.
+/// </summary>
 public class UIPostGame : MonoBehaviour
 {
-    [SerializeField]
-    private Button _continueButton, _exitButton;
-    private CanvasGroup canvasGroup;
+    [SerializeField] private Button _continueButton, _exitButton;
+    private CanvasGroup _canvasGroup;
 
     private void Start()
     {
-        canvasGroup = GetComponent<CanvasGroup>();
-     
-        if (canvasGroup == null)
-        {
-            canvasGroup = gameObject.AddComponent<CanvasGroup>();
-        }
-
+        _canvasGroup = GetComponent<CanvasGroup>() ?? gameObject.AddComponent<CanvasGroup>();
         _continueButton.onClick.AddListener(OnContinueButtonPressed);
-
         HideButton();
         SubscribeEvent();
     }
 
+    /// <summary>
+    /// Handles the action when the continue button is pressed.
+    /// </summary>
     private void OnContinueButtonPressed()
     {
-        Big2GMStateMachine.Instance.OnOpenGame();
+        Big2GlobalEvent.BroadcastRestartGame();
         HideButton();
     }
 
+    /// <summary>
+    /// Shows the post-game UI buttons.
+    /// </summary>
     private void ShowButton()
     {
-        canvasGroup.alpha = 1f;
-        canvasGroup.interactable = true;
-        canvasGroup.blocksRaycasts = true;
+        _canvasGroup.alpha = 1f;
+        _canvasGroup.interactable = true;
+        _canvasGroup.blocksRaycasts = true;
     }
 
+    /// <summary>
+    /// Hides the post-game UI buttons.
+    /// </summary>
     private void HideButton()
     {
-        canvasGroup.alpha = 0f;
-        canvasGroup.interactable = false;
-        canvasGroup.blocksRaycasts = false;
+        _canvasGroup.alpha = 0f;
+        _canvasGroup.interactable = false;
+        _canvasGroup.blocksRaycasts = false;
     }
 
-    public void SubscribeEvent()
+    /// <summary>
+    /// Subscribes to the relevant events.
+    /// </summary>
+    private void SubscribeEvent()
     {
-        Big2GMStateMachine.OnGameHasEnded += ShowButton;
+        Big2GlobalEvent.SubscribeAskPlayerInPostGame(ShowButton);
     }
 
-    public void UnsubscribeEvent()
+    /// <summary>
+    /// Unsubscribes from the relevant events.
+    /// </summary>
+    private void UnsubscribeEvent()
     {
-        Big2GMStateMachine.OnGameHasEnded -= ShowButton;
+        Big2GlobalEvent.UnsubscribeAskPlayerInPostGame(ShowButton);
     }
 
     private void OnDisable()
@@ -59,4 +69,3 @@ public class UIPostGame : MonoBehaviour
         UnsubscribeEvent();
     }
 }
-

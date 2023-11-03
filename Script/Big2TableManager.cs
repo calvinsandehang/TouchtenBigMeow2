@@ -73,13 +73,13 @@ public class Big2TableManager : SubjectTable, ISubscriber
 
     public void SubscribeEvent()
     {
-        Big2GMStateMachine.OnRoundHasEnded += CleanTable;
-        Big2GMStateMachine.OnGameHasEnded += CleanTable;
+        Big2GlobalEvent.SubscribeRoundHasEnded(CleanTable);
+        Big2GlobalEvent.SubscribeGameHasEnded(CleanTable);       
     }
 
     public void UnsubscribeEvent()
     {
-        Big2GMStateMachine.OnRoundHasEnded -= CleanTable;
-        Big2GMStateMachine.OnGameHasEnded -= CleanTable;
+        Big2GlobalEvent.UnsubscribeRoundHasEnded(CleanTable);
+        Big2GlobalEvent.UnsubscribeGameHasEnded(CleanTable);
     }
 }

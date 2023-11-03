@@ -1,68 +1,66 @@
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.EventSystems; // Required namespace for handling UI events
+using UnityEngine.EventSystems;
 using System;
 using static GlobalDefine;
 
+/// <summary>
+/// Represents the possible states of a selectable card.
+/// </summary>
 public enum CardState
 {
     Selected,
     Deselected,
 }
 
-public class UISelectableCard : SubjectCard, IPointerClickHandler // Implementing interface
+/// <summary>
+/// A script to handle the behavior of a selectable card in the UI.
+/// </summary>
+public class UISelectableCard : SubjectCard, IPointerClickHandler
 {
-    
-    private Image cardImage; // The UI Image component where the card's image will be displayed
-
-    public Color initialColor = Color.white; // Initial color for the card
-    public Color selectedColor = Color.green; // Color when the card is selected
-
-    private bool isSelected = false; // Flag to check if the card is selected or not
+    private Image cardImage;
+    public Color initialColor = Color.white;
+    public Color selectedColor = Color.green;
+    private bool isSelected = false;
     private CardModel cardModel;
 
-    [SerializeField] 
-    private AudioClip cardDeselectedSound;
-    [SerializeField]
-    private AudioClip cardSelectSound;
-
+    [SerializeField] private AudioClip cardDeselectedSound;
+    [SerializeField] private AudioClip cardSelectSound;
     private AudioSource audioSource;
+
    
-    public CardModel GetCardModel() 
-    {
-        return cardModel;
-    }
-    private void OnDisable()
-    {
-        isSelected = false;
-    }
-    void Awake()
+
+    private void Awake()
     {
         cardImage = GetComponent<Image>();
         audioSource = GetComponent<AudioSource>();
 
         if (audioSource == null)
+        {
             gameObject.AddComponent<AudioSource>();
+        }
+    }
+    private void OnDisable()
+    {
+        isSelected = false;
     }
 
+    /// <summary>
+    /// Initializes the UI card with the specified CardModel and player type.
+    /// </summary>
+    /// <param name="card">The CardModel to display.</param>
+    /// <param name="playerType">The player type associated with the card.</param>
     public void Initialize(CardModel card, PlayerType playerType)
     {
         cardModel = card;
-        Sprite cardSprite;
-        if (playerType == PlayerType.Human)
-        {
-            cardSprite = cardModel.CardSprite;
-        }
-        else
-        {
-            cardSprite = cardModel.BacksideSprite;
-        }
-       
-
+        Sprite cardSprite = (playerType == PlayerType.Human) ? cardModel.CardSprite : cardModel.BacksideSprite;
         DisplayCard(cardSprite, playerType);
     }
 
-
+    /// <summary>
+    /// Displays the card based on a CardSO.
+    /// </summary>
+    /// <param name="cardSO">The CardSO containing card information.</param>
     public void DisplayCard(CardSO cardSO)
     {
         cardImage.sprite = cardSO.CardSprite;
@@ -74,6 +72,11 @@ public class UISelectableCard : SubjectCard, IPointerClickHandler // Implementin
         }
     }
 
+    /// <summary>
+    /// Displays the card with a specified sprite and player type.
+    /// </summary>
+    /// <param name="cardSprite">The sprite to display.</param>
+    /// <param name="playerType">The player type associated with the card.</param>
     public void DisplayCard(Sprite cardSprite, PlayerType playerType)
     {
         cardImage.sprite = cardSprite;
@@ -94,9 +97,12 @@ public class UISelectableCard : SubjectCard, IPointerClickHandler // Implementin
         }
     }
 
+    /// <summary>
+    /// Handles the pointer click event on the card.
+    /// </summary>
+    /// <param name="eventData">The pointer event data.</param>
     public void OnPointerClick(PointerEventData eventData)
     {
-        // This method is called when the card is clicked
         if (isSelected)
         {
             DeselectCard();
@@ -106,9 +112,12 @@ public class UISelectableCard : SubjectCard, IPointerClickHandler // Implementin
             SelectCard();
         }
 
-        isSelected = !isSelected; // Toggle the selection state
+        isSelected = !isSelected;
     }
 
+    /// <summary>
+    /// Selects the card, changing its appearance and notifying observers.
+    /// </summary>
     public void SelectCard()
     {
         if (cardSelectSound != null)
@@ -119,11 +128,12 @@ public class UISelectableCard : SubjectCard, IPointerClickHandler // Implementin
 
         cardImage.color = selectedColor;
         NotifyObserver(CardState.Selected);
-
-        // this many instances refer to one instance => Singleton
         CardEvaluator.Instance.RegisterCard(cardModel);
     }
 
+    /// <summary>
+    /// Deselects the card, reverting its appearance and notifying observers.
+    /// </summary>
     public void DeselectCard()
     {
         if (cardDeselectedSound != null)
@@ -134,9 +144,16 @@ public class UISelectableCard : SubjectCard, IPointerClickHandler // Implementin
 
         cardImage.color = initialColor;
         NotifyObserver(CardState.Deselected);
-
-        // this many instances refer to one instance => Singleton
-        //Debug.Log("DeselectCard()");
         CardEvaluator.Instance.DeregisterCard(cardModel);
-    }   
+    }
+
+    /// <summary>
+    /// Gets the associated CardModel of this UI card.
+    /// </summary>
+    /// <returns>The CardModel.</returns>
+    public CardModel GetCardModel()
+    {
+        return cardModel;
+    }
+
 }

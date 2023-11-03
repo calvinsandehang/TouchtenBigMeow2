@@ -2,21 +2,23 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// Represents a UI element that displays a skip notification and fades it out after a delay.
+/// </summary>
 public class UISkipNotification : MonoBehaviour, ISubscriber
 {
     public float fadeInDuration = 0.5f;
     public float fadeOutDuration = 0.5f;
-    public float displayDuration = 1.0f; 
+    public float displayDuration = 1.0f;
 
     private CanvasGroup canvasGroup;
-
     private Big2PlayerSkipTurnHandler playerSkipHandler;
     private Big2PlayerHand playerHand;
+
 
     private void Awake()
     {
         canvasGroup = GetComponent<CanvasGroup>();
-        
     }
 
     private void Start()
@@ -26,14 +28,19 @@ public class UISkipNotification : MonoBehaviour, ISubscriber
         SubscribeEvent();
     }
 
-    public void InitializeUIElement(Big2PlayerSkipTurnHandler playerSkipHandler, Big2PlayerHand playerHand ) 
+    /// <summary>
+    /// Initializes the UI element with the specified player skip handler and player hand.
+    /// </summary>
+    /// <param name="playerSkipHandler">The player skip turn handler associated with the element.</param>
+    /// <param name="playerHand">The player hand associated with the element.</param>
+    public void InitializeUIElement(Big2PlayerSkipTurnHandler playerSkipHandler, Big2PlayerHand playerHand)
     {
         this.playerSkipHandler = playerSkipHandler;
         this.playerHand = playerHand;
     }
 
     // Method to instantly show the element and then fade out after a delay
-    private void ShowAndFadeOut(Big2PlayerHand playerHand) 
+    private void ShowAndFadeOut(Big2PlayerHand playerHand)
     {
         if (this.playerHand != playerHand) return;
         StartCoroutine(ShowAndFadeOutCoroutine());

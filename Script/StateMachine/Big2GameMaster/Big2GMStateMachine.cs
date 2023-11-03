@@ -5,81 +5,131 @@ using System.Collections.Generic;
 using UnityEngine;
 using static GlobalDefine;
 
-public enum GMState 
+/// <summary>
+/// Enumeration representing different states of the game manager.
+/// </summary>
+public enum GMState
 {
     AskPlayer,
     OpenGame,
-    CloseGame, 
+    CloseGame,
     P0Turn,
     P1Turn,
     P2Turn,
     P3Turn
 }
-/* Game : 
- * a game consist of multiple rounds
- * a player who manage to drop all of his cards first is the winner of a game
- * a game is initially start by player holding three of diamonds, but after that, the previous game winner start the game first
- * 
- * Round : 
- * A round consist of turns that made by player. 
- * A round is won by the player who drop the latest highest card
- * The next round start with the winner of the precious round
- * 
- * Turn : a turn is a state when a playing has a change to play/drop his card * 
- * 
- */
 
-
+/// <summary>
+/// Main game manager class that controls the flow of the Big2 game.
+/// </summary>
 [DefaultExecutionOrder(-9999)]
 public class Big2GMStateMachine : StateManager<GMState>, ISubscriber
 {
+    #region Singleton Instance
+
+    /// <summary>
+    /// The singleton instance of the game manager.
+    /// </summary>
     public static Big2GMStateMachine Instance;
 
-    [SerializeField]
-    private GameObject _playerPrefab;
-    public GameObject PlayerPrefab => _playerPrefab;
+    #endregion
 
-    [SerializeField]
-    private DeckSO _deck;
+    #region Prefabs and Deck
 
+    [Header("Prefabs")]
+    [SerializeField] private GameObject _playerPrefab;
+
+    [Header("Deck")]
+    [SerializeField] private DeckSO _deck;
     public DeckSO Deck => _deck;
 
-    [Header("Rule")]
+    #endregion
+
+    #region Game Rules
+
+    [Header("Game Rules")]
+
+    /// <summary>
+    /// The number of players in the game (2 to 4).
+    /// </summary>
     [SerializeField]
     [Range(2, 4)]
     private int _playerNumber = 4;
     public int PlayerNumber => _playerNumber;
 
-    [SerializeField]
-    private int _totalCardInHandPerPlayer = 13;
+    /// <summary>
+    /// The total number of cards in hand per player.
+    /// </summary>
+    [SerializeField] private int _totalCardInHandPerPlayer = 13;
     public int TotalCardInHandPerplayer => _totalCardInHandPerPlayer;
 
-    // a deck consist of 52 cards
-    public List<CardModel> deck = new List<CardModel>();  
-    public List<Big2PlayerHand> PlayerHands { get; private set; } = new List<Big2PlayerHand>();
-    
-    
-    [SerializeField]
-    private List<PlayerComponents> _playerUIComponent;
-    public List<PlayerComponents> PlayerUIComponents => _playerUIComponent;
-    public DeckModel DeckModel { get; set; }
-    
-    public event Action OnDealerFinishDealingCards;
-    //public event Action<Big2PlayerHand> OnRoundWinnerDeclared;
-    public static event Action OnRoundHasEnded; // Subs : Big2TableManager, UIBig2TableCards
-    public static event Action OnGameHasEnded;
-    public bool FirstGame { get; set; } = true;
-    public int CurrentPlayerIndex { get; set; } = 0;
-    public static bool DetermineWhoGoFirst = true;
-    public static bool WinnerIsDetermined = false;
-    public bool IsInitialized { get; set; }
-    public Big2PlayerHand WinnerPlayer { get; private set; }
-    
+    /// <summary>
+    /// The delay after the end of the game before proceeding to the post-game phase.
+    /// </summary>
+    [SerializeField] private int _endGameDelay = 5;
 
-    #region Initialization
+    /// <summary>
+    /// The delay after the post-game phase before starting a new game.
+    /// </summary>
+    [SerializeField] private int _postGameDelay = 5;
+    public int PostGameDelay => _postGameDelay;
+
+    #endregion
+
+    #region Deck and Players
+    public List<CardModel> deck = new List<CardModel>();
+    public List<Big2PlayerHand> PlayerHands { get; private set; } = new List<Big2PlayerHand>();
+    #endregion
+
+    #region UI Components
+
+    [Header("Player UI Components")]
+    [SerializeField] private List<PlayerComponents> _playerUIComponent;
+    public List<PlayerComponents> PlayerUIComponents => _playerUIComponent;
+
+    private List<Big2PlayerHand> skippingPlayers = new List<Big2PlayerHand>();
+    public DeckModel DeckModel { get; set; }
+
+    #endregion
+
+    #region Game State
+
+    /// <summary>
+    /// Indicates whether it's the first game.
+    /// </summary>
+    public bool FirstGame { get; set; } = true;
+
+    /// <summary>
+    /// The index of the current player.
+    /// </summary>
+    public int CurrentPlayerIndex { get; set; } = 0;
+
+    /// <summary>
+    /// Indicates whether it's time to determine who goes first.
+    /// </summary>
+    public static bool DetermineWhoGoFirst = true;
+
+    /// <summary>
+    /// Indicates whether the winner of the game has been determined.
+    /// </summary>
+    public static bool WinnerIsDetermined = false;
+
+    /// <summary>
+    /// Indicates whether the game has been initialized.
+    /// </summary>
+    public bool IsInitialized { get; set; }
+
+    /// <summary>
+    /// The player who has won the game.
+    /// </summary>
+    public Big2PlayerHand WinnerPlayer { get; private set; }
+
+    #endregion
+
+    #region Monobehaviour
     private void Awake()
     {
-        if (Instance == null) 
+        if (Instance == null)
         {
             Instance = this;
         }
@@ -100,37 +150,47 @@ public class Big2GMStateMachine : StateManager<GMState>, ISubscriber
         SubscribeEvent();
     }
 
-    public GameObject InstantiatePlayer() 
+    private void OnDisable()
     {
-        GameObject playerHandObject = Instantiate(PlayerPrefab);
+        UnsubscribeEvent();
+    }
+    #endregion
+
+    /// <summary>
+    /// Instantiate a player object.
+    /// </summary>
+    /// <returns>The instantiated player object.</returns>
+    public GameObject InstantiatePlayer()
+    {
+        GameObject playerHandObject = Instantiate(_playerPrefab);
         return playerHandObject;
     }
 
     #region Handle Turn
     // Determine who goes first based on Player who has three of diamonds
-    public void SetTurn(int currentPlayerIndex) 
+    public void SetTurn(int currentPlayerIndex)
     {
         if (currentPlayerIndex > 3)
-            Debug.LogError("player index should not be more than 3 as there are only 4 players");
-        //Debug.Log("GM called SetTurn for Player " + (currentPlayerIndex));
-        switch (currentPlayerIndex) 
         {
-            case 0: // player turn
-                Player0Turn();
-                break;
-            case 1:
-                Player1Turn();
-                break;
-            case 2:
-                Player2Turn();
-                break;
-            case 3:
-                Player3Turn();
-                break;
+            Debug.LogError("Player index should not be more than 3 as there are only 4 players");
+            return;
+        }
+
+        switch (currentPlayerIndex)
+        {
+            case 0: Player0Turn(); break;
+            case 1: Player1Turn(); break;
+            case 2: Player2Turn(); break;
+            case 3: Player3Turn(); break;
         }
     }
 
-    public void NextTurn(Big2PlayerHand playerHand) 
+
+    /// <summary>
+    /// Handle the next turn in the game.
+    /// </summary>
+    /// <param name="playerHand">The player whose turn is next.</param>
+    public void NextTurn(Big2PlayerHand playerHand)
     {
         // Increment currentPlayerIndex counterclockwise.
         Debug.Log("GM called Next Turn");
@@ -143,11 +203,12 @@ public class Big2GMStateMachine : StateManager<GMState>, ISubscriber
         SetTurn(CurrentPlayerIndex);
     }
 
-    private List<Big2PlayerHand> skippingPlayers = new List<Big2PlayerHand>();
-    
+    /// <summary>
+    /// Handles skipping a player's turn and checks if all other players have skipped.
+    /// </summary>
+    /// <param name="skippingPlayer">The player who is skipping their turn.</param>
     private void SkipTurn(Big2PlayerHand skippingPlayer)
     {
-        //Debug.Log("SkipTurn");
         Big2PlayerHand lastNonSkippingPlayer = null;
         skippingPlayers.Add(skippingPlayer);
 
@@ -156,7 +217,6 @@ public class Big2GMStateMachine : StateManager<GMState>, ISubscriber
         {
             Debug.Log("Skipping players: " + string.Join(", ", skippingPlayers[i].PlayerID));
         }
-        
 
         // Check if all other players have skipped
         if (skippingPlayers.Count == PlayerHands.Count - 1)
@@ -184,35 +244,63 @@ public class Big2GMStateMachine : StateManager<GMState>, ISubscriber
         }
     }
 
+    /// <summary>
+    /// Executes the next round after players have skipped their turns.
+    /// </summary>
+    /// <param name="lastNonSkippingPlayer">The last player who did not skip their turn.</param>
     private IEnumerator ExecuteNextRound(Big2PlayerHand lastNonSkippingPlayer)
     {
-        OnRoundHasEnded?.Invoke();
+        Big2GlobalEvent.BroadcastRoundHasEnded();
         yield return new WaitForSeconds(3f);
 
         int lastNonSkippingPlayerIndex = PlayerHands.IndexOf(lastNonSkippingPlayer);
         CurrentPlayerIndex = lastNonSkippingPlayerIndex;
         SetTurn(lastNonSkippingPlayerIndex);
-        //Debug.Log(" SetTurn(lastNonSkippingPlayerIndex)");
     }
 
-    public void ResetSkippingPlayers() 
+
+    /// <summary>
+    /// Reset the list of players who have skipped their turn.
+    /// </summary>
+    public void ResetSkippingPlayers()
     {
-        //Debug.Log("ResetSkippingPlayers() ");
         skippingPlayers.Clear();
     }
 
+    /// <summary>
+    /// Handle the end of the game.
+    /// </summary>
+    /// <param name="winningPlayer">The player who won the game.</param>
+    private void EndGame(Big2PlayerHand winningPlayer)
+    {
+        WinnerPlayer = winningPlayer;
+
+        // Set global variable
+        WinnerIsDetermined = true;
+
+        // Make the players win/lose
+        foreach (var player in PlayerHands)
+        {
+            Big2PlayerStateMachine playerStateMachine = player.GetComponent<Big2PlayerStateMachine>();
+
+            if (player == winningPlayer)
+                playerStateMachine.MakePlayerWin();
+            else
+                playerStateMachine.MakePlayerLose();
+        }
+
+        StartCoroutine(DelayedAction(OnEndGame, _endGameDelay));
+    }
     #endregion
 
     #region Initialization
     protected override void ParameterInitialization()
     {
-
+        // Initialize parameters if needed
     }
 
     protected override void StateInitialization()
     {
-        //Debug.Log("GM initialize states");
-
         States[GMState.AskPlayer] = new Big2GMStateAskPlayer(GMState.AskPlayer, this);
         States[GMState.OpenGame] = new Big2GMStateOpenGame(GMState.OpenGame, this);
         States[GMState.CloseGame] = new Big2GMStateCloseGame(GMState.CloseGame, this);
@@ -220,162 +308,147 @@ public class Big2GMStateMachine : StateManager<GMState>, ISubscriber
         States[GMState.P1Turn] = new Big2GMStateP1Turn(GMState.P1Turn, this);
         States[GMState.P2Turn] = new Big2GMStateP2Turn(GMState.P2Turn, this);
         States[GMState.P3Turn] = new Big2GMStateP3Turn(GMState.P3Turn, this);
-        
-    }      
-
-    public void DealCards()
-    {
-        // Deal 13 cards to each player
-        for (int i = 0; i < +_totalCardInHandPerPlayer; i++)
-        {
-            foreach (Big2PlayerHand playerHand in PlayerHands)
-            {
-                CardModel card = DeckModel.DrawCard();
-
-                if (card != null)
-                {                    
-                    playerHand.AddCard(card);                    
-                }
-                else
-                {
-                    Debug.LogError("Not enough card on the deck");
-                    return;
-                }
-            }
-        }
-        OnDealerFinishDealingCards?.Invoke();
-                
     }
     #endregion
 
-    #region Order
-    private void Player0Turn() 
+    #region State Transition
+
+    /// <summary>
+    /// Transition to the P0Turn state.
+    /// </summary>
+    private void Player0Turn()
     {
         NextState = States[GMState.P0Turn];
         Debug.Log("NextState : " + NextState);
     }
 
-    private void Player1Turn() 
+    /// <summary>
+    /// Transition to the P1Turn state.
+    /// </summary>
+    private void Player1Turn()
     {
         NextState = States[GMState.P1Turn];
         Debug.Log("NextState : " + NextState);
     }
 
-    private void Player2Turn() 
+    /// <summary>
+    /// Transition to the P2Turn state.
+    /// </summary>
+    private void Player2Turn()
     {
         NextState = States[GMState.P2Turn];
         Debug.Log("NextState : " + NextState);
     }
 
+    /// <summary>
+    /// Transition to the P3Turn state.
+    /// </summary>
     private void Player3Turn()
     {
         NextState = States[GMState.P3Turn];
         Debug.Log("NextState : " + NextState);
     }
 
-    public void OnOpenGame() 
+    /// <summary>
+    /// Transition to the OpenGame state.
+    /// </summary>
+    public void OnOpenGame()
     {
         NextState = States[GMState.OpenGame];
         Debug.Log("NextState : " + NextState);
     }
-   
 
+    /// <summary>
+    /// Transition to the CloseGame state.
+    /// </summary>
+    public void OnEndGame()
+    {
+        NextState = States[GMState.CloseGame];
+        Debug.Log("NextState : " + NextState);
+    }
+
+    /// <summary>
+    /// Transition to the AskPlayer state during post-game.
+    /// </summary>
+    public void AskPlayerInPostGame()
+    {
+        NextState = States[GMState.AskPlayer];
+        Debug.Log("NextState : " + NextState);
+    }
+    #endregion
+   
+    #region Order Player
+    /// <summary>
+    /// Order a player to play their turn based on their ID.
+    /// </summary>
+    /// <param name="playerID">The ID of the player to order to play.</param>
     public void OrderPlayerToPlay(int playerID)
     {
         Big2PlayerStateMachine playerStateMachine = PlayerHands[playerID].GetComponent<Big2PlayerStateMachine>();
         playerStateMachine.MakePlayerPlay();
-        //Debug.Log("GM OrderPlayer " + (playerID)+" to play");
     }
 
-    public void StartGame() 
-    {
-        WinnerIsDetermined = false;
-    }
-
-    private void EndGame(Big2PlayerHand winningPlayer) 
-    {
-        WinnerPlayer = winningPlayer;
-        NextState = States[GMState.CloseGame];
-
-        // set global variable
-        WinnerIsDetermined = true;
-
-        // make the player win/lose
-        foreach (var player in PlayerHands) 
-        {
-            Big2PlayerStateMachine playerStateMachine = player.GetComponent<Big2PlayerStateMachine>();
-
-            if (player == winningPlayer)            
-                playerStateMachine.MakePlayerWin();
-            else            
-                playerStateMachine.MakePlayerLose();            
-        }        
-    }
-
-    private void OrderPlayerToWaitInPostGame() 
+    /// <summary>
+    /// Order all players to wait during post-game.
+    /// </summary>
+    public void OrderPlayerToWaitInPostGame()
     {
         foreach (var player in PlayerHands)
         {
             Big2PlayerStateMachine playerStateMachine = player.GetComponent<Big2PlayerStateMachine>();
-                       
-            playerStateMachine.MakePlayerInPostGame();
+            playerStateMachine.MakePlayerWait();
         }
     }
-
-    
     #endregion
-
-    #endregion
-
-    #region Debugging
-    // This is a property for display in the inspector. It generates an array of string descriptions of the cards.
-    public string[] DeckDebugView
-    {
-        get
-        {
-            string[] cardDescriptions = new string[deck.Count];
-            for (int i = 0; i < deck.Count; i++)
-            {
-                cardDescriptions[i] = deck[i].ToString(); // Assuming you have a ToString method in CardModel that describes the card.
-            }
-            return cardDescriptions;
-        }
-    }
-
-
-    #endregion
-
-    #region LookUp
-    public bool CheckGameInFirstRound() 
-    {
-        return FirstGame;
-    }
-    #endregion
-
 
     #region Helper  
 
+    /// <summary>
+    /// Find the index of an element in a list.
+    /// </summary>
+    /// <typeparam name="T">The type of elements in the list.</typeparam>
+    /// <param name="list">The list to search in.</param>
+    /// <param name="element">The element to find.</param>
+    /// <returns>The index of the element in the list, or -1 if not found.</returns>
     public int FindElementIndex<T>(List<T> list, T element)
     {
         return list.IndexOf(element);
     }
 
-
-    public List<CardModel> GetRemainingDeck()
+    /// <summary>
+    /// Check if it's the first round of the game.
+    /// </summary>
+    /// <returns>True if it's the first round, false otherwise.</returns>
+    public bool CheckGameInFirstRound()
     {
-        return DeckModel.GetCurrentDeck();
+        return FirstGame;
     }
 
+
+    /// <summary>
+    /// Execute an action with a delayed wait.
+    /// </summary>
+    /// <param name="action">The action to execute.</param>
+    /// <param name="delay">The delay in seconds.</param>
+    /// <returns>An IEnumerator for the delayed action.</returns>
+    public IEnumerator DelayedAction(Action action, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        action.Invoke();
+    }
+    
+    #endregion
+
+    #region Subscribe Event
     public void SubscribeEvent()
     {
         Big2GlobalEvent.SubscribePlayerFinishTurnGlobal(NextTurn);
         Big2GlobalEvent.SubscribeAIFinishTurnGlobal(NextTurn);
         Big2GlobalEvent.SubscribeAISkipTurnGlobal(SkipTurn);
         Big2GlobalEvent.SubscribePlayerSkipTurnGlobal(SkipTurn);
-       // Big2GlobalEvent.SubscribePlayerDropLastCard(NextTurn);
         Big2GlobalEvent.SubscribePlayerDropLastCard(EndGame);
+        Big2GlobalEvent.SubscribeRestartGame(OnOpenGame);
     }
-   
 
     public void UnsubscribeEvent()
     {
@@ -383,25 +456,8 @@ public class Big2GMStateMachine : StateManager<GMState>, ISubscriber
         Big2GlobalEvent.UnsubscribeAIFinishTurnGlobal(NextTurn);
         Big2GlobalEvent.UnsubscribeAISkipTurnGlobal(SkipTurn);
         Big2GlobalEvent.UnsubscribePlayerSkipTurnGlobal(SkipTurn);
-        //Big2GlobalEvent.UnsubscribePlayerDropLastCard(NextTurn);
-        Big2GlobalEvent.UnsubscribePlayerDropLastCard(EndGame);    
+        Big2GlobalEvent.UnsubscribePlayerDropLastCard(EndGame);
+        Big2GlobalEvent.SubscribeRestartGame(OnOpenGame);
     }
-
-    public void BroadcastCardHasBeenDealt()
-    {
-        OnDealerFinishDealingCards?.Invoke();
-    }
-    public void BroadcastGameHasEnded()
-    {
-        OnGameHasEnded?.Invoke();
-    }
-
-
     #endregion
-
-    private void OnDisable()
-    {
-        UnsubscribeEvent();
-    }
-
 }
