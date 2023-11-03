@@ -30,7 +30,7 @@ public class Big2AvatarInteractable : MonoBehaviour, IPointerClickHandler
             Debug.Log($"Saved AvatarID: {userPicture.AvatarID}");
 
             // Broadcast an event indicating that an avatar has been set for a human player.
-            Big2CustomEvent.BroadcastOnAvatarIsSet(PlayerType.Human);
+            Big2GlobalEvent.BroadcastAvatarIsSet(PlayerType.Human);
 
             // Open the default menu.
             MenuManager.Instance.OpenDefaultMenu();

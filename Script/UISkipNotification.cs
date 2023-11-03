@@ -62,14 +62,14 @@ public class UISkipNotification : MonoBehaviour, ISubscriber
 
     public void SubscribeEvent()
     {
-        Big2SimpleAI.OnAISkipTurn += ShowAndFadeOut;
-        Big2PlayerSkipTurnHandler.OnPlayerSkipTurnGlobal += ShowAndFadeOut;
+        Big2GlobalEvent.SubscribeAISkipTurnGlobal(ShowAndFadeOut);
+        Big2GlobalEvent.SubscribePlayerSkipTurnGlobal(ShowAndFadeOut);
     }
 
     public void UnsubscribeEvent()
     {
-        Big2SimpleAI.OnAISkipTurn -= ShowAndFadeOut;
-        Big2PlayerSkipTurnHandler.OnPlayerSkipTurnGlobal -= ShowAndFadeOut;
+        Big2GlobalEvent.UnsubscribeAISkipTurnGlobal(ShowAndFadeOut);
+        Big2GlobalEvent.UnsubscribePlayerSkipTurnGlobal(ShowAndFadeOut);
     }
 
     private void OnDisable()

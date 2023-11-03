@@ -1,90 +1,156 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
 using static GlobalDefine;
 
-public class Big2PlayerHand : SubjectPlayer
+/// <summary>
+/// Represents a player's hand in the Big2 card game.
+/// </summary>
+public class Big2PlayerHand : MonoBehaviour, ISubscriber, IPlayer
 {
-    public PlayerType PlayerType;
-    public int PlayerID;
+    /// <summary>
+    /// Gets or sets the type of the player (Human, AI, etc.).
+    /// </summary>
+    public PlayerType PlayerType { get; set; }
+
+    /// <summary>
+    /// Gets or sets the unique identifier of the player.
+    /// </summary>
+    public int PlayerID { get; set; }
+
+    /// <summary>
+    /// Gets or sets the maximum number of cards a player can hold in their hand.
+    /// </summary>
+    public int HandSize { get; set; }
 
     private List<CardModel> playerCards = new List<CardModel>();
-    private const int playerHandSize = 13;
+    private bool hasThreeOfDiamonds;
+    private bool hasQuadrupleTwo;
 
     private Big2GMStateMachine gameMaster;
-    private UIPlayerHandManager uiPlayerHandManager;
     private Big2CardSubmissionCheck cardSubmissionCheck;
-
-    private bool inFirstRound;
-    private bool hasThreeOfDiamonds;
-
-    public static event Action<Big2PlayerHand> OnPlayerLastCardIsDropped;
-    public static event Action OnPlayerCardLessThanSix;
 
     private void Awake()
     {
-        ParameterInitialization();        
-       
+        ParameterInitialization();
+
         SubscribeEvent();
     }
 
     private void Start()
     {
         ComponentInitialization();
-
     }
-    private void ComponentInitialization()
+
+    /// <summary>
+    /// Initializes parameters related to the player.
+    /// </summary>
+    public void ParameterInitialization()
     {
-        if (PlayerType == PlayerType.Human) 
+        gameMaster = Big2GMStateMachine.Instance;
+        cardSubmissionCheck = GetComponent<Big2CardSubmissionCheck>();
+    }
+
+    /// <summary>
+    /// Initializes components and dependencies for the player.
+    /// </summary>
+    public void ComponentInitialization()
+    {
+        if (PlayerType == PlayerType.Human)
         {
             CardEvaluator cardEvaluator = this.gameObject.AddComponent<CardEvaluator>();
             cardEvaluator.InitializeCardEvaluator(cardSubmissionCheck);
-        }        
-    }
-
-    private void SubscribeEvent() 
-    {
-        //dealer.OnDealerFinishDealingCards += EvaluateCardInHand; testing
-        OnPlayerLastCardIsDropped += ResetPlayerCard;
-    }
-
-    private void UnsubscribeEvent()
-    {
-        //dealer.OnDealerFinishDealingCards -= EvaluateCardInHand; testing
-    }
-
-    public void AddCard(CardModel card) 
-    {
-        playerCards.Add(card);
-
-        // If this is the last card, notify that the hand is complete.
-        //if (PlayerType == PlayerType.Human)
-            UIPlayerHandManager.Instance.DisplayCards(playerCards, PlayerID, PlayerType);
-
-        inFirstRound = gameMaster.CheckGameInFirstRound();
-
-        if (gameMaster.CheckGameInFirstRound()) 
-        {
-            if (card.CardRank == Rank.Three && card.CardSuit == Suit.Diamonds)
-                hasThreeOfDiamonds = true;    
         }
     }
 
-    public void InitializePlayerID(int index) 
+    /// <summary>
+    /// Adds a card to the player's hand.
+    /// </summary>
+    /// <param name="card">The CardModel to add to the player's hand.</param>
+    public void AddCard(CardModel card)
+    {
+        playerCards.Add(card);
+
+        UIPlayerHandManager.Instance.DisplayCards(playerCards, PlayerID, PlayerType);
+
+        if (gameMaster.CheckGameInFirstRound())
+        {
+            if (card.CardRank == Rank.Three && card.CardSuit == Suit.Diamonds)
+                hasThreeOfDiamonds = true;
+        }
+    }
+
+    /// <summary>
+    /// Checks if the number of cards in the player's hand is below six and broadcasts an event if true.
+    /// </summary>
+    public void CheckCardBelowSix()
+    {
+        if (playerCards.Count < 6)
+        {
+            Big2GlobalEvent.BroadcastPlayerCardLessThanSix();
+        }
+    }
+
+    /// <summary>
+    /// Checks if the player has a quadruple of Two cards.
+    /// </summary>
+    /// <returns>True if the player has a quadruple of Two cards, otherwise false.</returns>
+    public bool CheckHavingQuadrupleTwoCard()
+    {
+        return hasQuadrupleTwo;
+    }
+
+    /// <summary>
+    /// Checks if the player has the Three of Diamonds card.
+    /// </summary>
+    /// <returns>True if the player has the Three of Diamonds, otherwise false.</returns>
+    public bool CheckHavingThreeOfDiamonds()
+    {
+        return hasThreeOfDiamonds;
+    }
+
+    /// <summary>
+    /// Checks if the player has won by having no cards left in their hand.
+    /// </summary>
+    public void CheckWinningCondition()
+    {
+        if (playerCards.Count == 0)
+        {
+            Debug.Log($"Player {PlayerID} has dropped their last card");
+            Big2GlobalEvent.BroadcastPlayerDropLastCard(this);
+        }
+    }
+
+    /// <summary>
+    /// Retrieves the cards currently held by the player.
+    /// </summary>
+    /// <returns>A list of CardModel representing the player's cards.</returns>
+    public List<CardModel> GetPlayerCards()
+    {
+        return playerCards;
+    }
+
+    /// <summary>
+    /// Initializes the unique identifier of the player.
+    /// </summary>
+    /// <param name="index">The index to assign as the player's identifier.</param>
+    public void InitializePlayerID(int index)
     {
         PlayerID = index;
-        Debug.Log("Initialize Player : " + index);  
     }
 
-    // temporary
-    private void ResetPlayerCard(Big2PlayerHand playerHand) 
+    /// <summary>
+    /// Looks up and retrieves the type of the player.
+    /// </summary>
+    /// <returns>The type of the player (Human, AI, etc.).</returns>
+    public PlayerType PlayerTypeLookUp()
     {
-        playerCards.Clear();
+        return PlayerType;
     }
 
+    /// <summary>
+    /// Removes specified cards from the player's hand.
+    /// </summary>
+    /// <param name="removedCards">A list of CardModel to be removed from the player's hand.</param>
     public void RemoveCards(List<CardModel> removedCards)
     {
         // Create a HashSet of cards to be removed based on their rank and suit
@@ -94,72 +160,46 @@ public class Big2PlayerHand : SubjectPlayer
         playerCards.RemoveAll(card => cardsToRemove.Contains(card));
 
         UIPlayerHandManager.Instance.DisplayCards(playerCards, PlayerID, PlayerType);
+
         // Notify UI to update the displayed cards
-        if (PlayerType == PlayerType.Human) 
+        if (PlayerType == PlayerType.Human)
         {
             CardEvaluator.Instance.DeregisterCard(removedCards);
-            NotifyObserver(playerCards, PlayerID);
+            //NotifyObserver(playerCards, PlayerID);
         }
 
         CheckCardBelowSix();
         CheckWinningCondition();
     }
 
-    private void CheckCardBelowSix()
+    /// <summary>
+    /// Resets the player's hand by clearing all cards.
+    /// </summary>
+    /// <param name="playerHand">The Big2PlayerHand instance representing the player's hand.</param>
+    public void ResetPlayerCard(Big2PlayerHand playerHand)
     {
-        if (playerCards.Count < 6) 
-        {
-            OnPlayerCardLessThanSix?.Invoke();
-        }
+        playerCards.Clear();
     }
 
-    private void CheckWinningCondition()
+    /// <summary>
+    /// Subscribes to relevant game events.
+    /// </summary>
+    public void SubscribeEvent()
     {
-        if (playerCards.Count == 0)
-        {
-            Debug.Log($"Player {PlayerID} drop his last card");
-            OnPlayerLastCardIsDropped?.Invoke(this);
-        }
+        Big2GlobalEvent.SubscribePlayerDropLastCard(ResetPlayerCard);
     }
 
-
-    #region Helper
-    private void ParameterInitialization()
+    /// <summary>
+    /// Unsubscribes from relevant game events.
+    /// </summary>
+    public void UnsubscribeEvent()
     {
-        gameMaster = Big2GMStateMachine.Instance;
-        cardSubmissionCheck = GetComponent<Big2CardSubmissionCheck>();
-        // Injecting this instance to the UIPlayerHandManager
-        if (PlayerType == PlayerType.Human)
-        {
-            //uiPlayerHandManager = UIPlayerHandManager.Instance;
-            //uiPlayerHandManager.InitialializedPlayerHand(this);
-        }
+        Big2GlobalEvent.UnsubscribePlayerDropLastCard(ResetPlayerCard);
     }
 
-    public PlayerType PlayerTypeLookUp() 
-    {
-        return PlayerType;
-    }
-    #endregion
-
-
-    // Get the cards in the player hand
-    // Would be useful for sorting cards
-    #region Look Up & Properties
-    
-
-    public bool CheckHavingThreeOfDiamonds() 
-    {
-        return hasThreeOfDiamonds;
-    }
-
-    public List<CardModel> GetPlayerCards() 
-    {
-        return playerCards;
-    }
-    #endregion
-
-
+    /// <summary>
+    /// Handles cleanup when the player hand is disabled.
+    /// </summary>
     private void OnDisable()
     {
         UnsubscribeEvent();

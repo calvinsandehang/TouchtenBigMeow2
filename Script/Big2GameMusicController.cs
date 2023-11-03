@@ -70,15 +70,15 @@ public class Big2GameMusicController : MonoBehaviour
     private void SubscribeEvent()
     {
         // Subscribe to events related to card gameplay.
-        Big2PlayerHand.OnPlayerCardLessThanSix += StartRushMusic;
-        Big2PlayerHand.OnPlayerLastCardIsDropped += StartNormalMusic;
+        Big2GlobalEvent.SubscribePlayerCardLessThanSix(StartRushMusic);
+        Big2GlobalEvent.SubscribePlayerDropLastCard(StartNormalMusic);
     }
 
     private void UnsubscribeEvent()
     {
         // Unsubscribe from events to prevent memory leaks.
-        Big2PlayerHand.OnPlayerCardLessThanSix -= StartRushMusic;
-        Big2PlayerHand.OnPlayerLastCardIsDropped -= StartNormalMusic;
+        Big2GlobalEvent.UnsubscribePlayerCardLessThanSix(StartRushMusic);
+        Big2GlobalEvent.UnsubscribePlayerDropLastCard(StartNormalMusic);
     }
 
     private void OnDisable()

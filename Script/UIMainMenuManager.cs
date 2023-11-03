@@ -44,11 +44,11 @@ public class UIMainMenuManager : MonoBehaviour, ISubscriber
 
     public void SubscribeEvent()
     {
-        Big2CustomEvent.OnAvatarIsSet += HideChooseAvatarMenu;
+        //Big2GlobalEvent.SubscribeAvatarIsSet(HideChooseAvatarMenu);
     }
 
     public void UnsubscribeEvent()
     {
-        Big2CustomEvent.OnAvatarIsSet -= HideChooseAvatarMenu;
+        //Big2GlobalEvent.UnsubscribeAvatarIsSet(HideChooseAvatarMenu);
     }
 }

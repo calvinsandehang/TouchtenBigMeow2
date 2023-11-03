@@ -24,9 +24,11 @@ public class UIPlayerSubmissionButton : MonoBehaviour, ISubscriber
     private void OnDisable()
     {
         // Unsubscribe from the events to prevent memory leaks
-        if (submissionCheck == null)
-            return;
-        UnsubscribeEvent();
+        if (submissionCheck != null)
+        {
+            UnsubscribeEvent();
+        }
+        
     }
     public void InitializeButton(Big2CardSubmissionCheck big2CardSubmissionCheck) 
     {
@@ -52,13 +54,13 @@ public class UIPlayerSubmissionButton : MonoBehaviour, ISubscriber
 
     public void SubscribeEvent()
     {
-        submissionCheck.AllowedToSubmitCard += OnAllowedToSubmitCard;
-        submissionCheck.NotAllowedToSubmitCard += OnNotAllowedToSubmitCard;
+        Big2GlobalEvent.SubscribeCardSubmissionAllowed(OnAllowedToSubmitCard);
+        Big2GlobalEvent.SubscribeCardSubmissionNotAllowed(OnNotAllowedToSubmitCard);
     }
 
     public void UnsubscribeEvent()
     {
-        submissionCheck.AllowedToSubmitCard -= OnAllowedToSubmitCard;
-        submissionCheck.NotAllowedToSubmitCard -= OnNotAllowedToSubmitCard;
+        Big2GlobalEvent.UnsubscribeCardSubmissionAllowed(OnAllowedToSubmitCard);
+        Big2GlobalEvent.UnsubscribeCardSubmissionNotAllowed(OnNotAllowedToSubmitCard);
     }
 }

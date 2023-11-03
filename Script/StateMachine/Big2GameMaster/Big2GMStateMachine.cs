@@ -368,21 +368,21 @@ public class Big2GMStateMachine : StateManager<GMState>, ISubscriber
 
     public void SubscribeEvent()
     {
-        Big2SimpleAI.OnAIFinishTurnGlobal += NextTurn;
-        Big2SimpleAI.OnAISkipTurn += SkipTurn;
-        Big2PlayerSkipTurnHandler.OnPlayerSkipTurnGlobal += SkipTurn;
-        Big2CardSubmissionCheck.OnPlayerFinishTurnGlobal += NextTurn;
-        Big2PlayerHand.OnPlayerLastCardIsDropped += EndGame;
+        Big2GlobalEvent.SubscribeAIFinishTurnGlobal(NextTurn);
+        Big2GlobalEvent.SubscribeAISkipTurnGlobal(NextTurn);
+        Big2GlobalEvent.SubscribePlayerSkipTurnGlobal(SkipTurn);
+        Big2GlobalEvent.SubscribePlayerDropLastCard(NextTurn);
+        Big2GlobalEvent.SubscribePlayerDropLastCard(EndGame);
     }
    
 
     public void UnsubscribeEvent()
     {
-        Big2SimpleAI.OnAIFinishTurnGlobal -= NextTurn;
-        Big2SimpleAI.OnAISkipTurn -= SkipTurn;
-        Big2PlayerSkipTurnHandler.OnPlayerSkipTurnGlobal -= SkipTurn;
-        Big2CardSubmissionCheck.OnPlayerFinishTurnGlobal -= NextTurn;
-        Big2PlayerHand.OnPlayerLastCardIsDropped -= EndGame;    
+        Big2GlobalEvent.UnsubscribeAIFinishTurnGlobal(NextTurn);
+        Big2GlobalEvent.UnsubscribeAISkipTurnGlobal(NextTurn);
+        Big2GlobalEvent.UnsubscribePlayerSkipTurnGlobal(SkipTurn);
+        Big2GlobalEvent.UnsubscribePlayerDropLastCard(NextTurn);
+        Big2GlobalEvent.UnsubscribePlayerDropLastCard(EndGame);    
     }
 
     public void BroadcastCardHasBeenDealt()

@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class SubjectPlayer : MonoBehaviour
 {
+    /*
     // a collection of all the observers of this subject
     private List<IObserverPlayerHand> observers = new List<IObserverPlayerHand>();
     public void AddObserver(IObserverPlayerHand observer)
@@ -20,4 +21,5 @@ public class SubjectPlayer : MonoBehaviour
             observer.OnNotify(cardModels, index);
         });
     }
+    */
 }

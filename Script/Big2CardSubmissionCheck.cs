@@ -2,202 +2,174 @@ using Sirenix.OdinInspector;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel.Design.Serialization;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 using static GlobalDefine;
 
+/// <summary>
+/// Manages the card submission and validation between players and the table.
+/// </summary>
 [InfoBox("Bridge between Player and Table")]
 public class Big2CardSubmissionCheck : MonoBehaviour
 {
+    #region Fields
+    // Table
     private Big2TableManager big2TableManager;
     private CardInfo tableInfo;
     public HandType currentTableHandType;
-    private HandRank currentTableHandRank;
+    private HandRank currentTableHandRank;    
     private List<CardModel> currentTableCards;
 
+    private Button submitCardButton;
     private List<CardModel> submittedCards = new List<CardModel>();
     private CardInfo submittedCardInfo;
-    private bool matchingHandType;
-        
-    public event Action AllowedToSubmitCard; // Subs : UIPlayerSubmissionButton
-    public event Action NotAllowedToSubmitCard; // Subs : UIPlayerSubmissionButton
 
+    private Big2PokerHands pokerHandChecker;
     private Big2PlayerHand playerHand;
-    private PlayerType playerType;
+    private PlayerType playerType;    
 
-    private Button submitCardButton;
+    [SerializeField]
+    private int _turnDelay = 2;
+    #endregion
 
-    private Big2PlayerStateMachine playerStateMachine;
-    private PlayerState playerState;
+    #region Events    
+    public event Action OnPlayerFinishTurnLocal; // subs : Big2PlayerStateMachine
+    #endregion
 
-    private bool isAllowedToCheck = false;
-
-    public static event Action<Big2PlayerHand> OnPlayerFinishTurnGlobal; // Subs : Big2GMStateMachine
-    public event Action<Big2PlayerHand> OnPlayerFinishTurnLocal; // subs : Big2PlayerStateMachine
-   
-
-    private void Awake()
-    {
-        
-    }
-
+    #region Unity Callback
+    /// <summary>
+    /// Initializes the class and subscribes to events.
+    /// </summary>
     private void Start()
     {
-        InitializeParameters();
-        InitializeBig2TableManager();
-        //AddSelfToSubjectList();
+        ParameterInitialization();
     }
 
-    private void InitializeBig2TableManager()
+    private void OnDisable()
     {
-        big2TableManager = Big2TableManager.Instance;
-        Big2TableLookUp();
+        UnsubscribeEvent();
     }
 
-    private void Big2TableLookUp()
-    {
-        tableInfo = big2TableManager.TableLookUp();
-        currentTableHandType = tableInfo.HandType;
-        currentTableHandRank = tableInfo.HandRank;
-        currentTableCards = new List<CardModel>();
-    }
+    #endregion
 
-    private void InitializeParameters()
-    {
-        playerStateMachine = GetComponent<Big2PlayerStateMachine>();
+    /// <summary>
+    /// Handles card submission and validation.
+    /// </summary>
+    /// <param name="selectedCard">The list of selected cards for submission.</param>
 
-        playerHand = GetComponent<Big2PlayerHand>();
-        playerType = playerHand.PlayerTypeLookUp();
-
-        if (playerType == PlayerType.Human)
-        {
-            SetupSubmissionButton();
-        }
-
-        SubscribeEvent();
-
-    }
-    
-    private void OnPlayerIsPlaying() 
-    {
-        isAllowedToCheck = true;
-    }
-
-    private void OnPlayerIsNotPlaying() 
-    {
-        isAllowedToCheck = false;
-    }
-
-    // Receive selected card from PlayerSelectedCardEvaluator
+    #region Card Check Logic
+    /// <summary>
+    /// Handles card submission and validation.
+    /// </summary>
+    /// <param name="selectedCard">The list of selected cards for submission.</param>
     public void SubmissionCheck(List<CardModel> selectedCard)
     {
-        NotAllowedToSubmitCard?.Invoke();
-
-        if (selectedCard.Count == 0)
+        try
         {
-            NotAllowedToSubmitCard?.Invoke();
-            return;
-        }
+            // Broadcast an event to notify that card submission is not allowed.
+            Big2GlobalEvent.BroadcastCardSubmissionNotAllowed();
 
-        // Check if the selected cards contain the three of diamonds at the initial round
-        if (Big2GMStateMachine.DetermineWhoGoFirst &&
-            !selectedCard.Exists(card => card.CardRank == Rank.Three && card.CardSuit == Suit.Diamonds)
-            )
-        {            
-            NotAllowedToSubmitCard?.Invoke();
-            return;
-        }
+            // Check if no cards are selected for submission.
+            if (selectedCard.Count == 0)
+            {
+                Debug.Log("No cards selected for submission.");
+                return;
+            }
 
-        Big2TableLookUp(); 
-        // Check if the hand type of the selected cards is allowed
-        if (!CompareHandType(selectedCard) && currentTableHandType != HandType.None)
+            // Check if the selected cards contain the Three of Diamonds at the initial round.
+            if (Big2GMStateMachine.DetermineWhoGoFirst &&
+                !selectedCard.Exists(card => card.CardRank == Rank.Three && card.CardSuit == Suit.Diamonds))
+            {
+                Debug.Log("The Three of Diamonds must be included in the initial round.");
+                return;
+            }
+
+            // Lookup the current table information.
+            Big2TableLookUp();
+
+            // Check if the hand type of the selected cards is allowed.
+            if (!CompareHandType(selectedCard) && currentTableHandType != HandType.None)
+            {
+                Debug.Log("Invalid hand type for the current table.");
+                return;
+            }
+
+            // Clear the submitted cards list.
+            ClearSubmittedCardList();
+
+            // Evaluate the selected cards to determine their hand type and rank.
+            submittedCardInfo = EvaluateSelectedCards(selectedCard);
+
+            // Check if the hand rank of the selected cards is allowed.
+            if (!CompareHandRank(submittedCardInfo.HandRank) || !CheckCardCount(selectedCard, submittedCardInfo))
+            {
+                Debug.Log("Invalid hand rank or card count.");
+                return;
+            }
+
+            // Compare the selected cards with the current table cards.
+            if (!CompareSelectedCardsWithTableCards(submittedCardInfo.CardComposition))
+            {
+                Debug.Log("Selected cards do not match the table cards.");
+                return;
+            }
+
+            // If all checks pass, add the selected cards to the submitted cards.
+            AddNewSubmittedCardToSubmittedCardList();
+
+            // Broadcast an event to notify that card submission is allowed.
+            Big2GlobalEvent.BroadcastCardSubmissionAllowed();
+        }
+        catch (Exception ex)
         {
-            NotAllowedToSubmitCard?.Invoke();
-            //Debug.Log("HandType mismatch");
-            return;
+            // Handle exceptions or log errors here.
+            Debug.LogError($"Error during card submission: {ex.Message}");
         }
-
-        ClearSubmittedCardList();
-
-        // Evaluate the selected cards to determine their hand type and rank
-        submittedCardInfo = EvaluateSelectedCards(selectedCard);
-
-        // Check if the hand rank of the selected cards is allowed
-        if (!CompareHandRank(submittedCardInfo.HandRank) || !CheckCardCount(selectedCard, submittedCardInfo))
-        {
-            NotAllowedToSubmitCard?.Invoke();
-            //Debug.Log("Selected card hand rank is lower than the table card / not suitable");
-            return;
-        }
-
-        //Debug.Log(CheckCardCount(submittedCardInfo));
-
-        // Compare the selected cards with the current table cards
-        if (!CompareSelectedCardsWithTableCards(submittedCardInfo.CardComposition))
-        {
-            NotAllowedToSubmitCard?.Invoke();
-            //Debug.Log("Selected cards value is lower than the table cards");
-            return;
-        }       
-
-        // If all checks pass, add the selected cards to the submitted cards
-        AddNewSubmittedCardToSubmittedCardList();
-
-        AllowedToSubmitCard?.Invoke();
     }
 
+
+    /// <summary>
+    /// Checks if the card count of selected cards matches the hand type.
+    /// </summary>
     private bool CheckCardCount(List<CardModel> selectedCards, CardInfo cardInfo)
     {
         int bestHandCardCount = cardInfo.CardComposition.Count;
         int selectedCardCount = selectedCards.Count;
 
-        if (bestHandCardCount != selectedCardCount)
-            return false;
-        else
-            return true;
-        /*
-        switch (cardInfo.HandType)
-        {
-            case HandType.None:
-                return false;
-            case HandType.Single:
-                return bestHandCardCount == 1;
-            case HandType.Pair:
-                return bestHandCardCount == 2;
-            case HandType.ThreeOfAKind:
-                return bestHandCardCount == 3;
-            case HandType.FiveCards:
-                return bestHandCardCount == 5;
-            default:
-                return false;
-        }
-        */
+        return bestHandCardCount == selectedCardCount;
     }
 
-
+    /// <summary>
+    /// Adds the newly submitted cards to the submitted cards list.
+    /// </summary>
     private void AddNewSubmittedCardToSubmittedCardList()
     {
         submittedCards.AddRange(submittedCardInfo.CardComposition);
     }
 
+    /// <summary>
+    /// Clears the submitted cards list.
+    /// </summary>
     private void ClearSubmittedCardList()
     {
         submittedCards.Clear();
     }
 
+    /// <summary>
+    /// Evaluates the selected cards to determine their hand type and rank.
+    /// </summary>
     private CardInfo EvaluateSelectedCards(List<CardModel> selectedCard)
-    {
-        Big2PokerHands checkSelectedCard = new Big2PokerHands();
-        var bestHand = checkSelectedCard.GetBestHand(selectedCard);
+    {        
+        var bestHand = pokerHandChecker.GetBestHand(selectedCard);
         var selectedCardHandType = bestHand.HandType;
         var selectedCardHandRank = bestHand.HandRank;
         var bestHandCards = bestHand.CardComposition;
-        return new CardInfo (selectedCardHandType, selectedCardHandRank, bestHandCards);
+        return new CardInfo(selectedCardHandType, selectedCardHandRank, bestHandCards);
     }
 
+    /// <summary>
+    /// Compares the selected cards with the current table cards.
+    /// </summary>
     private bool CompareSelectedCardsWithTableCards(List<CardModel> bestHandCards)
     {
         Big2CardComparer big2CardComparer = new Big2CardComparer();
@@ -205,60 +177,47 @@ public class Big2CardSubmissionCheck : MonoBehaviour
         currentTableCards = tableInfo.CardComposition;
 
         return big2CardComparer.CompareHands(bestHandCards, currentTableCards);
-    }  
+    }
 
+    /// <summary>
+    /// Compares the hand rank of selected cards with the current table hand rank.
+    /// </summary>
     private bool CompareHandRank(HandRank selectedCardHandRank)
     {
-        switch (currentTableHandRank)
+        return currentTableHandRank switch
         {
-            case HandRank.None:
-                return true;
-            case HandRank.HighCard:
-                // Allow any hand rank that is equal or higher
-                if (selectedCardHandRank == HandRank.HighCard)
-                    return true;
-                else
-                    return false;                
-            case HandRank.Pair:
-                // Allow any hand rank that is equal or higher, except HighCard
-                return selectedCardHandRank == HandRank.Pair;
-            case HandRank.ThreeOfAKind:
-                // Allow any hand rank that is equal or higher, except HighCard and Pair
-                return selectedCardHandRank == HandRank.ThreeOfAKind;
-            case HandRank.Straight:
-            case HandRank.Flush:
-            case HandRank.FullHouse:
-            case HandRank.FourOfAKind:
-            case HandRank.StraightFlush:
-                // Allow only the same or higher hand rank
-                return selectedCardHandRank >= currentTableHandRank;
-        }
-
-        return false;
+            HandRank.None => true,
+            HandRank.HighCard => selectedCardHandRank == HandRank.HighCard,
+            HandRank.Pair => selectedCardHandRank >= HandRank.Pair,
+            HandRank.ThreeOfAKind => selectedCardHandRank >= HandRank.ThreeOfAKind,
+            _ => selectedCardHandRank >= currentTableHandRank
+        };
     }
+
+
+    /// <summary>
+    /// Compares the hand type of selected cards with the current table hand type.
+    /// </summary>
     private bool CompareHandType(List<CardModel> submittedCardModels)
     {
         int cardCount = submittedCardModels.Count;
 
-        switch (cardCount)
+        return cardCount switch
         {
-            case 0:
-                return currentTableHandType == HandType.None;
-            case 1:
-                return currentTableHandType == HandType.Single;
-            case 2:
-                return currentTableHandType == HandType.Pair;
-            case 3:
-                return currentTableHandType == HandType.ThreeOfAKind;
-            case 5:
-                return currentTableHandType == HandType.FiveCards;
-            default:
-                return false;
-        }
+            0 => currentTableHandType == HandType.None,
+            1 => currentTableHandType == HandType.Single,
+            2 => currentTableHandType == HandType.Pair,
+            3 => currentTableHandType == HandType.ThreeOfAKind,
+            5 => currentTableHandType == HandType.FiveCards,
+            _ => false
+        };
     }
+    #endregion
 
-    
     #region Submission Button
+    /// <summary>
+    /// Sets up the submission button and initializes its behavior.
+    /// </summary>
     private void SetupSubmissionButton()
     {
         submitCardButton = UIButtonInjector.Instance.GetButton(ButtonType.SubmitCard);
@@ -268,80 +227,97 @@ public class Big2CardSubmissionCheck : MonoBehaviour
         submitButtonBehaviour.InitializeButton(this);
     }
 
+    /// <summary>
+    /// Handles the submission of cards and updates the game state.
+    /// </summary>
     public void OnSubmitCard()
     {
         Debug.Log("OnSubmitCard");
         Big2TableManager.Instance.UpdateTableCards(submittedCardInfo);
         playerHand.RemoveCards(submittedCards);
 
-        NotAllowedToSubmitCard?.Invoke();
-        StartCoroutine(DelayedAction(EndTurn, 2f));        
+        Big2GlobalEvent.BroadcastCardSubmissionNotAllowed();
+        StartCoroutine(DelayedAction(EndTurn, _turnDelay));
     }
 
+    /// <summary>
+    /// Ends the player's turn and handles the game state.
+    /// </summary>
     private void EndTurn()
     {
         if (!Big2GMStateMachine.WinnerIsDetermined)
         {
             Debug.Log("player end turn, redirect to waiting state");
-            OnPlayerFinishTurnGlobal?.Invoke(playerHand);
-            OnPlayerFinishTurnLocal?.Invoke(playerHand);
+            Big2GlobalEvent.BroadcastPlayerFinishTurnGlobal(playerHand);
+            OnPlayerFinishTurnLocal?.Invoke();
         }
         else
         {
             Debug.Log("player end turn, but not redirect to waiting state");
         }
-           
     }
- 
     #endregion
 
     #region Event
+    /// <summary>
+    /// Subscribes to relevant events.
+    /// </summary>
     private void SubscribeEvent()
     {
-        playerStateMachine.OnPlayerIsPlaying += OnPlayerIsPlaying;
-        playerStateMachine.OnPlayerIsWaiting += OnPlayerIsNotPlaying;
+        // Subscribe to events here.
     }
 
+    /// <summary>
+    /// Unsubscribes from relevant events.
+    /// </summary>
     private void UnsubscribeEvent()
     {
-        playerStateMachine.OnPlayerIsPlaying -= OnPlayerIsPlaying;
-        playerStateMachine.OnPlayerIsWaiting -= OnPlayerIsNotPlaying;
-    }
-    #endregion
+        // Unsubscribe from events here.
+    }   
+    #endregion 
 
-    private void OnDestroy()
+    #region Helper
+    /// <summary>
+    /// Looks up the current table information.
+    /// </summary>
+    private void Big2TableLookUp()
     {
-        //RemoveSelfToSubjectList(); //testing
+        tableInfo = big2TableManager.TableLookUp();
+        currentTableHandType = tableInfo.HandType;
+        currentTableHandRank = tableInfo.HandRank;
+        currentTableCards = new List<CardModel>();
     }
 
-    private void OnEnable()
+    /// <summary>
+    /// Initializes various parameters and subscribes to events.
+    /// </summary>
+    private void ParameterInitialization()
     {
-        //AddSelfToSubjectList(); //testing
+        playerHand = GetComponent<Big2PlayerHand>();
+        playerType = playerHand.PlayerTypeLookUp();
+
+        if (playerType == PlayerType.Human)
+        {
+            SetupSubmissionButton();
+        }
+
+        big2TableManager = Big2TableManager.Instance;
+        Big2TableLookUp();
+
+        pokerHandChecker = new Big2PokerHands();
+
+        SubscribeEvent();
     }
 
-    private void OnDisable()
-    {
-        //RemoveSelfToSubjectList(); //testing
-        UnsubscribeEvent();
-    }
 
+    /// <summary>
+    /// Executes an action after a specified delay.
+    /// </summary>
     private IEnumerator DelayedAction(Action action, float delay)
     {
         yield return new WaitForSeconds(delay);
         action.Invoke();
     }
 
-    #region Testing and debugging
-    // Card Evaluator
-    public void AddSelfToSubjectList()
-    {
-        // Assuming both TableManager and CardEvaluator have lists of observers
-        //CardEvaluator.Instance?.AddObserver(this);
-    }
-
-    public void RemoveSelfToSubjectList()
-    {
-        //CardEvaluator.Instance?.RemoveObserver(this);
-    }
     #endregion
 }

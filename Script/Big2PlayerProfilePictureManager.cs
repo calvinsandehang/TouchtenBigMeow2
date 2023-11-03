@@ -126,7 +126,7 @@ public class Big2PlayerProfilePictureManager : MonoBehaviour, ISubscriber
     /// </summary>
     public void SubscribeEvent()
     {
-        Big2CustomEvent.OnAvatarIsSet += LoadProfilePicture;
+        Big2GlobalEvent.SubscribeAvatarIsSet(LoadProfilePicture);
 
         if (playerSM != null)
         {
@@ -150,7 +150,7 @@ public class Big2PlayerProfilePictureManager : MonoBehaviour, ISubscriber
     /// </summary>
     public void UnsubscribeEvent()
     {
-        Big2CustomEvent.OnAvatarIsSet -= LoadProfilePicture;
+        Big2GlobalEvent.UnsubscribeAvatarIsSet(LoadProfilePicture);
 
         if (playerSM != null)
         {

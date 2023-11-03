@@ -29,11 +29,7 @@ public class Big2SimpleAI : MonoBehaviour
     private HandRank currentTableHandRank;
     private List<CardModel> currentTableCards;
 
-    public bool IsStartingTheTurn { get; set; }
-
-    public static event Action<Big2PlayerHand> OnAIFinishTurnGlobal;
-
-    public static event Action<Big2PlayerHand> OnAISkipTurn;
+    public bool IsStartingTheTurn { get; set; }   
 
     private void Awake()
     {
@@ -324,7 +320,7 @@ public class Big2SimpleAI : MonoBehaviour
         if (!Big2GMStateMachine.WinnerIsDetermined)
         {
             Debug.Log($"AI {playerHand.PlayerID} end turn, redirect to waiting state");
-            OnAIFinishTurnGlobal?.Invoke(playerHand);
+            Big2GlobalEvent.BroadcastAIFinishTurnGlobal(playerHand);
         }
         else
         {
@@ -336,7 +332,7 @@ public class Big2SimpleAI : MonoBehaviour
     private void SkipTurn() 
     {
         Debug.Log("Player " + (playerHand.PlayerID) + " Skip Turn");
-        OnAISkipTurn?.Invoke(playerHand);
+        Big2GlobalEvent.BroadcastAISkipTurnGlobal(playerHand);
     }
 
     private IEnumerator DelayedAction(Action action, float delay)
