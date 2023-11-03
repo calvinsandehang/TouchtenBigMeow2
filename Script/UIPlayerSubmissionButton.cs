@@ -1,4 +1,3 @@
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,50 +7,71 @@ public class UIPlayerSubmissionButton : MonoBehaviour, ISubscriber
     private Image buttonImage;
     private Big2CardSubmissionCheck submissionCheck;
 
-    [SerializeField]
-    private Color allowedColor = Color.white;
+    [SerializeField] private Color _allowedColor = Color.white;
+    [SerializeField] private Color _notAllowedColor = Color.gray;
 
-    [SerializeField]
-    private Color notAllowedColor = Color.gray;
-
+    #region Monobehaviour
     private void Awake()
     {
         buttonImage = GetComponent<Image>();
         submitButton = GetComponent<Button>();
         OnNotAllowedToSubmitCard();
     }
- 
+
     private void OnDisable()
     {
-        // Unsubscribe from the events to prevent memory leaks
         if (submissionCheck != null)
         {
             UnsubscribeEvent();
         }
-        
     }
-    public void InitializeButton(Big2CardSubmissionCheck big2CardSubmissionCheck) 
+    #endregion
+
+    #region Initialization
+    /// <summary>
+    /// Initializes the submit card button with a submission check handler.
+    /// </summary>
+    /// <param name="big2CardSubmissionCheck">The card submission check handler.</param>
+    public void InitializeButton(Big2CardSubmissionCheck big2CardSubmissionCheck)
     {
         submissionCheck = big2CardSubmissionCheck;
         SubscribeEvent();
     }
+    #endregion
 
+    #region Submit card methods
     private void OnAllowedToSubmitCard()
     {
-        // Set the button interactable and update the image color to allowedColor
-        //Debug.Log("AllowedToSubmitCard()");
-        submitButton.interactable = true;
-        buttonImage.color = allowedColor;
+        SetButtonInteractable();
     }
 
     private void OnNotAllowedToSubmitCard()
     {
-        // Set the button not interactable and update the image color to notAllowedColor
-        //Debug.Log("NotAllowedToSubmitCard()");
-        submitButton.interactable = false;
-        buttonImage.color = notAllowedColor;
+        SetButtonNonInteractable();
+    }
+    #endregion
+
+    #region Handle Button
+    /// <summary>
+    /// Set the button interactable and update the image color to allowedColor.
+    /// </summary>
+    private void SetButtonInteractable()
+    {
+        submitButton.interactable = true;
+        buttonImage.color = _allowedColor;
     }
 
+    /// <summary>
+    /// Set the button not interactable and update the image color to notAllowedColor.
+    /// </summary>
+    private void SetButtonNonInteractable()
+    {
+        submitButton.interactable = false;
+        buttonImage.color = _notAllowedColor;
+    }
+    #endregion
+
+    #region Subscribe Event
     public void SubscribeEvent()
     {
         Big2GlobalEvent.SubscribeCardSubmissionAllowed(OnAllowedToSubmitCard);
@@ -63,4 +83,5 @@ public class UIPlayerSubmissionButton : MonoBehaviour, ISubscriber
         Big2GlobalEvent.UnsubscribeCardSubmissionAllowed(OnAllowedToSubmitCard);
         Big2GlobalEvent.UnsubscribeCardSubmissionNotAllowed(OnNotAllowedToSubmitCard);
     }
+    #endregion
 }

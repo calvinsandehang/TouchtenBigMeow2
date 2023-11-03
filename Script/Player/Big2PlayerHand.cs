@@ -57,7 +57,8 @@ public class Big2PlayerHand : MonoBehaviour, ISubscriber, IPlayer
     {
         if (PlayerType == PlayerType.Human)
         {
-            CardEvaluator cardEvaluator = this.gameObject.AddComponent<CardEvaluator>();
+            // Only Human has Card Evaluator to evaluate the cards click by the Human
+            CardEvaluator cardEvaluator = gameObject.AddComponent<CardEvaluator>();
             cardEvaluator.InitializeCardEvaluator(cardSubmissionCheck);
         }
     }
@@ -164,8 +165,7 @@ public class Big2PlayerHand : MonoBehaviour, ISubscriber, IPlayer
         // Notify UI to update the displayed cards
         if (PlayerType == PlayerType.Human)
         {
-            CardEvaluator.Instance.DeregisterCard(removedCards);
-            //NotifyObserver(playerCards, PlayerID);
+            CardEvaluator.Instance.DeregisterCards(removedCards);
         }
 
         CheckCardBelowSix();

@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: -9207801129045166283}
   - component: {fileID: 6672282354337302211}
   - component: {fileID: 7456281591049916685}
+  - component: {fileID: 499296985850069608}
   m_Layer: 0
   m_Name: PlayerHand
   m_TagString: Untagged
@@ -51,8 +52,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ad18e3ec6dc5e664f81cd07ba2b9494d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PlayerType: 0
-  PlayerID: 0
 --- !u!114 &5728997258054005426
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -66,6 +65,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentTableHandType: 0
+  _turnDelay: 2
 --- !u!114 &5228797022240234200
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -78,7 +78,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b59f17a5311629147842ad56a7fc47ed, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Test: 0
 --- !u!114 &5183976326263560817
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -120,39 +119,6 @@ MonoBehaviour:
   PlayerProfile: {fileID: 0}
   maxScale: {x: 1.2, y: 1.2, z: 1.2}
   scaleDuration: 0.5
-  scaleCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 2
-      outSlope: 2
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 0.5004313
-      value: 0.9996737
-      inSlope: 0.027126588
-      outSlope: 0.027126588
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.14921585
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.99645996
-      value: -0.013641357
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
 --- !u!114 &6672282354337302211
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -264,3 +230,15 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &499296985850069608
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2972835322702556544}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c9543df84d29424b89c49d1a7a133d2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

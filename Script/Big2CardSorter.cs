@@ -5,10 +5,32 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using static GlobalDefine;
 
-public class Big2CardSorter
+/// <summary>
+/// Class responsible for sorting and managing player hands in a Big2 card game.
+/// </summary>
+[DefaultExecutionOrder(-9999)]
+public class Big2CardSorter : MonoBehaviour
 {
-    public void SortPlayerHandByRank(List<GameObject> cardsObjectsInPlayerHand
-        , PlayerType playerType)
+
+    private Big2PokerHands pokerHandsChecker;
+   
+    private List<CardModel> sortedCardModels = new List<CardModel>();
+    private List<CardModel> cardModelsInPlayerHand = new List<CardModel>();
+    
+
+    private void Awake()
+    {
+        pokerHandsChecker = new Big2PokerHands();
+        aiCardInfo = new AiCardInfo();
+        cardPackage = new CardPackage();
+    }
+
+    /// <summary>
+    /// Sorts player hand cards by rank.
+    /// </summary>
+    /// <param name="cardsObjectsInPlayerHand">List of card GameObjects in the player's hand.</param>
+    /// <param name="playerType">The type of player (Human or AI).</param>
+    public void SortPlayerHandByRank(List<GameObject> cardsObjectsInPlayerHand, PlayerType playerType)
     {
         cardsObjectsInPlayerHand.Sort((card1, card2) =>
         {
@@ -20,11 +42,16 @@ public class Big2CardSorter
 
             return cardModel1.CardRank.CompareTo(cardModel2.CardRank);
         });
+
         UpdateCardPositions(cardsObjectsInPlayerHand);
     }
 
-    public void SortPlayerHandBySuit(List<GameObject> cardsObjectsInPlayerHand
-        , PlayerType playerType)
+    /// <summary>
+    /// Sorts player hand cards by suit.
+    /// </summary>
+    /// <param name="cardsObjectsInPlayerHand">List of card GameObjects in the player's hand.</param>
+    /// <param name="playerType">The type of player (Human or AI).</param>
+    public void SortPlayerHandBySuit(List<GameObject> cardsObjectsInPlayerHand, PlayerType playerType)
     {
         cardsObjectsInPlayerHand.Sort((card1, card2) =>
         {
@@ -36,13 +63,15 @@ public class Big2CardSorter
 
             return cardModel1.CardSuit.CompareTo(cardModel2.CardSuit);
         });
+
         UpdateCardPositions(cardsObjectsInPlayerHand);
     }
+
 
     public void SortPlayerHandByBestHand(List<GameObject> cardsObjectsInPlayerHand, 
         CardPool cardPool, Transform cardParent, PlayerType playerType)
     {
-        List<CardModel> cardModelsInPlayerHand = new List<CardModel>();
+        cardModelsInPlayerHand.Clear();
 
         for (int i = 0; i < cardsObjectsInPlayerHand.Count; i++)
         {
@@ -51,9 +80,7 @@ public class Big2CardSorter
             cardModelsInPlayerHand.Add(card);
         }
 
-        Big2PokerHands pokerHandsChecker = new Big2PokerHands();
-        List<CardModel> tempCardModels = new List<CardModel>(cardModelsInPlayerHand);
-        List<CardModel> sortedCardModels = new List<CardModel>();
+        tempCardModels = cardModelsInPlayerHand;
 
         while (tempCardModels.Count > 0)
         {
@@ -80,23 +107,23 @@ public class Big2CardSorter
             }
         }
 
-       
+
 
         // Update the player's hand with the sorted cards and reflect this in the UI
-        cardModelsInPlayerHand = new List<CardModel>(sortedCardModels); // Replace the list, don't clear and re-add
+        cardModelsInPlayerHand = sortedCardModels;
+
         cardModelsInPlayerHand.Reverse();
 
         UpdateCardPosition(cardsObjectsInPlayerHand, cardModelsInPlayerHand, cardPool, cardParent, playerType);
     }
 
-   
+  
+
     public AiCardInfo SortPlayerHandByBestHand(List<CardModel> playerCard)
     {
-        AiCardInfo aiCardInfo = new AiCardInfo();
+        tempCardModels = playerCard;
+        sortedCardModels.Clear();
 
-        Big2PokerHands pokerHandsChecker = new Big2PokerHands();
-        List<CardModel> tempCardModels = new List<CardModel>(playerCard);
-        List<CardModel> sortedCardModels = new List<CardModel>();
 
         while (tempCardModels.Count > 0)
         {
@@ -104,17 +131,18 @@ public class Big2CardSorter
             CardInfo cardInfo = pokerHandsChecker.GetBestHand(tempCardModels);
             List<CardModel> bestHandCards = cardInfo.CardComposition;
 
-            // Log for debugging
+           
+            /* Log for debugging
             // Debug.Log("Best hand rank: " + cardInfo.HandRank.ToString());
             foreach (var card in bestHandCards)
             {
                 //Debug.Log("Card in best hand: " + card.CardRank.ToString() + " of " + card.CardSuit.ToString());
             }
+            */
 
             // Add the best hand cards to the sorted list
             sortedCardModels.AddRange(bestHandCards);
             // Add the best hand cards to the card package
-            CardPackage cardPackage = new CardPackage();
             cardPackage.CardPackageType = cardInfo.HandType;
             cardPackage.CardPackageRank = cardInfo.HandRank;
             cardPackage.CardPackageContent = cardInfo.CardComposition;
@@ -132,49 +160,51 @@ public class Big2CardSorter
         return aiCardInfo;
     }
 
+    private List<CardModel> singleCardList = new List<CardModel>();
+    private CardPackage cardPackage;
+    private AiCardInfo aiCardInfo;
+    private List<CardModel> tempCardModels = new List<CardModel>();
     public AiCardInfo SortPlayerHandByLowestHand(List<CardModel> playerCard)
     {
-        AiCardInfo aiCardInfo = new AiCardInfo();
-
-        Big2PokerHands pokerHandsChecker = new Big2PokerHands();
-        List<CardModel> tempCardModels = new List<CardModel>(playerCard);
-        List<CardModel> sortedCardModels = new List<CardModel>();
+        tempCardModels.Clear();
+        tempCardModels.AddRange(playerCard); // Reuse tempCardModels by clearing and adding items
+        aiCardInfo.ClearCardPackages(); // Assuming there's a method to clear previous card packages
 
         while (tempCardModels.Count > 0)
         {
-            // Find the lowest hand from the remaining cards
             CardInfo lowestCardInfo = null;
+
             foreach (var card in tempCardModels)
             {
-                List<CardModel> singleCardList = new List<CardModel> { card };
-                CardInfo cardInfo = pokerHandsChecker.GetBestHand(singleCardList);
+                singleCardList.Clear();
+                singleCardList.Add(card);
 
-                if (lowestCardInfo == null || cardInfo.HandRank < lowestCardInfo.HandRank)
-                {
-                    lowestCardInfo = cardInfo;
-                }
+                CardInfo cardInfo = pokerHandsChecker.GetBestHand(singleCardList);
+                lowestCardInfo = cardInfo;
             }
 
-            // Add the lowest hand cards to the sorted list
-            sortedCardModels.AddRange(lowestCardInfo.CardComposition);
+            if (lowestCardInfo == null || lowestCardInfo.CardComposition.Count == 0)
+            {
+                Debug.LogWarning("No valid hand is found");
+                break;
+            }
 
-            // Add the lowest hand cards to the card package
-            CardPackage cardPackage = new CardPackage();
+            // Reset cardPackage instead of creating a new one
+            cardPackage.Reset(); // Assuming there's a method to reset cardPackage
             cardPackage.CardPackageType = lowestCardInfo.HandType;
             cardPackage.CardPackageRank = lowestCardInfo.HandRank;
             cardPackage.CardPackageContent = lowestCardInfo.CardComposition;
 
             aiCardInfo.AddCardPackage(cardPackage);
 
-            // Remove the lowest hand cards from tempCardModels for the next iteration
-            foreach (var card in lowestCardInfo.CardComposition)
-            {
-                tempCardModels.Remove(card);
-            }
+            // Remove the cards of the found lowest hand from tempCardModels for the next iteration
+            tempCardModels.RemoveAll(card => lowestCardInfo.CardComposition.Contains(card));
         }
 
         return aiCardInfo;
     }
+
+
 
 
     private void UpdateCardPosition(List<GameObject> cardsObjectsInPlayerHand, 
@@ -211,6 +241,7 @@ public class Big2CardSorter
             cardGameObjects[i].transform.SetSiblingIndex(i);
         }
     }
+
 }
 
 

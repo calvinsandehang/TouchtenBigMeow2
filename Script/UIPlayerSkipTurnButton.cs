@@ -5,17 +5,17 @@ using UnityEngine;
 using UnityEngine.UI;
 using static GlobalDefine;
 
+/// <summary>
+/// Manages the skip turn button for a player in the UI.
+/// </summary>
 [DefaultExecutionOrder(2)]
 public class UIPlayerSkipTurnButton : MonoBehaviour, ISubscriber
 {
     private Button skipTurnButton;
-    private Image buttonImage;    
+    private Image buttonImage;
 
-    [SerializeField]
-    private Color allowedColor = Color.white;
-
-    [SerializeField]
-    private Color notAllowedColor = Color.gray;
+    [SerializeField] private Color _allowedColor = Color.white;
+    [SerializeField] private Color _notAllowedColor = Color.gray;
 
     private Big2PlayerStateMachine playerStateMachine;
     private PlayerType playerType;
@@ -23,21 +23,16 @@ public class UIPlayerSkipTurnButton : MonoBehaviour, ISubscriber
     private Big2TableManager tableManager;
     private HandType currentTableType;
 
+    #region Monobehaviour
     private void Awake()
     {
         buttonImage = GetComponent<Image>();
         skipTurnButton = GetComponent<Button>();
-        
     }
 
     private void Start()
     {
         ParameterInitialization();
-    }
-
-    private void ParameterInitialization()
-    {
-        tableManager = Big2TableManager.Instance;
     }
 
     private void OnDisable()
@@ -46,17 +41,32 @@ public class UIPlayerSkipTurnButton : MonoBehaviour, ISubscriber
             return;
         UnsubscribeEvent();
     }
+    #endregion
+
+    #region Initialization
+    private void ParameterInitialization()
+    {
+        tableManager = Big2TableManager.Instance;
+    }
+
+    /// <summary>
+    /// Initializes the skip turn button for a player.
+    /// </summary>
+    /// <param name="playerStateMachine">The player's state machine.</param>
     public void InitializeButton(Big2PlayerStateMachine playerStateMachine)
     {
-        
         this.playerStateMachine = playerStateMachine;
         playerType = playerStateMachine.GetPlayerType();
-        
-        if (playerStateMachine == null || playerType != PlayerType.Human) return;
-      
+
+        if (playerStateMachine == null || playerType != PlayerType.Human)
+            return;
+
         SubscribeEvent();
         OnNotAllowedToSkipTurn();
     }
+    #endregion
+
+    #region Skip turn logic
     private void OnAllowedToSkipTurn()
     {
         currentTableType = tableManager.TableHandType;
@@ -64,27 +74,36 @@ public class UIPlayerSkipTurnButton : MonoBehaviour, ISubscriber
         if (currentTableType == HandType.None)
             return;
 
-        //if (playerStateMachine == null || playerType != PlayerType.Human) return;
-        // Set the button interactable and update the image color to allowedColor
-        skipTurnButton.interactable = true;
-        buttonImage.color = allowedColor;
-
-        //Debug.Log("Allowed to skip");
-
+        SetButtonInteractable();
     }
 
     private void OnNotAllowedToSkipTurn()
     {
-        //Debug.Log("OnNotAllowedToSkipTurn()_1");
-        //if (playerStateMachine == null || playerType != PlayerType.Human) return;
+        SetButtonNonInteractable();
+    }
+    #endregion
 
-        // Set the button not interactable and update the image color to notAllowedColor
-        skipTurnButton.interactable = false;
-        buttonImage.color = notAllowedColor;
-
-        //Debug.Log("Not Allowed to skip");
+    #region Handle Button
+    /// <summary>
+    // Set the button interactable and update the image color to allowedColor
+    /// </summary>
+    private void SetButtonInteractable()
+    {
+        skipTurnButton.interactable = true;
+        buttonImage.color = _allowedColor;
     }
 
+    /// <summary>
+    // Set the button not interactable and update the image color to notAllowedColor
+    /// </summary>
+    private void SetButtonNonInteractable()
+    {
+        skipTurnButton.interactable = false;
+        buttonImage.color = _notAllowedColor;
+    }
+    #endregion
+
+    #region Subscribe Event
     public void SubscribeEvent()
     {
         playerStateMachine.OnPlayerIsPlaying += OnAllowedToSkipTurn;
@@ -98,4 +117,5 @@ public class UIPlayerSkipTurnButton : MonoBehaviour, ISubscriber
         playerStateMachine.OnPlayerIsLosing -= OnNotAllowedToSkipTurn;
         playerStateMachine.OnPlayerIsWaiting -= OnNotAllowedToSkipTurn;
     }
+    #endregion
 }

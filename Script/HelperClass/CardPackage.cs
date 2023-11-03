@@ -10,6 +10,14 @@ public class CardPackage
     public HandType CardPackageType{ get; set; }
     public HandRank CardPackageRank { get; set; }
     public List<CardModel> CardPackageContent { get; set; } = new List<CardModel>();
+
+    public void Reset()
+    {
+        // Assuming default values for HandType and HandRank enums are the "empty" state
+        CardPackageType = default(HandType);
+        CardPackageRank = default(HandRank);
+        CardPackageContent.Clear();
+    }
 }
 
 [Serializable]

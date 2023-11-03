@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -8,22 +7,20 @@ using static GlobalDefine;
 
 public class UISortButton : MonoBehaviour
 {
-    private const string bestHand = "Sort by Best Hand";
-    private const string rank = "Sort by Rank";
-    private const string suit = "Sort by Suit";
+    private const string BestHandText = "Sort by Best Hand";
+    private const string RankText = "Sort by Rank";
+    private const string SuitText = "Sort by Suit";
 
     private Button sortButton;
 
-    [SerializeField]
-    private TextMeshProUGUI _buttonText;
+    [SerializeField] private TextMeshProUGUI buttonText;
 
     private List<Action> methods = new List<Action>();
 
     private int currentIndex = -1;
     private int maxIndex = 3;
 
-    // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
         sortButton = GetComponent<Button>();
         sortButton.onClick.AddListener(OnSortButtonPressed);
@@ -32,44 +29,55 @@ public class UISortButton : MonoBehaviour
         methods.Add(SortByRank);
         methods.Add(SortBySuit);
 
-        _buttonText.text = bestHand;
+        buttonText.text = BestHandText;
     }
 
-    public void SortByBestHand() 
+    /// <summary>
+    /// Sort by the best hand criteria.
+    /// </summary>
+    public void SortByBestHand()
     {
-        Debug.Log("SortByBestHand() ");
-        // sort by best hand
-        UIPlayerHandManager.Instance.SortPlayerHand(SortCriteria.BestHand, 0, PlayerType.Human);
-        // change text
-        _buttonText.text = rank;
+        Big2GlobalEvent.BroadcastSortCard(SortCriteria.BestHand, 0, PlayerType.Human);
+        // Change text on the button
+        buttonText.text = RankText;
     }
 
-    public void SortByRank() 
+    /// <summary>
+    /// Sort by the rank criteria.
+    /// </summary>
+    public void SortByRank()
     {
-        Debug.Log("SortByRank() ");
-        // sort by best rank
-        UIPlayerHandManager.Instance.SortPlayerHand(SortCriteria.Rank, 0, PlayerType.Human);
-        // change text
-        _buttonText.text = suit;
+        Big2GlobalEvent.BroadcastSortCard(SortCriteria.Rank, 0, PlayerType.Human);
+        // Change text on the button
+        buttonText.text = SuitText;
     }
 
-    public void SortBySuit() 
+    /// <summary>
+    /// Sort by the suit criteria.
+    /// </summary>
+    public void SortBySuit()
     {
-        Debug.Log("SortBySuit()");
-        // sort by suit
-        UIPlayerHandManager.Instance.SortPlayerHand(SortCriteria.Suit, 0, PlayerType.Human);
-        // change text
-        _buttonText.text = bestHand;
+        Big2GlobalEvent.BroadcastSortCard(SortCriteria.Suit, 0, PlayerType.Human);
+        // Change text on the button
+        buttonText.text = BestHandText;
     }
-    
-    public void OnSortButtonPressed() 
+
+    /// <summary>
+    /// Handles the button click event.
+    /// </summary>
+    public void OnSortButtonPressed()
     {
         currentIndex = IncrementValue(currentIndex);
         methods[currentIndex].Invoke();
     }
 
+    /// <summary>
+    /// Increments the value in a circular manner.
+    /// </summary>
+    /// <param name="currentIndex">The current index value.</param>
+    /// <returns>The incremented index.</returns>
     public int IncrementValue(int currentIndex)
     {
-        return currentIndex = (currentIndex + 1) % (maxIndex);
+        return currentIndex = (currentIndex + 1) % maxIndex;
     }
 }

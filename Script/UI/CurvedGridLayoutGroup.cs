@@ -1,31 +1,61 @@
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// A custom GridLayoutGroup that arranges its children in a curved layout.
+/// </summary>
 [ExecuteInEditMode]
 public class CurvedGridLayoutGroup : MonoBehaviour
 {
+    /// <summary>
+    /// The radius of the curvature.
+    /// </summary>
     public float curveRadius = 200f;
+
+    /// <summary>
+    /// The size of each cell.
+    /// </summary>
     public Vector2 cellSize = new Vector2(100f, 100f);
+
+    /// <summary>
+    /// The number of cells per row.
+    /// </summary>
     public int cellsPerRow = 3;
-    public float rotationFactor = 10f; // The angle difference between adjacent cards.
+
+    /// <summary>
+    /// The angle difference between adjacent cards.
+    /// </summary>
+    public float rotationFactor = 10f;
 
     private RectTransform rectTransform;
 
+    /// <summary>
+    /// Called when the inspector's values change.
+    /// </summary>
     void OnValidate()
     {
         UpdateLayout();
     }
 
+    /// <summary>
+    /// Called when the script is started.
+    /// </summary>
     void Start()
     {
         rectTransform = GetComponent<RectTransform>();
     }
 
+    /// <summary>
+    /// Called every frame to update the layout.
+    /// </summary>
     void Update()
     {
         UpdateLayout();
     }
 
+    /// <summary>
+    /// Updates the layout of the children in a curved pattern.
+    /// </summary>
     private void UpdateLayout()
     {
         if (rectTransform == null)
@@ -84,5 +114,4 @@ public class CurvedGridLayoutGroup : MonoBehaviour
             }
         }
     }
-
 }

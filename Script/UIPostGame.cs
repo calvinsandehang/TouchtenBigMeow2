@@ -19,6 +19,11 @@ public class UIPostGame : MonoBehaviour
         SubscribeEvent();
     }
 
+    private void OnDisable()
+    {
+        UnsubscribeEvent();
+    }
+
     /// <summary>
     /// Handles the action when the continue button is pressed.
     /// </summary>
@@ -64,8 +69,5 @@ public class UIPostGame : MonoBehaviour
         Big2GlobalEvent.UnsubscribeAskPlayerInPostGame(ShowButton);
     }
 
-    private void OnDisable()
-    {
-        UnsubscribeEvent();
-    }
+   
 }

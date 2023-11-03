@@ -19,12 +19,7 @@ public interface IPlayer
     /// <summary>
     /// Initializes parameters related to the player.
     /// </summary>
-    void ParameterInitialization();
-
-    /// <summary>
-    /// Initializes components and dependencies for the player.
-    /// </summary>
-    void ComponentInitialization();
+    void ParameterInitialization(); 
 
     /// <summary>
     /// Initializes the unique identifier of the player.

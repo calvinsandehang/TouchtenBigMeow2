@@ -39,7 +39,7 @@ public class Big2SimpleAI : MonoBehaviour
         skipTurnHandler = GetComponent<Big2PlayerSkipTurnHandler>();
 
         pokerHand = new Big2PokerHands();
-        cardSorter = new Big2CardSorter();
+        cardSorter = GetComponent<Big2CardSorter>();  
     }
 
     private void Start()
@@ -311,7 +311,7 @@ public class Big2SimpleAI : MonoBehaviour
         Debug.Log("Player " + (playerHand.PlayerID) + " SubmitCard: " + submittedCardsString);
 
         // Update table and remove cards
-        Big2TableManager.Instance.UpdateTableCards(submittedCardInfo);
+        Big2GlobalEvent.BroadcastSubmitCard(submittedCardInfo);
         playerHand.RemoveCards(submittedCards);
     }
 

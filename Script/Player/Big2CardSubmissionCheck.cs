@@ -36,7 +36,7 @@ public class Big2CardSubmissionCheck : MonoBehaviour
     public event Action OnPlayerFinishTurnLocal; // subs : Big2PlayerStateMachine
     #endregion
 
-    #region Unity Callback
+    #region Monobehavior
     /// <summary>
     /// Initializes the class and subscribes to events.
     /// </summary>
@@ -232,8 +232,8 @@ public class Big2CardSubmissionCheck : MonoBehaviour
     /// </summary>
     public void OnSubmitCard()
     {
-        Debug.Log("OnSubmitCard");
-        Big2TableManager.Instance.UpdateTableCards(submittedCardInfo);
+        //Debug.Log("OnSubmitCard");
+        Big2GlobalEvent.BroadcastSubmitCard(submittedCardInfo);
         playerHand.RemoveCards(submittedCards);
 
         Big2GlobalEvent.BroadcastCardSubmissionNotAllowed();

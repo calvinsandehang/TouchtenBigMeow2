@@ -1,7 +1,7 @@
 using UnityEngine;
 using static GlobalDefine;
 
-public class UIMainMenuManager : MonoBehaviour, ISubscriber
+public class UIMainMenuManager : MonoBehaviour
 {
     [SerializeField]
     private CanvasGroup _chooseAvatarMenu;
@@ -37,18 +37,4 @@ public class UIMainMenuManager : MonoBehaviour, ISubscriber
         SetCanvasGroupVisibility(_chooseAvatarMenu, false);
     }
 
-    public void HideChooseAvatarMenu(PlayerType playerType) 
-    {
-        SetCanvasGroupVisibility(_chooseAvatarMenu, false);
-    }
-
-    public void SubscribeEvent()
-    {
-        //Big2GlobalEvent.SubscribeAvatarIsSet(HideChooseAvatarMenu);
-    }
-
-    public void UnsubscribeEvent()
-    {
-        //Big2GlobalEvent.UnsubscribeAvatarIsSet(HideChooseAvatarMenu);
-    }
 }

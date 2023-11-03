@@ -28,8 +28,6 @@ public class UISelectableCard : SubjectCard, IPointerClickHandler
     [SerializeField] private AudioClip cardSelectSound;
     private AudioSource audioSource;
 
-   
-
     private void Awake()
     {
         cardImage = GetComponent<Image>();

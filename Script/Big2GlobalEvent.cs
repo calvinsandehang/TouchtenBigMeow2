@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using static GlobalDefine;
 
+/// <summary>
+/// Static class responsible for managing global events in a Big2 card game.
+/// </summary>
 public static class Big2GlobalEvent
 {
     #region Event : AvatarIsSet
@@ -320,8 +323,6 @@ public static class Big2GlobalEvent
         }
     }
     #endregion
-
-
     #region Event : RestartGame
     private static List<Action> restartGameListeners = new List<Action>();
 
@@ -349,5 +350,58 @@ public static class Big2GlobalEvent
         }
     }
     #endregion
+    #region Event : SubmitCard
+    private static List<Action<CardInfo>> submitCardListeners = new List<Action<CardInfo>>();
 
+    public static void SubscribeSubmitCard(Action<CardInfo> listener)
+    {
+        if (!submitCardListeners.Contains(listener))
+        {
+            submitCardListeners.Add(listener);
+        }
+    }
+
+    public static void UnsubscribeSubmitCard(Action<CardInfo> listener)
+    {
+        if (submitCardListeners.Contains(listener))
+        {
+            submitCardListeners.Remove(listener);
+        }
+    }
+
+    public static void BroadcastSubmitCard(CardInfo cardInfo)
+    {
+        foreach (var listener in submitCardListeners)
+        {
+            listener.Invoke(cardInfo);
+        }
+    }
+    #endregion
+    #region Event : SortCard
+    private static List<Action<SortCriteria, int, PlayerType>> sortCardListeners = new List<Action<SortCriteria, int, PlayerType>>();
+
+    public static void SubscribeSortCard(Action<SortCriteria, int, PlayerType> listener)
+    {
+        if (!sortCardListeners.Contains(listener))
+        {
+            sortCardListeners.Add(listener);
+        }
+    }
+
+    public static void UnsubscribeSortCard(Action<SortCriteria, int, PlayerType> listener)
+    {
+        if (sortCardListeners.Contains(listener))
+        {
+            sortCardListeners.Remove(listener);
+        }
+    }
+
+    public static void BroadcastSortCard(SortCriteria criteria, int playerId, PlayerType playerType)
+    {
+        foreach (var listener in sortCardListeners)
+        {
+            listener.Invoke(criteria, playerId, playerType);
+        }
+    }
+    #endregion
 }

@@ -5,6 +5,9 @@ using Unity.VisualScripting;
 using UnityEngine;
 using static GlobalDefine;
 
+/// <summary>
+/// Manages the display of table information on the UI.
+/// </summary>
 public class UITableInfo : MonoBehaviour, IObserverTable
 {
     [SerializeField]
@@ -18,11 +21,16 @@ public class UITableInfo : MonoBehaviour, IObserverTable
         AddSelfToSubjectList();
     }
 
-    public void OnNotifyAssigningCard(CardInfo cardInfo)
+    private void OnDisable()
     {
-       // do nothing
+        RemoveSelfFromSubjectList();
     }
 
+    /// <summary>
+    /// Called when notified about the table state, updates the displayed text.
+    /// </summary>
+    /// <param name="tableHandType">The hand type on the table.</param>
+    /// <param name="tableRank">The hand rank on the table.</param>
     public void OnNotifyTableState(HandType tableHandType, HandRank tableRank)
     {
         if (tableHandType == HandType.None)
@@ -32,20 +40,27 @@ public class UITableInfo : MonoBehaviour, IObserverTable
         else
         {
             _tableText.text = tableHandType.ToString();
-        }       
+        }
     }
 
-    public void RemoveSelfToSubjectList()
+    /// <summary>
+    /// Removes this UI element from the list of observers in the table manager.
+    /// </summary>
+    public void RemoveSelfFromSubjectList()
     {
-       tableManager.RemoveObserver(this);
+        tableManager.RemoveObserver(this);
     }
+
+    public void OnNotifyAssigningCard(CardInfo cardInfo)
+    {
+        // do nothing
+    }
+
+    /// <summary>
+    /// Adds this UI element to the list of observers in the table manager.
+    /// </summary>
     public void AddSelfToSubjectList()
     {
         tableManager.AddObserver(this);
-    }
-
-    private void OnDisable()
-    {
-        RemoveSelfToSubjectList();
-    }
+    }  
 }

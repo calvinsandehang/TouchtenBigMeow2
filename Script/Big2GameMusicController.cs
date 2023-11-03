@@ -13,11 +13,17 @@ public class Big2GameMusicController : MonoBehaviour
     private int currentRushClipIndex;
     private bool isRushMode;
 
+    #region Monobehaviour
     private void Start()
     {
         isRushMode = false;
         StartNormalMusic(null);
         SubscribeEvent();
+    }
+
+    private void OnDisable()
+    {
+        UnsubscribeEvent();
     }
 
     private void Update()
@@ -41,7 +47,9 @@ public class Big2GameMusicController : MonoBehaviour
             StartRushMusic();
         }
     }
+    #endregion
 
+    #region Start Music methods
     private void StartNormalMusic(Big2PlayerHand playerHand)
     {
         isRushMode = false;
@@ -66,7 +74,9 @@ public class Big2GameMusicController : MonoBehaviour
             Big2GameMusicManager.Instance.PlayMusicClip(rushMusicClips[currentRushClipIndex]);
         }
     }
+    #endregion
 
+    #region Subscrive Event
     private void SubscribeEvent()
     {
         // Subscribe to events related to card gameplay.
@@ -80,9 +90,7 @@ public class Big2GameMusicController : MonoBehaviour
         Big2GlobalEvent.UnsubscribePlayerCardLessThanSix(StartRushMusic);
         Big2GlobalEvent.UnsubscribePlayerDropLastCard(StartNormalMusic);
     }
+    #endregion
 
-    private void OnDisable()
-    {
-        UnsubscribeEvent();
-    }
+  
 }

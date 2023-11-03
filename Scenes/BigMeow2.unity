@@ -1137,7 +1137,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c24fb96ff656a4041bd5b40e7fb913ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _buttonText: {fileID: 2053399592}
+  buttonText: {fileID: 2053399592}
 --- !u!114 &202799245
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2262,6 +2262,154 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &530335127
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 530335128}
+  - component: {fileID: 530335132}
+  - component: {fileID: 530335131}
+  - component: {fileID: 530335130}
+  - component: {fileID: 530335129}
+  m_Layer: 5
+  m_Name: UIManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &530335128
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 530335127}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2051284037}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &530335129
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 530335127}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c9543df84d29424b89c49d1a7a133d2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &530335130
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 530335127}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8355d166dee4e9d49b531d6fc24ba00f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _singleTable: {fileID: 1084432141}
+  _pairTable: {fileID: 1582571916}
+  _threeOfKindTable: {fileID: 201559644}
+  _fiveTable: {fileID: 633224378}
+  _singleTableImages:
+  - {fileID: 1804630990}
+  - {fileID: 152518203}
+  - {fileID: 1309751841}
+  - {fileID: 334373233}
+  _pairCardTemplate:
+  - CardImage1: {fileID: 1936566235}
+    CardImage2: {fileID: 1780070897}
+  - CardImage1: {fileID: 719818054}
+    CardImage2: {fileID: 1319018745}
+  - CardImage1: {fileID: 1348023966}
+    CardImage2: {fileID: 1875242865}
+  - CardImage1: {fileID: 1213145174}
+    CardImage2: {fileID: 2123579872}
+  _threeOfKindCardTemplate:
+  - CardImage1: {fileID: 201724982}
+    CardImage2: {fileID: 2037087224}
+    CardImage3: {fileID: 922777091}
+  - CardImage1: {fileID: 338859764}
+    CardImage2: {fileID: 840495110}
+    CardImage3: {fileID: 1292924606}
+  - CardImage1: {fileID: 1301140359}
+    CardImage2: {fileID: 1915389152}
+    CardImage3: {fileID: 2016471269}
+  - CardImage1: {fileID: 114346434}
+    CardImage2: {fileID: 248916448}
+    CardImage3: {fileID: 2064528349}
+  _fiveCardTemplate:
+  - CardImage1: {fileID: 1541710004}
+    CardImage2: {fileID: 1165278225}
+    CardImage3: {fileID: 996897533}
+    CardImage4: {fileID: 1653268391}
+    CardImage5: {fileID: 993751595}
+  - CardImage1: {fileID: 661478704}
+    CardImage2: {fileID: 1559275801}
+    CardImage3: {fileID: 297343548}
+    CardImage4: {fileID: 1070329494}
+    CardImage5: {fileID: 1360707899}
+  - CardImage1: {fileID: 948394413}
+    CardImage2: {fileID: 874729471}
+    CardImage3: {fileID: 921377413}
+    CardImage4: {fileID: 638189940}
+    CardImage5: {fileID: 445720991}
+  - CardImage1: {fileID: 1105719081}
+    CardImage2: {fileID: 1167724478}
+    CardImage3: {fileID: 295021282}
+    CardImage4: {fileID: 1902242868}
+    CardImage5: {fileID: 301834329}
+--- !u!114 &530335131
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 530335127}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e6325bfbb6da70a4cb35f572481a25f6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _cardPrefab: {fileID: 4691521513262490833, guid: 23c765cb2dccae040a857838478454a1, type: 3}
+  _totalCard: 52
+--- !u!114 &530335132
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 530335127}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 652a45c10f288fe49a95c5857a618a7e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  deckSO: {fileID: 11400000, guid: d961765c7f1bf924ab72ed7a393bde5d, type: 2}
+  cardParent: {fileID: 1756659386}
+  _playerCardsParent:
+  - {fileID: 1756659385}
+  - {fileID: 25243915}
+  - {fileID: 1168008390}
+  - {fileID: 936883022}
 --- !u!1 &539423649
 GameObject:
   m_ObjectHideFlags: 0
@@ -2846,7 +2994,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _continueButton: {fileID: 1702052993}
-  _exitButton: {fileID: 0}
+  _exitButton: {fileID: 1992643625}
 --- !u!225 &663732728
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -4272,7 +4420,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1193286714}
-  - component: {fileID: 1193286716}
   - component: {fileID: 1193286715}
   m_Layer: 0
   m_Name: Table
@@ -4306,18 +4453,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5787829594f16c2439797d9a64b65511, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &1193286716
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1193286712}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 41d6dc99800003a4a8a233521bb78f37, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1213145171
@@ -5186,8 +5321,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f588a36d45c1f3841a52d6e3aa472206, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  allowedColor: {r: 1, g: 1, b: 1, a: 1}
-  notAllowedColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  _allowedColor: {r: 1, g: 1, b: 1, a: 1}
+  _notAllowedColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
 --- !u!114 &1374267912
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5925,18 +6060,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06196485740c1fa41b3c5c9e6160bbaf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  voiceClips:
-  - {fileID: 8300000, guid: 832686c09283c114c8410b6399d61b32, type: 3}
-  - {fileID: 8300000, guid: 878d543f4cf9b2548a06a8a595a16e32, type: 3}
-  - {fileID: 8300000, guid: ff200c38f9d06a844bedd30df4d359a2, type: 3}
-  - {fileID: 8300000, guid: 2009687cce02a984cb7d550979400684, type: 3}
-  - {fileID: 8300000, guid: 485f4b8d2a279464980da6d5e1987b03, type: 3}
-  - {fileID: 8300000, guid: 8c3478bd825bf59428cb164a4ba4787d, type: 3}
-  - {fileID: 8300000, guid: 86e67b50d29311e44b9ee8e9baa76eff, type: 3}
-  - {fileID: 8300000, guid: 45449ea54dd7dbb4c82ca22c1aa8b2fc, type: 3}
-  - {fileID: 8300000, guid: 0f81823b52ba32b479d53a4958da8017, type: 3}
-  - {fileID: 8300000, guid: fe7238b7c0ab65e4d88dc1cc221b5904, type: 3}
-  audioVolume: 1
+  VoiceClips: []
+  AudioVolume: 1
 --- !u!1 &1653268388
 GameObject:
   m_ObjectHideFlags: 0
@@ -6202,8 +6327,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52e2c6d1b90857a439460820362fdd67, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  allowedColor: {r: 1, g: 1, b: 1, a: 1}
-  notAllowedColor: {r: 0.4528302, g: 0.4528302, b: 0.4528302, a: 1}
+  _allowedColor: {r: 1, g: 1, b: 1, a: 1}
+  _notAllowedColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
 --- !u!114 &1706309628
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7149,6 +7274,17 @@ RectTransform:
   m_AnchoredPosition: {x: 197, y: -302}
   m_SizeDelta: {x: 1484.627, y: 218.68921}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1992643625 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3251661124460130138, guid: 3e3e4d443fcf88f4e90f24b478b17627, type: 3}
+  m_PrefabInstance: {fileID: 751629875}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2016471266
 GameObject:
   m_ObjectHideFlags: 0
@@ -7332,6 +7468,8 @@ MonoBehaviour:
   _deck: {fileID: 11400000, guid: d961765c7f1bf924ab72ed7a393bde5d, type: 2}
   _playerNumber: 4
   _totalCardInHandPerPlayer: 6
+  _endGameDelay: 5
+  _postGameDelay: 5
   _playerUIComponent:
   - SkipNotification: {fileID: 3160574193443835939}
     ProfilePicture: {fileID: 2197743509858440032}
@@ -7372,9 +7510,6 @@ GameObject:
   - component: {fileID: 2051284036}
   - component: {fileID: 2051284035}
   - component: {fileID: 2051284034}
-  - component: {fileID: 2051284039}
-  - component: {fileID: 2051284040}
-  - component: {fileID: 2051284042}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -7457,6 +7592,7 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 530335128}
   - {fileID: 600665794}
   - {fileID: 1976793589}
   - {fileID: 2085251076}
@@ -7474,104 +7610,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
---- !u!114 &2051284039
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2051284033}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 652a45c10f288fe49a95c5857a618a7e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  deckSO: {fileID: 11400000, guid: d961765c7f1bf924ab72ed7a393bde5d, type: 2}
-  cardParent: {fileID: 1756659386}
-  _playerCardsParent:
-  - {fileID: 1756659385}
-  - {fileID: 25243915}
-  - {fileID: 1168008390}
-  - {fileID: 936883022}
-  cardPool: {fileID: 2051284040}
---- !u!114 &2051284040
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2051284033}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e6325bfbb6da70a4cb35f572481a25f6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _cardPrefab: {fileID: 4691521513262490833, guid: 23c765cb2dccae040a857838478454a1, type: 3}
-  _totalCard: 52
---- !u!114 &2051284042
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2051284033}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8355d166dee4e9d49b531d6fc24ba00f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _singleTable: {fileID: 1084432141}
-  _pairTable: {fileID: 1582571916}
-  _threeOfKindTable: {fileID: 201559644}
-  _fiveTable: {fileID: 633224378}
-  _singleTableImages:
-  - {fileID: 1804630990}
-  - {fileID: 152518203}
-  - {fileID: 1309751841}
-  - {fileID: 334373233}
-  _pairCardTemplate:
-  - CardImage1: {fileID: 1936566235}
-    CardImage2: {fileID: 1780070897}
-  - CardImage1: {fileID: 719818054}
-    CardImage2: {fileID: 1319018745}
-  - CardImage1: {fileID: 1348023966}
-    CardImage2: {fileID: 1875242865}
-  - CardImage1: {fileID: 1213145174}
-    CardImage2: {fileID: 2123579872}
-  _threeOfKindCardTemplate:
-  - CardImage1: {fileID: 201724982}
-    CardImage2: {fileID: 2037087224}
-    CardImage3: {fileID: 922777091}
-  - CardImage1: {fileID: 338859764}
-    CardImage2: {fileID: 840495110}
-    CardImage3: {fileID: 1292924606}
-  - CardImage1: {fileID: 1301140359}
-    CardImage2: {fileID: 1915389152}
-    CardImage3: {fileID: 2016471269}
-  - CardImage1: {fileID: 114346434}
-    CardImage2: {fileID: 248916448}
-    CardImage3: {fileID: 2064528349}
-  _fiveCardTemplate:
-  - CardImage1: {fileID: 1541710004}
-    CardImage2: {fileID: 1165278225}
-    CardImage3: {fileID: 996897533}
-    CardImage4: {fileID: 1653268391}
-    CardImage5: {fileID: 993751595}
-  - CardImage1: {fileID: 661478704}
-    CardImage2: {fileID: 1559275801}
-    CardImage3: {fileID: 297343548}
-    CardImage4: {fileID: 1070329494}
-    CardImage5: {fileID: 1360707899}
-  - CardImage1: {fileID: 948394413}
-    CardImage2: {fileID: 874729471}
-    CardImage3: {fileID: 921377413}
-    CardImage4: {fileID: 638189940}
-    CardImage5: {fileID: 445720991}
-  - CardImage1: {fileID: 1105719081}
-    CardImage2: {fileID: 1167724478}
-    CardImage3: {fileID: 295021282}
-    CardImage4: {fileID: 1902242868}
-    CardImage5: {fileID: 301834329}
 --- !u!1 &2053399590
 GameObject:
   m_ObjectHideFlags: 0
