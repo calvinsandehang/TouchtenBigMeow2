@@ -1,3 +1,4 @@
+using Big2Meow.UI;
 using System.Collections.Generic;
 using UnityEngine;
 using static GlobalDefine;
@@ -58,7 +59,7 @@ public class Big2PlayerHand : MonoBehaviour, ISubscriber, IPlayer
         if (PlayerType == PlayerType.Human)
         {
             // Only Human has Card Evaluator to evaluate the cards click by the Human
-            CardEvaluator cardEvaluator = gameObject.AddComponent<CardEvaluator>();
+            Big2PlayerCardEvaluator cardEvaluator = gameObject.AddComponent<Big2PlayerCardEvaluator>();
             cardEvaluator.InitializeCardEvaluator(cardSubmissionCheck);
         }
     }
@@ -165,7 +166,7 @@ public class Big2PlayerHand : MonoBehaviour, ISubscriber, IPlayer
         // Notify UI to update the displayed cards
         if (PlayerType == PlayerType.Human)
         {
-            CardEvaluator.Instance.DeregisterCards(removedCards);
+            Big2PlayerCardEvaluator.Instance.DeregisterCards(removedCards);
         }
 
         CheckCardBelowSix();

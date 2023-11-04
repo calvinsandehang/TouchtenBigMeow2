@@ -1,31 +1,45 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class LoadSceneUsingButton : MonoBehaviour
+namespace Big2Meow.UI
 {
-    [SerializeField]
-    private Button loadSceneButton;
-
-    [SerializeField]
-    private string sceneNameToLoad;
-
-    private void Start()
+    /// <summary>
+    /// A MonoBehaviour class for loading scenes using a button click.
+    /// </summary>
+    public class LoadSceneUsingButton : MonoBehaviour
     {
-        // Add the listener to the button
-        loadSceneButton.onClick.AddListener(LoadScene);
-    }
+        [SerializeField]
+        private Button _loadSceneButton;
 
-    private void LoadScene()
-    {
-        if (SceneLoader.Instance != null)
+        [SerializeField]
+        private string _sceneNameToLoad;
+
+        /// <summary>
+        /// Initializes the button click event.
+        /// </summary>
+        private void Start()
         {
-            SceneLoader.Instance.LoadNextScene(sceneNameToLoad);
+            // Add a listener to the button's click event
+            _loadSceneButton.onClick.AddListener(LoadScene);
         }
-        else
+
+        /// <summary>
+        /// Loads the specified scene using the SceneLoader instance.
+        /// </summary>
+        private void LoadScene()
         {
-            Debug.LogError("SceneLoader instance not found!");
+            // Check if a SceneLoader instance exists
+            if (SceneLoader.Instance != null)
+            {
+                // Load the specified scene using the SceneLoader
+                SceneLoader.Instance.LoadNextScene(_sceneNameToLoad);
+            }
+            else
+            {
+                // Log an error message if SceneLoader instance is not found
+                Debug.LogError("SceneLoader instance not found!");
+            }
         }
     }
 }
+  

@@ -8,9 +8,9 @@ using static GlobalDefine;
 /// A class responsible for evaluating and managing selected cards for submission.
 /// Only Human Player can have this component
 /// </summary>
-public class CardEvaluator : MonoBehaviour
+public class Big2PlayerCardEvaluator : MonoBehaviour
 {
-    public static CardEvaluator Instance { get; private set; }
+    public static Big2PlayerCardEvaluator Instance { get; private set; }
     public List<CardModel> SelectedCards { get; private set; } = new List<CardModel>();
     private List<Tuple<HandRank, List<CardModel>, int>> RankedHands = new List<Tuple<HandRank, List<CardModel>, int>>();
 

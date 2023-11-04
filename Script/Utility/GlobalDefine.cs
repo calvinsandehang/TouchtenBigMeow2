@@ -87,5 +87,14 @@ public static class GlobalDefine
         BlueCat,
         OrangeCat,
         WhiteCat
-    }    
+    }
+
+    /// <summary>
+    /// Represents the possible states of a selectable card.
+    /// </summary>
+    public enum CardState
+    {
+        Selected,
+        Deselected,
+    }
 }
