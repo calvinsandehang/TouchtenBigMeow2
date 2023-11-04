@@ -7467,7 +7467,7 @@ MonoBehaviour:
   _playerPrefab: {fileID: 2972835322702556544, guid: 614bb5fadbf330a4aa51edc942a672c9, type: 3}
   _deck: {fileID: 11400000, guid: d961765c7f1bf924ab72ed7a393bde5d, type: 2}
   _playerNumber: 4
-  _totalCardInHandPerPlayer: 6
+  _totalCardInHandPerPlayer: 13
   _endGameDelay: 5
   _postGameDelay: 5
   _playerUIComponent:
