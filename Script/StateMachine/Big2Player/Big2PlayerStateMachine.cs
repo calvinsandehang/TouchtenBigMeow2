@@ -27,6 +27,7 @@ public class Big2PlayerStateMachine : StateManager<PlayerState>, ISubscriber
     private Big2CardSubmissionCheck cardSubmissionCheck;
     private Big2PlayerSkipTurnHandler skipTurnHandler;
     public Big2SimpleAI Big2AI { get; private set; }
+    
 
     #region Events
     public event Action OnPlayerIsPlaying;
@@ -35,7 +36,7 @@ public class Big2PlayerStateMachine : StateManager<PlayerState>, ISubscriber
     public event Action OnPlayerIsWinning;
     #endregion
 
-    #region Unity Callback
+    #region Monobehaviour
 
     private void Awake()
     {
@@ -61,40 +62,41 @@ public class Big2PlayerStateMachine : StateManager<PlayerState>, ISubscriber
 
     public void MakePlayerWait()
     {
-        NextState = States[PlayerState.Waiting];
+        RequestTransitionToState(PlayerState.Waiting);
     }
 
     public void MakePlayerWait(Big2PlayerHand player)
     {
         if (PlayerHand == player)
-            NextState = States[PlayerState.Waiting];
+            RequestTransitionToState(PlayerState.Waiting);
     }
 
     public void MakePlayerPlay()
     {
-        NextState = States[PlayerState.Playing];
+        RequestTransitionToState(PlayerState.Playing);
         // Handle player's turn logic here
     }
 
     public void MakePlayerLose()
     {
-        NextState = States[PlayerState.Losing];
+        RequestTransitionToState(PlayerState.Losing);
         // Handle player's losing logic here
     }
 
     public void MakePlayerWin()
     {
-        NextState = States[PlayerState.Winning];
+        RequestTransitionToState(PlayerState.Winning);
         // Handle player's winning logic here
     }
 
     public void MakePlayerInPostGame()
     {
-        NextState = States[PlayerState.Postgame];
+        RequestTransitionToState(PlayerState.Postgame);
         // Handle player's postgame logic here
     }
 
-    #endregion   
+    #endregion
+
 
     #region Event Broadcasting Methods
 
@@ -131,7 +133,7 @@ public class Big2PlayerStateMachine : StateManager<PlayerState>, ISubscriber
         skipTurnHandler.OnPlayerSkipTurnLocal += MakePlayerWait;
         Big2GlobalEvent.SubscribeAISkipTurnGlobal(MakePlayerWait);
         Big2GlobalEvent.SubscribeAIFinishTurnGlobal(MakePlayerWait);
-        
+        Big2GlobalEvent.SubscribeHavingQuadrupleTwo(MakePlayerWait);        
     }
 
     /// <summary>
@@ -143,7 +145,7 @@ public class Big2PlayerStateMachine : StateManager<PlayerState>, ISubscriber
         skipTurnHandler.OnPlayerSkipTurnLocal -= MakePlayerWait;
         Big2GlobalEvent.UnsubscribeAISkipTurnGlobal(MakePlayerWait);
         Big2GlobalEvent.UnsubscribeAIFinishTurnGlobal(MakePlayerWait);
-
+        Big2GlobalEvent.UnsubscribeHavingQuadrupleTwo(MakePlayerWait);
     }
 
     #endregion
@@ -155,7 +157,7 @@ public class Big2PlayerStateMachine : StateManager<PlayerState>, ISubscriber
         return PlayerHand.PlayerType;
     }
 
-    protected override void ParameterInitialization()
+    private void ParameterInitialization()
     {
         PlayerHand = GetComponent<Big2PlayerHand>();
         cardSubmissionCheck = GetComponent<Big2CardSubmissionCheck>();
@@ -163,7 +165,7 @@ public class Big2PlayerStateMachine : StateManager<PlayerState>, ISubscriber
         skipTurnHandler = GetComponent<Big2PlayerSkipTurnHandler>();
     }
 
-    protected override void StateInitialization()
+    private void StateInitialization()
     {
         // Initialize player states
         States[PlayerState.Pregame] = new Big2PlayerStatePreGame(PlayerState.Pregame, this);

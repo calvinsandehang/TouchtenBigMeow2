@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -29,41 +30,54 @@ public abstract class StateManager<Estate> : MonoBehaviour where Estate : Enum
     /// </summary>
     protected bool IsTransitioningState = false;
 
-    /// <summary>
-    /// Awake is called when the script instance is being loaded.
-    /// </summary>
-    private void Awake()
-    {
-        StateInitialization();
-        ParameterInitialization();
-    }
+    private bool waitingForTransitionToEndOfFrame = false;
 
     /// <summary>
     /// Update is called once per frame.
     /// </summary>
     private void Update()
     {
-        if (NextState == null && CurrentState != null)
+        // Process current state update if not transitioning
+        if (!IsTransitioningState && CurrentState != null)
         {
             CurrentState.UpdateState();
         }
 
-        if (NextState == null)
+        // Check at the end of the frame if we need to transition states
+        if (NextState != null && !IsTransitioningState && !waitingForTransitionToEndOfFrame)
         {
+            waitingForTransitionToEndOfFrame = true;
+            StartCoroutine(DelayedStateTransition());
+        }
+    }
+
+    private IEnumerator DelayedStateTransition()
+    {
+        // Wait until the end of the frame to process state transition
+        // This ensures all Update() calls for this frame are done
+        yield return new WaitForEndOfFrame();
+
+        // Now perform the state transition
+        if (NextState != null) // Double-checking in case something changed during the frame
+        {
+            TransitionToState(NextState.StateKey);
+            NextState = null;
+            waitingForTransitionToEndOfFrame = false;
+        }
+    }
+
+    public void RequestTransitionToState(Estate stateKey)
+    {
+        if (IsTransitioningState)
+        {
+            Debug.LogWarning($"Transition to {stateKey} is requested while another transition is in progress.");
             return;
         }
 
-        Estate currentStateKey = CurrentState.GetActiveState();
-
-        if (!IsTransitioningState && currentStateKey.Equals(NextState.StateKey))
-        {
-            CurrentState.UpdateState();
-        }
-        else if (!IsTransitioningState)
-        {
-            TransitionToState(NextState.StateKey);
-        }
+        // Set the NextState without immediately transitioning
+        NextState = States[stateKey];
     }
+
 
     /// <summary>
     /// Transitions the state manager to a new state.
@@ -76,19 +90,5 @@ public abstract class StateManager<Estate> : MonoBehaviour where Estate : Enum
         CurrentState = States[stateKey];
         CurrentState.EnterState();
         IsTransitioningState = false;
-    }
-
-    /// <summary>
-    /// Initializes parameters for the state manager (override in derived classes if needed).
-    /// </summary>
-    protected virtual void ParameterInitialization()
-    {
-    }
-
-    /// <summary>
-    /// Initializes state-related settings and objects (override in derived classes if needed).
-    /// </summary>
-    protected virtual void StateInitialization()
-    {
     }
 }

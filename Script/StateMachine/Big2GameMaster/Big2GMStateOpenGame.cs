@@ -1,3 +1,4 @@
+using Big2Meow.DeckNCard;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -23,8 +24,7 @@ public class Big2GMStateOpenGame : BaseState<GMState>
     }
 
     public override void ExitState()
-    {
-        // Cleanup or additional logic when exiting the state
+    {       
     }
 
     public override GMState GetActiveState()
@@ -37,6 +37,7 @@ public class Big2GMStateOpenGame : BaseState<GMState>
         // Additional state-specific update logic if needed
     }
 
+    #region Initialization
     /// <summary>
     /// Initialize the game state.
     /// </summary>
@@ -44,59 +45,53 @@ public class Big2GMStateOpenGame : BaseState<GMState>
     {
         Big2GMStateMachine.WinnerIsDetermined = false;
 
-        InitializeDeck();
-       
+        InitializeDeck();       
 
         if (!GMSM.IsInitialized)
             InitializePlayer();
 
         DealCards();
 
-        // Determining player turn
-        if (!GMSM.IsInitialized)
+        GMSM.IsInitialized = true;
+
+        bool violatingRule = GMSM.Big2Rule.CheckBig2RuleViolation(GMSM.PlayerHands);
+
+        if (!violatingRule)
         {
-            GMSM.IsInitialized = true;
-            DetermineWhoPlayFirst();
+            DetermineTurn();
         }
         else
         {
-            PreviousWinnerGoFirst();
+            // global event has been broadcasted in CheckBig2RuleViolation()
+            // should there is a violation
         }
     }
 
     /// <summary>
-    /// Determine the player who won the previous game and let them go first.
-    /// </summary>
-    private void PreviousWinnerGoFirst()
-    {
-        int winnerPlayerIndex = GMSM.FindElementIndex(GMSM.PlayerHands, GMSM.WinnerPlayer);
-
-        GMSM.SetTurn(winnerPlayerIndex);
-    }
-
-    /// <summary>
-    /// Initialize the deck for the game.
+    /// Initializes the deck for the game based on the selected deck type.
     /// </summary>
     private void InitializeDeck()
     {
+        // Check if the DeckModel is already initialized.
         if (GMSM.DeckModel == null)
         {
-            GMSM.DeckModel = new DeckModel(GMSM.Deck);
+            // Initialize based on the deck type.
+            GMSM.DeckModel = GMSM.DeckType switch
+            {
+                DeckType.Normal => new DeckModel(GMSM.NormalDeck),
+                DeckType.Test => new DeckModel(GMSM.TestDeck.SetupTestDeck()),
+                _ => throw new InvalidOperationException("Unknown deck type")
+            };
         }
         else
         {
-            GMSM.DeckModel.ResetDeck(); // Reset the deck for a new game
+            // Reset the deck for a new game if already initialized.
+            GMSM.DeckModel.ResetDeck();
         }
 
-        ShuffleDeck();
-    }
-
-    /// <summary>
-    /// Shuffle the deck.
-    /// </summary>
-    private void ShuffleDeck()
-    {
-        GMSM.DeckModel.Shuffle();
+        // Shuffle the deck if it's a normal game.
+        if (GMSM.DeckType == DeckType.Normal)
+            ShuffleDeck();
     }
 
     /// <summary>
@@ -126,29 +121,37 @@ public class Big2GMStateOpenGame : BaseState<GMState>
             GMSM.PlayerHands.Add(playerHand);
         }
     }
+    #endregion
 
-    /// <summary>
-    /// Deal cards to each player.
-    /// </summary>
-    private void DealCards()
+    #region Check Rule Violation
+
+    private bool CheckBig2RuleViolation()
     {
-        // Deal 13 cards to each player
-        for (int i = 0; i < +GMSM.TotalCardInHandPerplayer; i++)
+        foreach (var player in GMSM.PlayerHands)
         {
-            foreach (Big2PlayerHand playerHand in GMSM.PlayerHands)
+            if (player.CheckHavingQuadrupleTwoCard())
             {
-                CardModel card = GMSM.DeckModel.DrawCard();
-
-                if (card != null)
-                {
-                    playerHand.AddCard(card);
-                }
-                else
-                {
-                    Debug.LogError("Not enough cards in the deck");
-                    return;
-                }
+                // Using string interpolation for cleaner and more readable code.
+                Debug.Log($"Rule violation: Player {player.PlayerID} has all four twos.");
+                Big2GlobalEvent.BroadcastHavingQuadrupleTwo();
+                return true;
             }
+        }
+        return false;
+    }
+
+
+    #endregion
+    #region Determine Turn
+    private void DetermineTurn()
+    {
+        if (!GMSM.IsInitialized)
+        {           
+            DetermineWhoPlayFirst();
+        }
+        else
+        {
+            PreviousWinnerGoFirst();
         }
     }
 
@@ -168,4 +171,93 @@ public class Big2GMStateOpenGame : BaseState<GMState>
             }
         }
     }
+
+    /// <summary>
+    /// Determine the player who won the previous game and let them go first.
+    /// </summary>
+    private void PreviousWinnerGoFirst()
+    {
+        int winnerPlayerIndex = GMSM.FindElementIndex(GMSM.PlayerHands, GMSM.WinnerPlayer);
+
+        GMSM.SetTurn(winnerPlayerIndex);
+    }
+    #endregion
+
+    #region Deal Cards
+    /// <summary>
+    /// Deals cards to each player according to the deck type.
+    /// </summary>
+    private void DealCards()
+    {
+        switch (GMSM.DeckType)
+        {
+            case DeckType.Normal:
+                DealCardsRoundRobin();
+                break;
+            case DeckType.Test:
+                DealCardsSequentially();
+                break;
+            default:
+                throw new InvalidOperationException("Unsupported deck type for dealing cards.");
+        }
+    }
+
+    /// <summary>
+    /// Deals cards to players in a round-robin fashion.
+    /// </summary>
+    private void DealCardsRoundRobin()
+    {
+        for (int i = 0; i < GMSM.TotalCardInHandPerplayer; i++)
+        {
+            foreach (Big2PlayerHand playerHand in GMSM.PlayerHands)
+            {
+                TryDealCardToPlayer(playerHand);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Deals all cards to each player sequentially.
+    /// </summary>
+    private void DealCardsSequentially()
+    {
+        foreach (Big2PlayerHand playerHand in GMSM.PlayerHands)
+        {
+            for (int cardIndex = 0; cardIndex < GMSM.TotalCardInHandPerplayer; cardIndex++)
+            {
+                TryDealCardToPlayer(playerHand);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Attempts to deal a single card to the given player hand.
+    /// </summary>
+    /// <param name="playerHand">The player hand to deal a card to.</param>
+    private void TryDealCardToPlayer(Big2PlayerHand playerHand)
+    {
+        CardModel card = GMSM.DeckModel.DrawCard();
+        
+        if (card != null)
+        {
+            playerHand.AddCard(card);
+        }
+        else
+        {
+            Debug.LogError("Not enough cards in the deck.");
+            // Consider adding some error handling here, like breaking out of the loop.
+        }
+    }
+
+
+    /// <summary>
+    /// Shuffle the deck.
+    /// </summary>
+    private void ShuffleDeck()
+    {
+        GMSM.DeckModel.Shuffle();
+    }
+
+    #endregion
+
 }

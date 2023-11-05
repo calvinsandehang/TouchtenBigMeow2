@@ -1,20 +1,23 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Xml;
 using UnityEngine;
 
 /// <summary>
 /// Represents the game state when the game is closing.
 /// </summary>
-public class Big2GMStateCloseGame : BaseState<GMState>
+public class Big2GMStateForceRestartGame : BaseState<GMState>
 {
     private Big2GMStateMachine GMSM;
+    private Guid uniqueID = Guid.NewGuid(); // Unique identifier for debugging
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="Big2GMStateCloseGame"/> class.
+    /// Initializes a new instance of the <see cref="Big2GMStateForceRestartGame"/> class.
     /// </summary>
     /// <param name="key">The state key.</param>
     /// <param name="stateMachine">The game state machine.</param>
-    public Big2GMStateCloseGame(GMState key, Big2GMStateMachine stateMachine) : base(key)
+    public Big2GMStateForceRestartGame(GMState key, Big2GMStateMachine stateMachine) : base(key)
     {
         GMSM = stateMachine;
     }
@@ -24,15 +27,15 @@ public class Big2GMStateCloseGame : BaseState<GMState>
     /// </summary>
     public override void EnterState()
     {
-        Debug.Log("GM in Close Game State");
+        Debug.Log($"GM in ForceRestartGame State - Unique ID: {uniqueID}");
 
         Big2GlobalEvent.BroadcastGameHasEnded();
         SetGameNotInFirstGame();
 
-        GMSM.StartCoroutine(GMSM.DelayedAction(GMSM.AskPlayerInPostGame, GMSM.PostGameDelay));
+        GMSM.StartCoroutine(GMSM.DelayedAction(GMSM.OnOpenGame, GMSM.PostGameDelay));
     }
 
-    
+
 
     /// <summary>
     /// Executes when exiting this game state.
@@ -62,7 +65,7 @@ public class Big2GMStateCloseGame : BaseState<GMState>
     /// </summary>
     private void SetGameNotInFirstGame()
     {
-        if (GMSM.WinnerPlayer != null)
+        if(GMSM.WinnerPlayer != null)
             GMSM.FirstGame = false;
     }
 }

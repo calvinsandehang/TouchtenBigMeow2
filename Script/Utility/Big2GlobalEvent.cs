@@ -1,3 +1,4 @@
+using Big2Meow.DeckNCard;
 using System;
 using System.Collections.Generic;
 using static GlobalDefine;
@@ -404,4 +405,32 @@ public static class Big2GlobalEvent
         }
     }
     #endregion
+    #region Event : HavingQuadruple2
+    private static List<Action> havingQuadruple2Listeners = new List<Action>();
+
+    public static void SubscribeHavingQuadrupleTwo(Action listener)
+    {
+        if (!havingQuadruple2Listeners.Contains(listener))
+        {
+            havingQuadruple2Listeners.Add(listener);
+        }
+    }
+
+    public static void UnsubscribeHavingQuadrupleTwo(Action listener)
+    {
+        if (havingQuadruple2Listeners.Contains(listener))
+        {
+            havingQuadruple2Listeners.Remove(listener);
+        }
+    }
+
+    public static void BroadcastHavingQuadrupleTwo()
+    {
+        foreach (var listener in havingQuadruple2Listeners)
+        {
+            listener.Invoke();
+        }
+    }
+    #endregion
+
 }

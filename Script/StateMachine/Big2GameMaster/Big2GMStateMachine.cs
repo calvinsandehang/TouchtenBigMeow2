@@ -1,3 +1,4 @@
+using Big2Meow.DeckNCard;
 using Sirenix.OdinInspector;
 using System;
 using System.Collections;
@@ -16,7 +17,8 @@ public enum GMState
     P0Turn,
     P1Turn,
     P2Turn,
-    P3Turn
+    P3Turn,
+    ForceRestartGame
 }
 
 /// <summary>
@@ -25,14 +27,10 @@ public enum GMState
 [DefaultExecutionOrder(-9999)]
 public class Big2GMStateMachine : StateManager<GMState>, ISubscriber
 {
-    #region Singleton Instance
-
     /// <summary>
     /// The singleton instance of the game manager.
     /// </summary>
     public static Big2GMStateMachine Instance;
-
-    #endregion
 
     #region Prefabs and Deck
 
@@ -40,8 +38,13 @@ public class Big2GMStateMachine : StateManager<GMState>, ISubscriber
     [SerializeField] private GameObject _playerPrefab;
 
     [Header("Deck")]
-    [SerializeField] private DeckSO _deck;
-    public DeckSO Deck => _deck;
+    [Tooltip("Test deck is not shuffled ")]
+    [SerializeField] private DeckType _deckType;
+    [SerializeField] private DeckSO _normalDeck;
+    [SerializeField] private TestDeckSO _testDeck;
+    public DeckSO NormalDeck => _normalDeck;
+    public TestDeckSO TestDeck => _testDeck;
+    public DeckType DeckType => _deckType;
 
     #endregion
 
@@ -124,6 +127,8 @@ public class Big2GMStateMachine : StateManager<GMState>, ISubscriber
     /// </summary>
     public Big2PlayerHand WinnerPlayer { get; private set; }
 
+    public Big2Rule Big2Rule { get; private set; }
+
     #endregion
 
     #region Monobehaviour
@@ -144,10 +149,10 @@ public class Big2GMStateMachine : StateManager<GMState>, ISubscriber
 
     private void Start()
     {
+        SubscribeEvent();
+
         CurrentState = States[GMState.OpenGame];
         CurrentState.EnterState();
-
-        SubscribeEvent();
     }
 
     private void OnDisable()
@@ -274,8 +279,6 @@ public class Big2GMStateMachine : StateManager<GMState>, ISubscriber
     private void EndGame(Big2PlayerHand winningPlayer)
     {
         WinnerPlayer = winningPlayer;
-
-        // Set global variable
         WinnerIsDetermined = true;
 
         // Make the players win/lose
@@ -290,20 +293,22 @@ public class Big2GMStateMachine : StateManager<GMState>, ISubscriber
         }
 
         StartCoroutine(DelayedAction(OnEndGame, _endGameDelay));
+
     }
     #endregion
 
     #region Initialization
-    protected override void ParameterInitialization()
+    private void ParameterInitialization()
     {
-        // Initialize parameters if needed
+        Big2Rule = new Big2Rule();
     }
 
-    protected override void StateInitialization()
+    private void StateInitialization()
     {
         States[GMState.AskPlayer] = new Big2GMStateAskPlayer(GMState.AskPlayer, this);
         States[GMState.OpenGame] = new Big2GMStateOpenGame(GMState.OpenGame, this);
         States[GMState.CloseGame] = new Big2GMStateCloseGame(GMState.CloseGame, this);
+        States[GMState.ForceRestartGame] = new Big2GMStateForceRestartGame(GMState.ForceRestartGame, this);
         States[GMState.P0Turn] = new Big2GMStateP0Turn(GMState.P0Turn, this);
         States[GMState.P1Turn] = new Big2GMStateP1Turn(GMState.P1Turn, this);
         States[GMState.P2Turn] = new Big2GMStateP2Turn(GMState.P2Turn, this);
@@ -318,8 +323,8 @@ public class Big2GMStateMachine : StateManager<GMState>, ISubscriber
     /// </summary>
     private void Player0Turn()
     {
-        NextState = States[GMState.P0Turn];
-        Debug.Log("NextState : " + NextState);
+        RequestTransitionToState(GMState.P0Turn);
+        Debug.Log("Requested Transition to : " + GMState.P0Turn);
     }
 
     /// <summary>
@@ -327,8 +332,8 @@ public class Big2GMStateMachine : StateManager<GMState>, ISubscriber
     /// </summary>
     private void Player1Turn()
     {
-        NextState = States[GMState.P1Turn];
-        Debug.Log("NextState : " + NextState);
+        RequestTransitionToState(GMState.P1Turn);
+        Debug.Log("Requested Transition to : " + GMState.P1Turn);
     }
 
     /// <summary>
@@ -336,8 +341,8 @@ public class Big2GMStateMachine : StateManager<GMState>, ISubscriber
     /// </summary>
     private void Player2Turn()
     {
-        NextState = States[GMState.P2Turn];
-        Debug.Log("NextState : " + NextState);
+        RequestTransitionToState(GMState.P2Turn);
+        Debug.Log("Requested Transition to : " + GMState.P2Turn);
     }
 
     /// <summary>
@@ -345,8 +350,8 @@ public class Big2GMStateMachine : StateManager<GMState>, ISubscriber
     /// </summary>
     private void Player3Turn()
     {
-        NextState = States[GMState.P3Turn];
-        Debug.Log("NextState : " + NextState);
+        RequestTransitionToState(GMState.P3Turn);
+        Debug.Log("Requested Transition to : " + GMState.P3Turn);
     }
 
     /// <summary>
@@ -354,8 +359,8 @@ public class Big2GMStateMachine : StateManager<GMState>, ISubscriber
     /// </summary>
     public void OnOpenGame()
     {
-        NextState = States[GMState.OpenGame];
-        Debug.Log("NextState : " + NextState);
+        RequestTransitionToState(GMState.OpenGame);
+        Debug.Log("Requested Transition to : " + GMState.OpenGame);
     }
 
     /// <summary>
@@ -363,8 +368,8 @@ public class Big2GMStateMachine : StateManager<GMState>, ISubscriber
     /// </summary>
     public void OnEndGame()
     {
-        NextState = States[GMState.CloseGame];
-        Debug.Log("NextState : " + NextState);
+        RequestTransitionToState(GMState.CloseGame);
+        Debug.Log("Requested Transition to : " + GMState.CloseGame);
     }
 
     /// <summary>
@@ -372,11 +377,24 @@ public class Big2GMStateMachine : StateManager<GMState>, ISubscriber
     /// </summary>
     public void AskPlayerInPostGame()
     {
-        NextState = States[GMState.AskPlayer];
-        Debug.Log("NextState : " + NextState);
+        RequestTransitionToState(GMState.AskPlayer);
+        Debug.Log("Requested Transition to : " + GMState.AskPlayer);
     }
+
+    public void OnForceRestartGame()
+    {
+        RequestTransitionToState(GMState.ForceRestartGame);
+        Debug.Log("Requested Transition to : " + GMState.ForceRestartGame);
+    }
+    public void OnQuadrapleTwo()
+    {
+        // and _endGameDelay is a predefined variable with the delay duration
+        StartCoroutine(DelayedAction(OnForceRestartGame, _endGameDelay));
+    }
+
     #endregion
-   
+
+
     #region Order Player
     /// <summary>
     /// Order a player to play their turn based on their ID.
@@ -448,6 +466,7 @@ public class Big2GMStateMachine : StateManager<GMState>, ISubscriber
         Big2GlobalEvent.SubscribePlayerSkipTurnGlobal(SkipTurn);
         Big2GlobalEvent.SubscribePlayerDropLastCard(EndGame);
         Big2GlobalEvent.SubscribeRestartGame(OnOpenGame);
+        Big2GlobalEvent.SubscribeHavingQuadrupleTwo(OnQuadrapleTwo);
     }
 
     public void UnsubscribeEvent()
@@ -458,6 +477,7 @@ public class Big2GMStateMachine : StateManager<GMState>, ISubscriber
         Big2GlobalEvent.UnsubscribePlayerSkipTurnGlobal(SkipTurn);
         Big2GlobalEvent.UnsubscribePlayerDropLastCard(EndGame);
         Big2GlobalEvent.SubscribeRestartGame(OnOpenGame);
+        Big2GlobalEvent.UnsubscribeHavingQuadrupleTwo(OnQuadrapleTwo);
     }
     #endregion
 }
