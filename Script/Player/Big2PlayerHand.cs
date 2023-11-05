@@ -205,6 +205,7 @@ public class Big2PlayerHand : MonoBehaviour, ISubscriber, IPlayer
         playerCards.Clear();
     }
 
+    #region Subscribe Event
     /// <summary>
     /// Subscribes to relevant game events.
     /// </summary>
@@ -222,13 +223,20 @@ public class Big2PlayerHand : MonoBehaviour, ISubscriber, IPlayer
         Big2GlobalEvent.UnsubscribePlayerDropLastCard(ResetPlayerCard);
         Big2GlobalEvent.UnsubscribeHavingQuadrupleTwo(ResetPlayerCard);
     }
+    #endregion
 
-  
 
     #region Testing Purposes
     public void EvaluateCardInHand()
     {
         //handEvaluator.EvaluateHand(playerCards.ToList());
     }
+
+    // Add this method to your Big2PlayerHand class
+    public List<CardModel> GetPlayerCardsForEditor()
+    {
+        return playerCards;
+    }
+
     #endregion
 }

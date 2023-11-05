@@ -45,28 +45,7 @@ public class CardPool : MonoBehaviour
             
         }
     }
-    /*
-
-    /// <summary>
-    /// Gets a card from the pool or instantiates a new one if necessary.
-    /// </summary>
-    /// <returns>The retrieved card GameObject.</returns>
-    public GameObject GetCard()
-    {
-        foreach (var card in _cardPool)
-        {
-            if (!card.activeInHierarchy)
-            {
-                ActivateCard(card);
-                return card;
-            }
-        }
-
-        // Instead of instantiating a new card, log a warning or handle the situation appropriately
-        Debug.LogWarning("No cards available in the pool.");
-        return null; // or handle differently
-    }
-    */
+  
     /// <summary>
     /// Gets a card from the pool or instantiates a new one if necessary.
     /// </summary>

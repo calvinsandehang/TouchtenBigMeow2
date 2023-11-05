@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: TestDeck_FullHouse
   m_EditorClassIdentifier: 
   _cards: []
-  _player1Deck: {fileID: 11400000, guid: 32ee4ea27dda583409d9fd73bf279b2c, type: 2}
-  _player2Deck: {fileID: 11400000, guid: 029cc3922e328f34a8e412a493f37165, type: 2}
-  _player3Deck: {fileID: 11400000, guid: 849ab51abc4df7044b0de409b27be285, type: 2}
-  _player4Deck: {fileID: 11400000, guid: 8850ca3384bf22845ad01e4b807d7543, type: 2}
+  _player1Deck: {fileID: 11400000, guid: a6c47004d51d96d4ea9294a43e7183f3, type: 2}
+  _player2Deck: {fileID: 11400000, guid: 979a16e03f4e39b4f94a1f4f17c9cc7e, type: 2}
+  _player3Deck: {fileID: 11400000, guid: c891557c6c1b8f74a9ee2d44963c1fc6, type: 2}
+  _player4Deck: {fileID: 11400000, guid: a2e81304e9d03cb4d8ed18a1ff02b2be, type: 2}

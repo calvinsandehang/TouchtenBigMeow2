@@ -7,7 +7,8 @@ using UnityEngine;
 using static GlobalDefine;
 
 /// <summary>
-/// Enumeration representing different states of the game manager.
+/// Enumeration representing different states of the game manager.  
+/// Changing the order of the enum WILL NOT break the system
 /// </summary>
 public enum GMState
 {
@@ -303,6 +304,9 @@ public class Big2GMStateMachine : StateManager<GMState>, ISubscriber
         Big2Rule = new Big2Rule();
     }
 
+    /// <summary>
+    /// Initialize GM states
+    /// </summary>
     private void StateInitialization()
     {
         States[GMState.AskPlayer] = new Big2GMStateAskPlayer(GMState.AskPlayer, this);

@@ -211,11 +211,11 @@ namespace Big2Meow.UI
                 _pairCardTemplate[j].CardImage1.sprite = cardSprite1;
                 _pairCardTemplate[j].CardImage2.sprite = cardSprite2;
 
-                Color imageColor1 = _pairCardTemplate[j].CardImage1.color;
+                Color imageColor1 = Color.white;
                 imageColor1.a = 1f;
                 _pairCardTemplate[j].CardImage1.color = imageColor1;
 
-                Color imageColor2 = _pairCardTemplate[j].CardImage2.color;
+                Color imageColor2 = Color.white;
                 imageColor2.a = 1f;
                 _pairCardTemplate[j].CardImage2.color = imageColor2;
 
@@ -249,9 +249,9 @@ namespace Big2Meow.UI
                 _threeOfKindCardTemplate[j].CardImage2.sprite = cardSprite2;
                 _threeOfKindCardTemplate[j].CardImage3.sprite = cardSprite3;
 
-                Color imageColor1 = _threeOfKindCardTemplate[j].CardImage1.color;
-                Color imageColor2 = _threeOfKindCardTemplate[j].CardImage2.color;
-                Color imageColor3 = _threeOfKindCardTemplate[j].CardImage3.color;
+                Color imageColor1 = Color.white;
+                Color imageColor2 = Color.white;
+                Color imageColor3 = Color.white;
                 imageColor1.a = 1f;
                 imageColor2.a = 1f;
                 imageColor3.a = 1f;
@@ -293,11 +293,11 @@ namespace Big2Meow.UI
                 _fiveCardTemplate[j].CardImage4.sprite = cardSprite4;
                 _fiveCardTemplate[j].CardImage5.sprite = cardSprite5;
 
-                Color imageColor1 = _fiveCardTemplate[j].CardImage1.color;
-                Color imageColor2 = _fiveCardTemplate[j].CardImage2.color;
-                Color imageColor3 = _fiveCardTemplate[j].CardImage3.color;
-                Color imageColor4 = _fiveCardTemplate[j].CardImage4.color;
-                Color imageColor5 = _fiveCardTemplate[j].CardImage5.color;
+                Color imageColor1 = Color.white;
+                Color imageColor2 = Color.white;
+                Color imageColor3 = Color.white;
+                Color imageColor4 = Color.white;
+                Color imageColor5 = Color.white;
                 imageColor1.a = 1f;
                 imageColor2.a = 1f;
                 imageColor3.a = 1f;

@@ -66,67 +66,59 @@ public class Big2CardSubmissionCheck : MonoBehaviour
     /// <param name="selectedCard">The list of selected cards for submission.</param>
     public void SubmissionCheck(List<CardModel> selectedCard)
     {
-        try
+        // Broadcast an event to notify that card submission is not allowed.
+        Big2GlobalEvent.BroadcastCardSubmissionNotAllowed();
+
+        // Check if no cards are selected for submission.
+        if (selectedCard.Count == 0)
         {
-            // Broadcast an event to notify that card submission is not allowed.
-            Big2GlobalEvent.BroadcastCardSubmissionNotAllowed();
-
-            // Check if no cards are selected for submission.
-            if (selectedCard.Count == 0)
-            {
-                Debug.Log("No cards selected for submission.");
-                return;
-            }
-
-            // Check if the selected cards contain the Three of Diamonds at the initial round.
-            if (Big2GMStateMachine.DetermineWhoGoFirst &&
-                !selectedCard.Exists(card => card.CardRank == Rank.Three && card.CardSuit == Suit.Diamonds))
-            {
-                Debug.Log("The Three of Diamonds must be included in the initial round.");
-                return;
-            }
-
-            // Lookup the current table information.
-            Big2TableLookUp();
-
-            // Check if the hand type of the selected cards is allowed.
-            if (!CompareHandType(selectedCard) && currentTableHandType != HandType.None)
-            {
-                Debug.Log("Invalid hand type for the current table.");
-                return;
-            }
-
-            // Clear the submitted cards list.
-            ClearSubmittedCardList();
-
-            // Evaluate the selected cards to determine their hand type and rank.
-            submittedCardInfo = EvaluateSelectedCards(selectedCard);
-
-            // Check if the hand rank of the selected cards is allowed.
-            if (!CompareHandRank(submittedCardInfo.HandRank) || !CheckCardCount(selectedCard, submittedCardInfo))
-            {
-                Debug.Log("Invalid hand rank or card count.");
-                return;
-            }
-
-            // Compare the selected cards with the current table cards.
-            if (!CompareSelectedCardsWithTableCards(submittedCardInfo.CardComposition))
-            {
-                Debug.Log("Selected cards do not match the table cards.");
-                return;
-            }
-
-            // If all checks pass, add the selected cards to the submitted cards.
-            AddNewSubmittedCardToSubmittedCardList();
-
-            // Broadcast an event to notify that card submission is allowed.
-            Big2GlobalEvent.BroadcastCardSubmissionAllowed();
+            Debug.Log("No cards selected for submission.");
+            return;
         }
-        catch (Exception ex)
+
+        // Check if the selected cards contain the Three of Diamonds at the initial round.
+        if (Big2GMStateMachine.DetermineWhoGoFirst &&
+            !selectedCard.Exists(card => card.CardRank == Rank.Three && card.CardSuit == Suit.Diamonds))
         {
-            // Handle exceptions or log errors here.
-            Debug.LogError($"Error during card submission: {ex.Message}");
+            Debug.Log("The Three of Diamonds must be included in the initial round.");
+            return;
         }
+
+        // Lookup the current table information.
+        Big2TableLookUp();
+
+        // Check if the hand type of the selected cards is allowed.
+        if (!CompareHandType(selectedCard) && currentTableHandType != HandType.None)
+        {
+            Debug.Log("Invalid hand type for the current table.");
+            return;
+        }
+
+        // Clear the submitted cards list.
+        ClearSubmittedCardList();
+
+        // Evaluate the selected cards to determine their hand type and rank.
+        submittedCardInfo = EvaluateSelectedCards(selectedCard);
+
+        // Check if the hand rank of the selected cards is allowed.
+        if (!CompareHandRank(submittedCardInfo.HandRank) || !CheckCardCount(selectedCard, submittedCardInfo))
+        {
+            Debug.Log("Invalid hand rank or card count.");
+            return;
+        }
+
+        // Compare the selected cards with the current table cards.
+        if (!CompareSelectedCardsWithTableCards(submittedCardInfo.CardComposition))
+        {
+            Debug.Log("Selected cards do not match the table cards.");
+            return;
+        }
+
+        // If all checks pass, add the selected cards to the submitted cards.
+        AddNewSubmittedCardToSubmittedCardList();
+
+        // Broadcast an event to notify that card submission is allowed.
+        Big2GlobalEvent.BroadcastCardSubmissionAllowed();
     }
 
 

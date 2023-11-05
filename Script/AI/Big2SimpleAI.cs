@@ -3,343 +3,380 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
-using Unity.VisualScripting;
-using UnityEditor;
 using UnityEngine;
 using static GlobalDefine;
 
-[DefaultExecutionOrder(1)]
-public class Big2SimpleAI : MonoBehaviour
+namespace Big2Meow.AI 
 {
-    [SerializeField]
-    private float _turnDelay = 3f;
-    private Big2PlayerHand playerHand;
-    private Big2PlayerStateMachine playerStateMachine;
-    private Big2CardSubmissionCheck cardSubmissionCheck;
-    private Big2PlayerSkipTurnHandler skipTurnHandler;
-    private Big2PokerHands pokerHand;
-    private Big2CardSorter cardSorter;
-
-    private List<CardModel> aiCards, sortedAiCards;
-    public AiCardInfo aiCardInfo;
-
-    private Big2TableManager big2TableManager;
-    private CardInfo tableInfo;
-    private HandType currentTableHandType;
-    private HandRank currentTableHandRank;
-    private List<CardModel> currentTableCards;
-
-    public bool IsStartingTheTurn { get; set; }   
-
-    private void Awake()
+    [DefaultExecutionOrder(1)]
+    public class Big2SimpleAI : MonoBehaviour
     {
-        playerHand = GetComponent<Big2PlayerHand>();
-        playerStateMachine = GetComponent<Big2PlayerStateMachine>();
-        cardSubmissionCheck = GetComponent<Big2CardSubmissionCheck>();
-        skipTurnHandler = GetComponent<Big2PlayerSkipTurnHandler>();
+        [SerializeField]
+        private float _turnDelay = 3f;
+        private Big2PlayerHand playerHand;
+        
+        private Big2PokerHands big2PokerHands;
+        private Big2CardSorter cardSorter;
+        private Big2CardComparer big2CardComparer;
+        private List<CardModel> aiCards;
+        public AiCardInfo aiCardInfo;
 
-        pokerHand = new Big2PokerHands();
-        cardSorter = GetComponent<Big2CardSorter>();  
-    }
+        private Big2TableManager big2TableManager;
+        private CardInfo tableInfo;
+        private HandType currentTableHandType;
+        private HandRank currentTableHandRank;
+        private List<CardModel> currentTableCards;
 
-    private void Start()
-    { 
-        big2TableManager = Big2TableManager.Instance;
-    }
-
-    
-
-    public void InitiateAiDecisionMaking()
-    {
-        StartCoroutine(AIDecisionMaking());
-        /*
-        // reference the owned cards
-        //Debug.Log("InitiateAiDecisionMaking()");
-        aiCards = playerHand.GetPlayerCards();
-        // sort the hand by best hand
-        // make a list of possible hand rank and the corresponding card
-        aiCardInfo = cardSorter.SortPlayerHandByLowestHand(aiCards);
-
-        // check if it is higher/suittable for the table
-        Big2TableLookUp();
-
-        //Debug.Log("currentTableHandRank : " + currentTableHandRank);
-        // IF THERE IS NO ANOTHER CARD ON THE TABLE
-        if (currentTableHandRank == HandRank.None)
+        #region Monobehaviour
+        private void Awake()
         {
+            playerHand = GetComponent<Big2PlayerHand>();         
+            big2PokerHands = new Big2PokerHands();
+            big2CardComparer = new Big2CardComparer();
+            cardSorter = GetComponent<Big2CardSorter>();
+        }
 
-            if (Big2GMStateMachine.DetermineWhoGoFirst)
+        private void Start()
+        {
+            big2TableManager = Big2TableManager.Instance;
+        }
+        #endregion
+
+        #region AI Decision Making
+
+        /// <summary>
+        /// Initiates AI decision making with a delay.
+        /// </summary>
+        public void InitiateAiDecisionMaking()
+        {
+            StartCoroutine(AIDecisionMaking());
+        }
+
+        /// <summary>
+        /// This coroutine handles the AI's decision-making process during their turn.
+        /// </summary>
+        private IEnumerator AIDecisionMaking()
+        {
+            // Wait for the predefined turn delay before making a decision
+            yield return new WaitForSeconds(_turnDelay);
+
+            // Update the AI's cards from their hand
+            aiCards = playerHand.GetPlayerCards();
+
+            // Display the AI's cards for debugging purposes
+            //DebugAIHand(aiCards);
+
+            // Check the current state of the table to make an informed decision
+            Big2TableLookUp();
+
+            // Decide the course of action based on the table's state
+            if (currentTableHandRank == HandRank.None)
             {
-                Big2PokerHands big2PokerHands = new Big2PokerHands();
-                CardInfo lowestHandInfo = big2PokerHands.GetThreeOfDiamonds(aiCards);
-                List<CardModel> lowestHandCards = lowestHandInfo.CardComposition;
-                OnSubmitCard(lowestHandInfo, lowestHandCards);
-                StartCoroutine(DelayedAction(EndTurn, _turnDelay));
+                HandleEmptyTable();
             }
             else
             {
-                // choose the lowest card
-                //Debug.Log("No card on the Table, AI is thinking...");
-                Big2PokerHands big2PokerHands = new Big2PokerHands();
-                CardInfo lowestHandInfo = big2PokerHands.GetLowestHand(aiCards);
-                List<CardModel> lowestHandCards = lowestHandInfo.CardComposition;
-            
-                for (int i = 0; i < lowestHandCards.Count; i++)
+                // Attempt to play a card package that beats the current table hand
+                bool hasPlayed = TryPlayBeatingHand();
+
+                if (!hasPlayed)
                 {
-                    Debug.Log(lowestHandCards[i]);
+                    // If no suitable hand is found, skip the turn
+                    SkipTurn();
                 }
-                
-                OnSubmitCard(lowestHandInfo, lowestHandCards);
-                StartCoroutine(DelayedAction(EndTurn, _turnDelay));
             }
-            
+
         }
-        // IF THERE IS ANOTHER CARD ON THE TABLE
-        else
+
+        /// <summary>
+        /// Display the AI's cards in the console for debugging purposes.
+        /// </summary>
+        /// <param name="aiCards">The list of AI's card models.</param>
+        private void DebugAIHand(List<CardModel> aiCards)
         {
-            for (int i = 0; i < aiCardInfo.CardPackages.Count; i++)
-            {
-                var cardPackage = aiCardInfo.CardPackages[i];
-                var cardPackageComposition = cardPackage.CardPackageContent;
-                //Debug.Log($"Card Package Type: {cardPackage.CardPackageType}, Card Package Rank: {cardPackage.CardPackageRank}, Card Composition: [{string.Join(", ", cardPackageComposition.Select(card => $"{card.CardRank} of {card.CardSuit}"))}]");
-
-
-                if (!CompareHandType(cardPackageComposition) && currentTableHandType != HandType.None)
-                {
-                    //NotAllowedToSubmitCard?.Invoke();
-                    //Debug.Log("HandType mismatch");
-                    continue;
-                }
-
-                // Check if the hand rank of the selected cards is allowed
-                if (!CompareHandRank(cardPackage.CardPackageRank))
-                {
-                    //NotAllowedToSubmitCard?.Invoke();
-                    //Debug.Log("Selected card hand rank is lower than the table card / not suitable");
-                    continue;
-                }
-
-                // Compare the selected cards with the current table cards
-                if (!CompareSelectedCardsWithTableCards(cardPackageComposition))
-                {
-                    //NotAllowedToSubmitCard?.Invoke();
-                    //Debug.Log("Selected cards value is lower than the table cards");
-                    continue;
-                }
-
-                // card is suitable, submit card
-                CardInfo submittedCardInfo = EvaluateSelectedCards(cardPackageComposition);
-                OnSubmitCard(submittedCardInfo, cardPackageComposition);
-                StartCoroutine(DelayedAction(EndTurn, _turnDelay));
-                return;              
-            }
-
-            // skip turn when no card packages is suitable
-            StartCoroutine(DelayedAction(SkipTurn, _turnDelay));
+            string aiCardsContent = string.Join(", ", aiCards.Select(card => $"Rank: {card.CardRank}, Suit: {card.CardSuit}"));
+            Debug.Log($"AI Cards: {aiCardsContent}");
         }
 
-        // if not, skip turn
-        // if yes, submit card
-        // remove the submitted card
-        */
-    }
-
-    private IEnumerator AIDecisionMaking()
-    {
-        yield return new WaitForSeconds(_turnDelay);
-
-        // Reference the owned cards
-        aiCards = playerHand.GetPlayerCards();
-
-        // Sort the hand by best hand
-        aiCardInfo = cardSorter.SortPlayerHandByLowestHand(aiCards);
-
-        Big2TableLookUp();
-
-        Big2PokerHands big2PokerHands = new Big2PokerHands();
-
-        if (currentTableHandRank == HandRank.None)
+        /// <summary>
+        /// Handle the situation where the table is empty and AI has to lead the turn.
+        /// </summary>
+        private void HandleEmptyTable()
         {
             if (Big2GMStateMachine.DetermineWhoGoFirst)
             {
-                HandleThreeOfDiamonds(big2PokerHands);
+                HandleThreeOfDiamonds();
             }
             else
             {
-                HandleLowestHand(big2PokerHands);
+                HandleLowestHand();
             }
-            //yield return new WaitForSeconds(_turnDelay);
             EndTurn();
-            yield break;
         }
 
-        foreach (var cardPackage in aiCardInfo.CardPackages)
+        /// <summary>
+        /// Attempts to play a hand that beats the current table's hand.
+        /// If a suitable hand is found, it plays that hand and ends the turn.
+        /// </summary>
+        /// <returns>True if a suitable hand is played, false otherwise.</returns>
+        private bool TryPlayBeatingHand()
         {
-            if (IsCardPackageSuitable(cardPackage))
+            AiCardInfo aiCardInfo = SortCardsByCurrentTableHandType(aiCards);
+
+            foreach (var cardPackage in aiCardInfo.CardPackages)
             {
-                CardInfo submittedCardInfo = EvaluateSelectedCards(cardPackage.CardPackageContent);
-                OnSubmitCard(submittedCardInfo, cardPackage.CardPackageContent);
-                //yield return new WaitForSeconds(_turnDelay);
-                EndTurn();
-                yield break;
+                //DebugCardPackage(cardPackage);
+
+                if (CompareCardWithTableCards(cardPackage.CardPackageContent))
+                {
+                    CardInfo submittedCardInfo = EvaluateSelectedCards(cardPackage.CardPackageContent);
+                    OnSubmitCard(submittedCardInfo, cardPackage.CardPackageContent);
+                    EndTurn();
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Sorts the AI's cards based on the current table hand type.
+        /// </summary>
+        /// <param name="aiCards">The AI's current hand.</param>
+        /// <returns>A sorted AiCardInfo object with potential card packages to play.</returns>
+        private AiCardInfo SortCardsByCurrentTableHandType(List<CardModel> aiCards)
+        {
+            switch (currentTableHandType)
+            {
+                case HandType.Single:
+                    return cardSorter.SortPlayerHandHighCardByLowestHand(aiCards);
+                case HandType.Pair:
+                    return cardSorter.SortPlayerPairCardByLowestHand(aiCards);
+                case HandType.ThreeOfAKind:
+                    return cardSorter.SortPlayerThreeOfAKindCardByLowestHand(aiCards);
+                case HandType.FiveCards:
+                    return SortCardsForFiveCardHand();
+                default:
+                    throw new InvalidOperationException($"Unhandled table hand type: {currentTableHandType}");
             }
         }
 
-        // Skip turn when no card packages are suitable
-        //yield return new WaitForSeconds(_turnDelay);
-        SkipTurn();
-    }
-
-    private void HandleThreeOfDiamonds(Big2PokerHands big2PokerHands)
-    {
-        CardInfo lowestHandInfo = big2PokerHands.GetThreeOfDiamonds(aiCards);
-        OnSubmitCard(lowestHandInfo, lowestHandInfo.CardComposition);
-    }
-
-    private void HandleLowestHand(Big2PokerHands big2PokerHands)
-    {
-        CardInfo lowestHandInfo = big2PokerHands.GetLowestHand(aiCards);
-        OnSubmitCard(lowestHandInfo, lowestHandInfo.CardComposition);
-    }
-
-    private bool IsCardPackageSuitable(CardPackage cardPackage)
-    {
-        if (!CompareHandType(cardPackage.CardPackageContent) && currentTableHandType != HandType.None) return false;
-        if (!CompareHandRank(cardPackage.CardPackageRank)) return false;
-        if (!CompareSelectedCardsWithTableCards(cardPackage.CardPackageContent)) return false;
-
-        return true;
-    }
-
-
-
-
-    private void Big2TableLookUp()
-    {
-        tableInfo = big2TableManager.TableLookUp();
-        currentTableHandType = tableInfo.HandType;
-        currentTableHandRank = tableInfo.HandRank;
-        currentTableCards = new List<CardModel>();
-
-    }
-
-    private bool CompareHandType(List<CardModel> submittedCardModels)
-    {
-        int cardCount = submittedCardModels.Count;
-
-        switch (cardCount)
+        /// <summary>
+        /// Sorts the AI's cards for a five-card hand based on the current table hand rank.
+        /// </summary>
+        /// <returns>A sorted AiCardInfo object with potential card packages to play.</returns>
+        private AiCardInfo SortCardsForFiveCardHand()
         {
-            case 0:
-                return currentTableHandType == HandType.None;
-            case 1:
-                return currentTableHandType == HandType.Single;
-            case 2:
-                return currentTableHandType == HandType.Pair;
-            case 3:
-                return currentTableHandType == HandType.ThreeOfAKind;
-            case 5:
-                return currentTableHandType == HandType.FiveCards;
-            default:
-                return false;
+            switch (currentTableHandRank)
+            {
+                case HandRank.Straight:
+                    return cardSorter.SortPlayerStraightCardByLowestHand(aiCards);
+                case HandRank.Flush:
+                    return cardSorter.SortPlayerFlushCardByLowestHand(aiCards);
+                case HandRank.FullHouse:
+                    return cardSorter.SortPlayerFullHouseCardByLowestHand(aiCards);
+                case HandRank.FourOfAKind:
+                    return cardSorter.SortPlayerFourOfAKindCardByLowestHand(aiCards);
+                case HandRank.StraightFlush:
+                    return cardSorter.SortPlayerStraightFlushCardByLowestHand(aiCards);
+                default:
+                    throw new InvalidOperationException($"Unhandled five card hand rank: {currentTableHandRank}");
+            }
         }
-    }
 
-    private bool CompareHandRank(HandRank selectedCardHandRank)
-    {
-        switch (currentTableHandRank)
+        /// <summary>
+        /// Prints the contents of a card package for debugging purposes.
+        /// </summary>
+        /// <param name="cardPackage">The card package to display.</param>
+        private void DebugCardPackage(CardPackage cardPackage)
         {
-            case HandRank.None:
-                return true;
-            case HandRank.HighCard:
-                // Allow any hand rank that is equal or higher
-                if (selectedCardHandRank == HandRank.HighCard)
-                    return true;
-                else
+            string cardPackageContent = string.Join(", ", cardPackage.CardPackageContent.Select(card => $"Rank: {card.CardRank}, Suit: {card.CardSuit}"));
+            Debug.Log($"Attempting with card package: {cardPackageContent}");
+        }
+
+
+        #endregion
+
+        #region Helper Methods
+
+        /// <summary>
+        /// Handles playing the Three of Diamonds card.
+        /// </summary>
+        private void HandleThreeOfDiamonds()
+        {
+            CardInfo lowestHandInfo = big2PokerHands.GetThreeOfDiamonds(aiCards);
+            OnSubmitCard(lowestHandInfo, lowestHandInfo.CardComposition);
+        }
+
+        /// <summary>
+        /// Handles playing the lowest hand available.
+        /// </summary>
+        private void HandleLowestHand()
+        {
+            CardInfo lowestHandInfo = big2PokerHands.GetLowestHand(aiCards);
+            OnSubmitCard(lowestHandInfo, lowestHandInfo.CardComposition);
+        }
+
+        /// <summary>
+        /// Checks if a card package is suitable to be played.
+        /// </summary>
+        /// 
+
+        private bool IsCardPackageSuitable(CardPackage cardPackage)
+        {
+            if (!CompareHandType(cardPackage.CardPackageContent) && currentTableHandType != HandType.None) return false;
+            if (!CompareHandRank(cardPackage.CardPackageRank)) return false;
+            if (!CompareCardWithTableCards(cardPackage.CardPackageContent)) return false;
+
+            return true;
+        }
+
+        /// <summary>
+        /// Looks up the current state of the Big2 table.
+        /// </summary>
+        private void Big2TableLookUp()
+        {
+            tableInfo = big2TableManager.TableLookUp();
+            currentTableHandType = tableInfo.HandType;
+            currentTableHandRank = tableInfo.HandRank;
+            currentTableCards = new List<CardModel>();
+        }
+
+        /// <summary>
+        /// Compares the hand type of submitted cards with the current table hand type.
+        /// </summary>
+        private bool CompareHandType(List<CardModel> submittedCardModels)
+        {
+            int cardCount = submittedCardModels.Count;
+            Debug.Log("CompareHandType. currentTableHandType : " + currentTableHandType + ", cardCount : " + cardCount);
+            switch (cardCount)
+            {
+                case 0:
+                    return currentTableHandType == HandType.None;
+                case 1:
+                    return currentTableHandType == HandType.Single;
+                case 2:
+                    return currentTableHandType == HandType.Pair;
+                case 3:
+                    return currentTableHandType == HandType.ThreeOfAKind;
+                case 5:
+                    return currentTableHandType == HandType.FiveCards;
+                default:
                     return false;
-            case HandRank.Pair:
-                // Allow any hand rank that is equal or higher, except HighCard
-                return selectedCardHandRank == HandRank.Pair;
-            case HandRank.ThreeOfAKind:
-                // Allow any hand rank that is equal or higher, except HighCard and Pair
-                return selectedCardHandRank == HandRank.ThreeOfAKind;
-            case HandRank.Straight:
-            case HandRank.Flush:
-            case HandRank.FullHouse:
-            case HandRank.FourOfAKind:
-            case HandRank.StraightFlush:
-                // Allow only the same or higher hand rank
-                return selectedCardHandRank >= currentTableHandRank;
+            }
         }
 
-        return false;
-    }
-
-    private bool CompareSelectedCardsWithTableCards(List<CardModel> bestHandCards)
-    {
-        Big2CardComparer big2CardComparer = new Big2CardComparer();
-        tableInfo = big2TableManager.TableLookUp();
-        currentTableCards = tableInfo.CardComposition;
-
-        return big2CardComparer.CompareHands(bestHandCards, currentTableCards);
-    }
-
-    private CardInfo EvaluateSelectedCards(List<CardModel> selectedCard)
-    {
-        Big2PokerHands checkSelectedCard = new Big2PokerHands();
-        var bestHand = checkSelectedCard.GetBestHand(selectedCard);
-        var selectedCardHandType = bestHand.HandType;
-        var selectedCardHandRank = bestHand.HandRank;
-        var bestHandCards = bestHand.CardComposition;
-        return new CardInfo(selectedCardHandType, selectedCardHandRank, bestHandCards);
-    }
-
-    private void OnSubmitCard(CardInfo submittedCardInfo, List<CardModel> submittedCards)
-    {
-        // Create a list of card descriptions
-        List<string> cardDescriptions = new List<string>();
-
-        // Debug each submitted card and add its description to the list
-        foreach (var card in submittedCards)
+        /// <summary>
+        /// Compares the hand rank of submitted cards with the current table hand rank.
+        /// </summary>
+        private bool CompareHandRank(HandRank selectedCardHandRank)
         {
-            cardDescriptions.Add(card.CardRank + " of " + card.CardSuit);
+            Debug.Log("CompareHandRank. currentTableHandRank : " + currentTableHandRank + ", selectedCardHandRank : " + selectedCardHandRank);
+            switch (currentTableHandRank)
+            {
+                case HandRank.None:
+                    return true;
+                case HandRank.HighCard:
+                    // Allow any hand rank that is equal or higher
+                    return selectedCardHandRank == HandRank.HighCard;
+                case HandRank.Pair:
+                    // Allow any hand rank that is equal or higher, except HighCard
+                    return selectedCardHandRank == HandRank.Pair;
+                case HandRank.ThreeOfAKind:
+                    // Allow any hand rank that is equal or higher, except HighCard and Pair
+                    return selectedCardHandRank == HandRank.ThreeOfAKind;
+                case HandRank.Straight:
+                case HandRank.Flush:
+                case HandRank.FullHouse:
+                case HandRank.FourOfAKind:
+                case HandRank.StraightFlush:
+                    // Allow only the same or higher hand rank
+                    return selectedCardHandRank >= currentTableHandRank;
+            }
+
+            return false;
         }
 
-        // Join the card descriptions into a single string
-        string submittedCardsString = string.Join(", ", cardDescriptions);
-
-        // Log the submitted cards
-        Debug.Log("Player " + (playerHand.PlayerID) + " SubmitCard: " + submittedCardsString);
-
-        // Update table and remove cards
-        Big2GlobalEvent.BroadcastSubmitCard(submittedCardInfo);
-        playerHand.RemoveCards(submittedCards);
-    }
-
-    private void EndTurn()
-    {
-        if (!Big2GMStateMachine.WinnerIsDetermined)
+        /// <summary>
+        /// Compares the selected cards with the current table cards.
+        /// </summary>
+        private bool CompareCardWithTableCards(List<CardModel> bestHandCards)
         {
-            Debug.Log($"AI {playerHand.PlayerID} end turn, redirect to waiting state");
-            Big2GlobalEvent.BroadcastAIFinishTurnGlobal(playerHand);
+            tableInfo = big2TableManager.TableLookUp();
+            currentTableCards = tableInfo.CardComposition;
+
+            return big2CardComparer.CompareHands(bestHandCards, currentTableCards);
         }
-        else
+
+        /// <summary>
+        /// Evaluates the selected cards to determine their hand type and rank.
+        /// </summary>
+        private CardInfo EvaluateSelectedCards(List<CardModel> selectedCard)
         {
-            Debug.Log("AI {playerHand.PlayerID} end turn, but not redirect to waiting state");
+            var bestHand = big2PokerHands.GetBestHand(selectedCard);
+            var selectedCardHandType = bestHand.HandType;
+            var selectedCardHandRank = bestHand.HandRank;
+            var bestHandCards = bestHand.CardComposition;
+            return new CardInfo(selectedCardHandType, selectedCardHandRank, bestHandCards);
         }
-       
-    }
 
-    private void SkipTurn() 
-    {
-        Debug.Log("Player " + (playerHand.PlayerID) + " Skip Turn");
-        Big2GlobalEvent.BroadcastAISkipTurnGlobal(playerHand);
-    }
+        #endregion
 
-    private IEnumerator DelayedAction(Action action, float delay)
-    {
-        yield return new WaitForSeconds(delay);
-        action.Invoke();
-    }
+        #region AI Action Methods
 
+        /// <summary>
+        /// Handles the submission of cards by the AI player.
+        /// </summary>
+        /// <param name="submittedCardInfo">Information about the submitted cards.</param>
+        /// <param name="submittedCards">The cards being submitted.</param>
+        private void OnSubmitCard(CardInfo submittedCardInfo, List<CardModel> submittedCards)
+        {
+            // Create a list of card descriptions
+            List<string> cardDescriptions = new List<string>();
+
+            // Debug each submitted card and add its description to the list
+            foreach (var card in submittedCards)
+            {
+                cardDescriptions.Add(card.CardRank + " of " + card.CardSuit);
+            }
+
+            // Join the card descriptions into a single string
+            string submittedCardsString = string.Join(", ", cardDescriptions);
+
+            // Log the submitted cards
+            Debug.Log("Player " + (playerHand.PlayerID) + " SubmitCard: " + submittedCardsString);
+
+            // Update table and remove cards
+            Big2GlobalEvent.BroadcastSubmitCard(submittedCardInfo);
+            playerHand.RemoveCards(submittedCards);
+        }
+
+        /// <summary>
+        /// Ends the AI player's turn and takes appropriate actions.
+        /// </summary>
+        private void EndTurn()
+        {
+            if (!Big2GMStateMachine.WinnerIsDetermined)
+            {
+                Debug.Log($"AI {playerHand.PlayerID} end turn, redirect to waiting state");
+                Big2GlobalEvent.BroadcastAIFinishTurnGlobal(playerHand);
+            }
+            else
+            {
+                Debug.Log($"AI {playerHand.PlayerID} end turn, but not redirect to waiting state");
+            }
+        }
+
+        /// <summary>
+        /// Handles the AI player's decision to skip their turn.
+        /// </summary>
+        private void SkipTurn()
+        {
+            Debug.Log("Player " + (playerHand.PlayerID) + " Skip Turn");
+            Big2GlobalEvent.BroadcastAISkipTurnGlobal(playerHand);
+        }
+
+        #endregion
+    }
 }
+

@@ -24,7 +24,7 @@ namespace Big2Meow.DeckNCard
         /// Gets or sets the content of the card package as a list of card models.
         /// </summary>
         public List<CardModel> CardPackageContent { get; set; } = new List<CardModel>();
-
+              
         /// <summary>
         /// Resets the card package to its default state.
         /// </summary>
