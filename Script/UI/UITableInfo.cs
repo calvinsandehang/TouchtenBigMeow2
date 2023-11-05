@@ -1,3 +1,4 @@
+using Big2Meow.DeckNCard;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -10,22 +11,27 @@ namespace Big2Meow.UI
     /// <summary>
     /// Manages the display of table information on the UI.
     /// </summary>
-    public class UITableInfo : MonoBehaviour, IObserverTable
+    public class UITableInfo : MonoBehaviour, IObserverTable, ISubscriber
     {
         [SerializeField]
         private TextMeshProUGUI _tableText;
 
         private Big2TableManager tableManager;
 
+        private const string quadrupleTwoWarning = "A player is having quadruple Two, restarting the game";
+
+
         void Start()
         {
             tableManager = Big2TableManager.Instance;
             AddSelfToSubjectList();
+            SubscribeEvent();
         }
 
         private void OnDisable()
         {
             RemoveSelfFromSubjectList();
+            UnsubscribeEvent();
         }
 
         /// <summary>
@@ -58,12 +64,28 @@ namespace Big2Meow.UI
             // do nothing
         }
 
+        private void OnHavingQuadrapleTwo() 
+        {
+            //Debug.Log("Text Quadruple");
+            _tableText.text = quadrupleTwoWarning;
+        }
+
         /// <summary>
         /// Adds this UI element to the list of observers in the table manager.
         /// </summary>
         public void AddSelfToSubjectList()
         {
             tableManager.AddObserver(this);
+        }
+
+        public void SubscribeEvent()
+        {
+            Big2GlobalEvent.SubscribeHavingQuadrupleTwo(OnHavingQuadrapleTwo);
+        }
+
+        public void UnsubscribeEvent()
+        {
+            Big2GlobalEvent.UnsubscribeHavingQuadrupleTwo(OnHavingQuadrapleTwo);
         }
     }
 }

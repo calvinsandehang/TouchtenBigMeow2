@@ -1,3 +1,4 @@
+using Big2Meow.DeckNCard;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -495,6 +496,46 @@ public class Big2PokerHands
         {
             return new CardInfo(GlobalDefine.HandType.None, GlobalDefine.HandRank.None, new List<CardModel>());
         }
+    }
+    public bool HasAllFourTwos(List<CardModel> hand)
+    {
+        // Flags to determine if the two of each suit is present
+        bool hasTwoOfHearts = false;
+        bool hasTwoOfClubs = false;
+        bool hasTwoOfDiamonds = false;
+        bool hasTwoOfSpades = false;
+
+        // Iterate through the hand and set flags if the two of each suit is found
+        foreach (var card in hand)
+        {
+            if (card.CardRank == GlobalDefine.Rank.Two)
+            {
+                switch (card.CardSuit)
+                {
+                    case GlobalDefine.Suit.Hearts:
+                        hasTwoOfHearts = true;
+                        break;
+                    case GlobalDefine.Suit.Clubs:
+                        hasTwoOfClubs = true;
+                        break;
+                    case GlobalDefine.Suit.Diamonds:
+                        hasTwoOfDiamonds = true;
+                        break;
+                    case GlobalDefine.Suit.Spades:
+                        hasTwoOfSpades = true;
+                        break;
+                }
+            }
+
+            // If all twos are found, no need to continue checking
+            if (hasTwoOfHearts && hasTwoOfClubs && hasTwoOfDiamonds && hasTwoOfSpades)
+            {
+                return true;
+            }
+        }
+
+        // Return true only if all four twos are present
+        return hasTwoOfHearts && hasTwoOfClubs && hasTwoOfDiamonds && hasTwoOfSpades;
     }
 
 

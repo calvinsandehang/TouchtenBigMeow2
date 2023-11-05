@@ -1,3 +1,4 @@
+using Big2Meow.DeckNCard;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -96,5 +97,14 @@ public static class GlobalDefine
     {
         Selected,
         Deselected,
+    }
+
+    /// <summary>
+    /// Represents the possible deck.
+    /// </summary>
+    public enum DeckType
+    {
+        Normal,
+        Test,
     }
 }

@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEditor;
+using Big2Meow.DeckNCard;
 
 [CustomEditor(typeof(CardSO))]
 public class CardSOEditor : Editor

@@ -1,3 +1,4 @@
+using Big2Meow.DeckNCard;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -88,7 +89,7 @@ namespace Big2Meow.UI
         /// </summary>
         public void DisplayCards(List<CardModel> cards, int playerID, PlayerType playerType)
         {
-            Debug.Log($"Display Card, Player {playerID}");
+            //Debug.Log($"Display Card, Player {playerID}");
 
             PlayerCards[playerID].CardModelsInPlayerHand.Clear();
             PlayerCards[playerID].CardModelsInPlayerHand = cards.ToList();
@@ -112,7 +113,7 @@ namespace Big2Meow.UI
                 PlayerCards[playerID].CardsObjectsInPlayerHand.Add(cardGO);
             }
 
-            Debug.Log(_playerCardsParent[playerID].transform);
+            //Debug.Log(_playerCardsParent[playerID].transform);
 
             SortPlayerHand(currentSortCriteria, playerID, playerType);
         }

@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System;
 using static GlobalDefine;
+using Big2Meow.DeckNCard;
 
 namespace Big2Meow.UI
 {

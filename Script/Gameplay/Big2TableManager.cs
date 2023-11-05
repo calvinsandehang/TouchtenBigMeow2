@@ -1,3 +1,4 @@
+using Big2Meow.DeckNCard;
 using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;

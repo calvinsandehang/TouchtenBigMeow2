@@ -1030,7 +1030,6 @@ GameObject:
   m_Component:
   - component: {fileID: 450857603}
   - component: {fileID: 450857602}
-  - component: {fileID: 450857604}
   m_Layer: 0
   m_Name: Manager
   m_TagString: Untagged
@@ -1069,20 +1068,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &450857604
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 450857601}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f8762aa74914b914ea670e9a0b2507d9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _loadSceneButton: {fileID: 0}
-  _sceneNameToLoad: 
 --- !u!1 &824125521
 GameObject:
   m_ObjectHideFlags: 0
@@ -1518,7 +1503,7 @@ GameObject:
   - component: {fileID: 920608302}
   - component: {fileID: 920608301}
   m_Layer: 5
-  m_Name: Panel_Button
+  m_Name: Button_Play
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3137,6 +3122,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1939754450}
   - component: {fileID: 1939754451}
+  - component: {fileID: 1939754452}
   m_Layer: 5
   m_Name: UIManager
   m_TagString: Untagged
@@ -3177,6 +3163,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   defaultMenu: {fileID: 1749829381}
   chooseAvatarMenu: {fileID: 2056915154}
+--- !u!114 &1939754452
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1939754449}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f8762aa74914b914ea670e9a0b2507d9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _loadSceneButton: {fileID: 920608301}
+  _sceneNameToLoad: BigMeow2
 --- !u!1 &2056915151
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,3 +1,4 @@
+using Big2Meow.DeckNCard;
 using UnityEngine;
 /// <summary>
 /// A class responsible for playing voice effects based on game events in a Big2 card game.

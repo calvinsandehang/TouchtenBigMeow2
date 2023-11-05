@@ -1,3 +1,4 @@
+using Big2Meow.DeckNCard;
 using Big2Meow.UI;
 using System.Collections.Generic;
 using UnityEngine;
@@ -29,11 +30,12 @@ public class Big2PlayerHand : MonoBehaviour, ISubscriber, IPlayer
 
     private Big2GMStateMachine gameMaster;
     private Big2CardSubmissionCheck cardSubmissionCheck;
+    private Big2PokerHands pokerHandCheck;
 
+    #region Monobehaviour
     private void Awake()
     {
         ParameterInitialization();
-
         SubscribeEvent();
     }
 
@@ -41,7 +43,15 @@ public class Big2PlayerHand : MonoBehaviour, ISubscriber, IPlayer
     {
         ComponentInitialization();
     }
+ 
+    private void OnDisable()
+    {
+        UnsubscribeEvent();
+    }
 
+    #endregion
+
+    #region Initialization
     /// <summary>
     /// Initializes parameters related to the player.
     /// </summary>
@@ -49,6 +59,7 @@ public class Big2PlayerHand : MonoBehaviour, ISubscriber, IPlayer
     {
         gameMaster = Big2GMStateMachine.Instance;
         cardSubmissionCheck = GetComponent<Big2CardSubmissionCheck>();
+        pokerHandCheck = new Big2PokerHands();
     }
 
     /// <summary>
@@ -64,6 +75,19 @@ public class Big2PlayerHand : MonoBehaviour, ISubscriber, IPlayer
         }
     }
 
+    /// <summary>
+    /// Initializes the unique identifier of the player.
+    /// </summary>
+    /// <param name="index">The index to assign as the player's identifier.</param>
+    public void InitializePlayerID(int index)
+    {
+        PlayerID = index;
+    }
+
+
+    #endregion
+
+    #region Player methods
     /// <summary>
     /// Adds a card to the player's hand.
     /// </summary>
@@ -98,6 +122,7 @@ public class Big2PlayerHand : MonoBehaviour, ISubscriber, IPlayer
     /// <returns>True if the player has a quadruple of Two cards, otherwise false.</returns>
     public bool CheckHavingQuadrupleTwoCard()
     {
+        hasQuadrupleTwo =  pokerHandCheck.HasAllFourTwos(playerCards);
         return hasQuadrupleTwo;
     }
 
@@ -121,6 +146,7 @@ public class Big2PlayerHand : MonoBehaviour, ISubscriber, IPlayer
             Big2GlobalEvent.BroadcastPlayerDropLastCard(this);
         }
     }
+    #endregion
 
     /// <summary>
     /// Retrieves the cards currently held by the player.
@@ -131,15 +157,7 @@ public class Big2PlayerHand : MonoBehaviour, ISubscriber, IPlayer
         return playerCards;
     }
 
-    /// <summary>
-    /// Initializes the unique identifier of the player.
-    /// </summary>
-    /// <param name="index">The index to assign as the player's identifier.</param>
-    public void InitializePlayerID(int index)
-    {
-        PlayerID = index;
-    }
-
+ 
     /// <summary>
     /// Looks up and retrieves the type of the player.
     /// </summary>
@@ -177,6 +195,11 @@ public class Big2PlayerHand : MonoBehaviour, ISubscriber, IPlayer
     /// Resets the player's hand by clearing all cards.
     /// </summary>
     /// <param name="playerHand">The Big2PlayerHand instance representing the player's hand.</param>
+    /// 
+    public void ResetPlayerCard()
+    {
+        playerCards.Clear();
+    }
     public void ResetPlayerCard(Big2PlayerHand playerHand)
     {
         playerCards.Clear();
@@ -188,6 +211,7 @@ public class Big2PlayerHand : MonoBehaviour, ISubscriber, IPlayer
     public void SubscribeEvent()
     {
         Big2GlobalEvent.SubscribePlayerDropLastCard(ResetPlayerCard);
+        Big2GlobalEvent.SubscribeHavingQuadrupleTwo(ResetPlayerCard);
     }
 
     /// <summary>
@@ -196,15 +220,10 @@ public class Big2PlayerHand : MonoBehaviour, ISubscriber, IPlayer
     public void UnsubscribeEvent()
     {
         Big2GlobalEvent.UnsubscribePlayerDropLastCard(ResetPlayerCard);
+        Big2GlobalEvent.UnsubscribeHavingQuadrupleTwo(ResetPlayerCard);
     }
 
-    /// <summary>
-    /// Handles cleanup when the player hand is disabled.
-    /// </summary>
-    private void OnDisable()
-    {
-        UnsubscribeEvent();
-    }
+  
 
     #region Testing Purposes
     public void EvaluateCardInHand()
