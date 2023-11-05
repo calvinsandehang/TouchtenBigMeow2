@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8cef66d804e1d0141942e1876af3c288, type: 3}
+  m_Name: TestDeck_Quadruple_2_Player2
+  m_EditorClassIdentifier: 
+  _cards:
+  - {fileID: 11400000, guid: c7b00073b7cb4594f8ffeabc1fe0e7d0, type: 2}
+  - {fileID: 11400000, guid: f2dded8f14a8be746883bb200287716b, type: 2}
+  - {fileID: 11400000, guid: aa6bd100d8b74cd4886853348875d7b6, type: 2}
+  - {fileID: 11400000, guid: 9f7645ab2019e374b867d875ba983392, type: 2}
+  - {fileID: 11400000, guid: 32484fd5b4e42fc46910d8eff6ed478c, type: 2}
+  - {fileID: 11400000, guid: 2513527ce6e057e4fad57bd8d3d35e5c, type: 2}
+  - {fileID: 11400000, guid: 611d8895b7411834bb7303c425a06fc5, type: 2}
+  - {fileID: 11400000, guid: e28ca4cd7a51d6e4e9a10954f84ed935, type: 2}
+  - {fileID: 11400000, guid: efcd64be89bbdd44eb551200c6f7b0d6, type: 2}
+  - {fileID: 11400000, guid: 9b44cce835ce7d04c87c3367b4010ed0, type: 2}
+  - {fileID: 11400000, guid: cc88df528157aec4b9ec553e6ce65309, type: 2}
+  - {fileID: 11400000, guid: 436796ff2701e09419e79b2561d3def8, type: 2}
+  - {fileID: 11400000, guid: 39d33302cb303424fa0a50225ca6dcdf, type: 2}

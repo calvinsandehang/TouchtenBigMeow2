@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a5ba5cf436989942b7ed791faf4eacf, type: 3}
+  m_Name: TestDeck_ThreeOfAKind
+  m_EditorClassIdentifier: 
+  _cards: []
+  _player1Deck: {fileID: 11400000, guid: a95117ced63db134a9b9fc029995bc63, type: 2}
+  _player2Deck: {fileID: 11400000, guid: 91a7c06dc914dd644a98ae301e65c7e1, type: 2}
+  _player3Deck: {fileID: 11400000, guid: 212f531574b3e23498029c12330bfe05, type: 2}
+  _player4Deck: {fileID: 11400000, guid: 1fd7abe75ebf0af439ff1c6ab5b02ddd, type: 2}

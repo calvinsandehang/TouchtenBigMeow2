@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8cef66d804e1d0141942e1876af3c288, type: 3}
+  m_Name: TestDeck_ThreeOfAKind_Player3
+  m_EditorClassIdentifier: 
+  _cards:
+  - {fileID: 11400000, guid: 187f9b9556a5d5b409884b1b9f35b6a5, type: 2}
+  - {fileID: 11400000, guid: f4e386deddbff204dacf86961b8caa97, type: 2}
+  - {fileID: 11400000, guid: 9f7645ab2019e374b867d875ba983392, type: 2}
+  - {fileID: 11400000, guid: 9244ac04fbcd8274c80707fc13e1a172, type: 2}
+  - {fileID: 11400000, guid: d609595be2ccfdf44b30374ec7c92bb3, type: 2}
+  - {fileID: 11400000, guid: e28ca4cd7a51d6e4e9a10954f84ed935, type: 2}
+  - {fileID: 11400000, guid: 8b614fba297e31a46bc3be1c6f7d739f, type: 2}
+  - {fileID: 11400000, guid: b90fa1f3526794546a178a2c94a0fe7c, type: 2}
+  - {fileID: 11400000, guid: bb3820a00f56b0942adc84b237967265, type: 2}
+  - {fileID: 11400000, guid: e2e28df589349de44a9441b737c4e01d, type: 2}
+  - {fileID: 11400000, guid: 2245de08aff2c17468455b5e047ddcd2, type: 2}
+  - {fileID: 11400000, guid: ff87890f4c7d77347be8472676525c5c, type: 2}
+  - {fileID: 11400000, guid: 436796ff2701e09419e79b2561d3def8, type: 2}
