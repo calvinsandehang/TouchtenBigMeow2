@@ -1,3 +1,7 @@
+
+
+#if UNITY_EDITOR
+using Big2Meow.FSM;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
@@ -89,3 +93,7 @@ public class DealerEditor : Editor
     }
     */
 }
+
+#endif
+
+

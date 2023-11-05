@@ -1534,8 +1534,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 381aefe8207204a4fabe0ba6ad1747e7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  screenFader: {fileID: 964875565}
-  fadeDuration: 2
+  _screenFader: {fileID: 964875565}
+  _fadeDuration: 2
 --- !u!114 &824125527
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1875,8 +1875,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e7686c2cf5c63f40bfe2d577a29cbcc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fadePanel: {fileID: 1739230163}
-  fadeDuration: 1
+  _fadePanel: {fileID: 1739230163}
+  _fadeDuration: 2
 --- !u!224 &964875566
 RectTransform:
   m_ObjectHideFlags: 0

@@ -4,6 +4,8 @@ using UnityEngine.EventSystems;
 using System;
 using static GlobalDefine;
 using Big2Meow.DeckNCard;
+using Big2Meow.Gameplay;
+using Big2Meow.Player;
 
 namespace Big2Meow.UI
 {

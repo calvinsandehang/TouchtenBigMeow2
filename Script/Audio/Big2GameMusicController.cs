@@ -1,3 +1,5 @@
+using Big2Meow.Gameplay;
+using Big2Meow.Player;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -81,14 +83,12 @@ namespace Big2Meow.Audio
         #region Subscrive Event
         private void SubscribeEvent()
         {
-            // Subscribe to events related to card gameplay.
             Big2GlobalEvent.SubscribePlayerCardLessThanSix(StartRushMusic);
             Big2GlobalEvent.SubscribePlayerDropLastCard(StartNormalMusic);
         }
 
         private void UnsubscribeEvent()
         {
-            // Unsubscribe from events to prevent memory leaks.
             Big2GlobalEvent.UnsubscribePlayerCardLessThanSix(StartRushMusic);
             Big2GlobalEvent.UnsubscribePlayerDropLastCard(StartNormalMusic);
         }

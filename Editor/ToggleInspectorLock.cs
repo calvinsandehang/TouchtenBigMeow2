@@ -1,6 +1,10 @@
+
+
+#if UNITY_EDITOR
 using System;
 using System.Reflection;
 using UnityEditor;
+
 public class InspectorLockToggle
 {
     [MenuItem("Tools/Toggle Lock #w")]
@@ -18,3 +22,4 @@ public class InspectorLockToggle
         }
     }
 }
+#endif

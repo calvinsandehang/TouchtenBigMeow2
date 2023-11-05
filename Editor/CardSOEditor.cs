@@ -1,3 +1,6 @@
+
+
+#if UNITY_EDITOR
 using UnityEngine;
 using UnityEditor;
 using Big2Meow.DeckNCard;
@@ -24,3 +27,6 @@ public class CardSOEditor : Editor
         }
     }
 }
+
+#endif
+

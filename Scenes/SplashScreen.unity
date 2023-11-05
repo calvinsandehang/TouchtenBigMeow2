@@ -233,8 +233,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 381aefe8207204a4fabe0ba6ad1747e7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  screenFader: {fileID: 1114091612}
-  fadeDuration: 2
+  _screenFader: {fileID: 1114091612}
+  _fadeDuration: 2
 --- !u!4 &705670173
 Transform:
   m_ObjectHideFlags: 0
@@ -735,8 +735,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e7686c2cf5c63f40bfe2d577a29cbcc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fadePanel: {fileID: 1225883380}
-  fadeDuration: 1
+  _fadePanel: {fileID: 1225883380}
+  _fadeDuration: 2
 --- !u!1 &1158673874
 GameObject:
   m_ObjectHideFlags: 0
@@ -824,7 +824,7 @@ GameObject:
   - component: {fileID: 1225883381}
   - component: {fileID: 1225883380}
   m_Layer: 5
-  m_Name: Img_Splash
+  m_Name: Img_Fade
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

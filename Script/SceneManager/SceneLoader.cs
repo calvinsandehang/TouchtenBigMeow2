@@ -1,58 +1,63 @@
 using UnityEngine;
 using System.Collections;
 
-/// <summary>
-/// Manages scene loading and transitions using a screen fader.
-/// </summary>
-public class SceneLoader : MonoBehaviour
+namespace Big2Meow.SceneManager
 {
     /// <summary>
-    /// Gets the singleton instance of the SceneLoader.
+    /// Manages scene loading and transitions using a screen fader.
     /// </summary>
-    public static SceneLoader Instance { get; private set; }
-
-    [SerializeField]
-    private ScreenFader screenFader;
-
-    [SerializeField]
-    private float fadeDuration = 2.0f;
-
-    private void Awake()
+    public class SceneLoader : MonoBehaviour
     {
-        // Singleton pattern: Ensure there is only one instance of SceneLoader.
-        if (Instance == null)
+        /// <summary>
+        /// Gets the singleton instance of the SceneLoader.
+        /// </summary>
+        public static SceneLoader Instance { get; private set; }
+
+        [SerializeField]
+        private ScreenFader _screenFader;
+
+        [SerializeField]
+        private float _fadeDuration = 2.0f;
+
+        private void Awake()
         {
-            Instance = this;
+            // Singleton pattern: Ensure there is only one instance of SceneLoader.
+            if (Instance == null)
+            {
+                Instance = this;
+            }
+            else if (Instance != this)
+            {
+                // If an instance already exists, destroy this GameObject.
+                Destroy(gameObject);
+                return;
+            }
         }
-        else if (Instance != this)
+
+        /// <summary>
+        /// Loads the next scene with a transition effect.
+        /// </summary>
+        /// <param name="sceneName">The name of the scene to load.</param>
+        public void LoadNextScene(string sceneName)
         {
-            // If an instance already exists, destroy this GameObject.
-            Destroy(gameObject);
-            return;
+            StartCoroutine(TransitionToScene(sceneName));
         }
-    }
 
-    /// <summary>
-    /// Loads the next scene with a transition effect.
-    /// </summary>
-    /// <param name="sceneName">The name of the scene to load.</param>
-    public void LoadNextScene(string sceneName)
-    {
-        StartCoroutine(TransitionToScene(sceneName));
-    }
+        private IEnumerator TransitionToScene(string sceneName)
+        {
+            // Fade the screen to black before loading the new scene.
+            yield return _screenFader.FadeToBlack(_fadeDuration);
 
-    private IEnumerator TransitionToScene(string sceneName)
-    {
-        // Fade the screen to black before loading the new scene.
-        yield return screenFader.FadeToBlack(fadeDuration);
+            // Load the new scene.
+            UnityEngine.SceneManagement.SceneManager.LoadScene(sceneName);
 
-        // Load the new scene.
-        UnityEngine.SceneManagement.SceneManager.LoadScene(sceneName);
+            // Wait for one frame for the scene to fully load.
+            yield return null;
 
-        // Wait for one frame for the scene to fully load.
-        yield return null;
-
-        // Fade the screen from black after the new scene is loaded.
-        yield return screenFader.FadeFromBlack(fadeDuration);
+            // Fade the screen from black after the new scene is loaded.
+            yield return _screenFader.FadeFromBlack(_fadeDuration);
+        }
     }
 }
+
+

@@ -1,4 +1,7 @@
 using Big2Meow.DeckNCard;
+using Big2Meow.FSM;
+using Big2Meow.Gameplay;
+using Big2Meow.Player;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -8,19 +11,23 @@ using static GlobalDefine;
 
 namespace Big2Meow.AI 
 {
+    /// <summary>
+    /// Represents a simple AI for the Big2 card game that decides moves based on predefined logic.
+    /// </summary>
     [DefaultExecutionOrder(1)]
     public class Big2SimpleAI : MonoBehaviour
     {
         [SerializeField]
         private float _turnDelay = 3f;
-        private Big2PlayerHand playerHand;
-        
+
+        private Big2PlayerHand playerHand;        
         private Big2PokerHands big2PokerHands;
         private Big2CardSorter cardSorter;
         private Big2CardComparer big2CardComparer;
         private List<CardModel> aiCards;
         public AiCardInfo aiCardInfo;
 
+        // Table
         private Big2TableManager big2TableManager;
         private CardInfo tableInfo;
         private HandType currentTableHandType;

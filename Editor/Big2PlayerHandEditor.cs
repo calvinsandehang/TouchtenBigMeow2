@@ -1,7 +1,12 @@
+
+
+#if UNITY_EDITOR
 using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
 using Big2Meow.DeckNCard; // Assuming CardModel is in this namespace
+using Big2Meow.Gameplay;
+using Big2Meow.Player;
 
 [CustomEditor(typeof(Big2PlayerHand))]
 public class Big2PlayerHandEditor : Editor
@@ -84,3 +89,5 @@ public class Big2PlayerHandEditor : Editor
     }
 
 }
+#endif
+
