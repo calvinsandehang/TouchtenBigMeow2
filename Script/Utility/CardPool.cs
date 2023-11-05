@@ -26,7 +26,7 @@ public class CardPool : MonoBehaviour
     /// <summary>
     /// Initializes the card pool by preloading cards.
     /// </summary>
-    private void Start()
+    private void Awake()
     {
         PreloadCards(_totalCard);
     }
@@ -40,10 +40,12 @@ public class CardPool : MonoBehaviour
         for (int i = 0; i < count; i++)
         {
             GameObject card = Instantiate(_cardPrefab);
-            DeactivateCard(card);
             _cardPool.Add(card);
+            DeactivateCard(card);
+            
         }
     }
+    /*
 
     /// <summary>
     /// Gets a card from the pool or instantiates a new one if necessary.
@@ -60,11 +62,35 @@ public class CardPool : MonoBehaviour
             }
         }
 
+        // Instead of instantiating a new card, log a warning or handle the situation appropriately
+        Debug.LogWarning("No cards available in the pool.");
+        return null; // or handle differently
+    }
+    */
+    /// <summary>
+    /// Gets a card from the pool or instantiates a new one if necessary.
+    /// </summary>
+    /// <returns>The retrieved card GameObject.</returns>
+    public GameObject GetCard()
+    {
+        foreach (var card in _cardPool)
+        {
+            if (!card.activeInHierarchy)
+            {
+                ActivateCard(card);
+                return card;
+            }
+        }
+
         // If no inactive card is available, instantiate a new one, add it to the pool, and return it
+        Debug.Log("Instantiate new Card");
         GameObject newCard = Instantiate(_cardPrefab);
         _cardPool.Add(newCard);
         return newCard;
     }
+
+
+
 
     /// <summary>
     /// Deactivates a card and returns it to the pool.
