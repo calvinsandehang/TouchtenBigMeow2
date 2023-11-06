@@ -481,7 +481,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   audioSource: {fileID: 705670177}
-  volume: 0.7
+  volume: 0.5
   fadeOutTime: 2
 --- !u!1 &843162523
 GameObject:

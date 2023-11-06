@@ -8,7 +8,7 @@ namespace Big2Meow.UI
     public class UIBig2TableText : MonoBehaviour, ISubscriber
     {
         private const string FIVE_CARDS_LEFT_MESSAGE = "5 CARD LEFT!";
-        private const string MUST_INCLUDE_THREE_OF_DIAMONDS_MESSAGE = "5 CARD LEFT!";
+        private const string MUST_INCLUDE_THREE_OF_DIAMONDS_MESSAGE = "MUST INCLUDE THREE OF DIAMONDS";
 
         [SerializeField] private TextMeshProUGUI _big2TableText;
         [SerializeField] private Color _textColor = Color.red;
@@ -63,7 +63,7 @@ namespace Big2Meow.UI
         {
             if (!warningMustIncludeThreeOfDiamondsTextActive)
             {
-                warningCardLessThanSixTextActive = true;
+                warningMustIncludeThreeOfDiamondsTextActive = true;
 
                 StartCoroutine(FadeTextInOutCoroutine(MUST_INCLUDE_THREE_OF_DIAMONDS_MESSAGE));
             }

@@ -1,3 +1,4 @@
+using Big2Meow.DeckNCard;
 using Big2Meow.FSM;
 using Big2Meow.Gameplay;
 using System;
@@ -85,6 +86,11 @@ namespace Big2Meow.UI
         {
             SetButtonNonInteractable();
         }
+
+        private void OnNotAllowedToSkipTurn(CardInfo cardInfo)
+        {
+            SetButtonNonInteractable();
+        }
         #endregion
 
         #region Handle Button
@@ -113,6 +119,7 @@ namespace Big2Meow.UI
             playerStateMachine.OnPlayerIsPlaying += OnAllowedToSkipTurn;
             playerStateMachine.OnPlayerIsLosing += OnNotAllowedToSkipTurn;
             playerStateMachine.OnPlayerIsWaiting += OnNotAllowedToSkipTurn;
+            Big2GlobalEvent.SubscribeSubmitCard(OnNotAllowedToSkipTurn);
         }
 
         public void UnsubscribeEvent()
@@ -120,6 +127,7 @@ namespace Big2Meow.UI
             playerStateMachine.OnPlayerIsPlaying -= OnAllowedToSkipTurn;
             playerStateMachine.OnPlayerIsLosing -= OnNotAllowedToSkipTurn;
             playerStateMachine.OnPlayerIsWaiting -= OnNotAllowedToSkipTurn;
+            Big2GlobalEvent.UnsubscribeSubmitCard(OnNotAllowedToSkipTurn);
         }
         #endregion
     }
