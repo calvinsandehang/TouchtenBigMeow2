@@ -473,10 +473,14 @@ namespace Big2Meow.FSM
             {
                 Debug.LogWarning("Player prefab is not assigned!", this);
             }
-            
+
             if (_deckType == DeckType.Test)
             {
                 Debug.LogWarning("Deck type is set to Test, which is not shuffled!", this);
+            }
+            else if (_deckType == DeckType.Normal) 
+            {
+                Debug.LogWarning("Deck type is set to Normal, change to Test Deck for testing purpose", this);
             }
         }
 

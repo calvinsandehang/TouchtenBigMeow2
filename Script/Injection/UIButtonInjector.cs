@@ -37,8 +37,6 @@ namespace Big2Meow.Injection
             {
                 Destroy(gameObject);
             }
-
-            DontDestroyOnLoad(gameObject);
         }
 
         /// <summary>
