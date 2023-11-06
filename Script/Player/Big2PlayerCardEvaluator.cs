@@ -1,23 +1,25 @@
 using Big2Meow.DeckNCard;
+using Big2Meow.FSM;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using static GlobalDefine;
 
-namespace Big2Meow.Player 
+namespace Big2Meow.Player
 {
     /// <summary>
     /// A class responsible for evaluating and managing selected cards for submission.
     /// Only Human Player can have this component
     /// </summary>
-    public class Big2PlayerCardEvaluator : MonoBehaviour
+    public class Big2PlayerCardEvaluator : MonoBehaviour, ISubscriber
     {
         public static Big2PlayerCardEvaluator Instance { get; private set; }
         public List<CardModel> SelectedCards { get; private set; } = new List<CardModel>();
         private List<Tuple<HandRank, List<CardModel>, int>> RankedHands = new List<Tuple<HandRank, List<CardModel>, int>>();
 
         public Big2CardSubmissionCheck PlayerSubmissionCheck;
+        private Big2PlayerStateMachine playerSM;
 
         private void Awake()
         {
@@ -29,6 +31,17 @@ namespace Big2Meow.Player
             {
                 Destroy(Instance);
             }
+        }
+
+        private void Start()
+        {
+            playerSM = GetComponent<Big2PlayerStateMachine>();
+            SubscribeEvent();
+        }
+
+        private void OnDisable()
+        {
+            UnsubscribeEvent();
         }
 
         #region Selecting & Deselecting Cards
@@ -76,6 +89,11 @@ namespace Big2Meow.Player
             PlayerSubmissionCheck.SubmissionCheck(SelectedCards);
         }
 
+        public void OnPlaying() 
+        {
+            PlayerSubmissionCheck.SubmissionCheck(SelectedCards);
+        }
+
         #endregion
 
         #region Helper
@@ -86,6 +104,16 @@ namespace Big2Meow.Player
         public void InitializeCardEvaluator(Big2CardSubmissionCheck submissionCheck)
         {
             PlayerSubmissionCheck = submissionCheck;
+        }
+
+        public void SubscribeEvent()
+        {
+            playerSM.OnPlayerIsPlaying += OnPlaying;
+        }
+
+        public void UnsubscribeEvent()
+        {
+            playerSM.OnPlayerIsPlaying -= OnPlaying;
         }
 
         #endregion

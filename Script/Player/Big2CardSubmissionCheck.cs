@@ -30,11 +30,15 @@ namespace Big2Meow.Player
 
         private Button submitCardButton;
         private List<CardModel> submittedCards = new List<CardModel>();
+        private List<CardModel> currentSelectedCard = new List<CardModel>();
         private CardInfo submittedCardInfo;
 
+        private Big2PlayerStateMachine playerSM;
         private Big2PokerHands pokerHandChecker;
         private Big2PlayerHand playerHand;
         private PlayerType playerType;
+
+        private bool isPlaying = false;
 
         [SerializeField]
         private int _turnDelay = 2;
@@ -51,6 +55,7 @@ namespace Big2Meow.Player
         private void Start()
         {
             ParameterInitialization();
+            SubscribeEvent();
         }
 
         private void OnDisable()
@@ -72,13 +77,15 @@ namespace Big2Meow.Player
         /// <param name="selectedCard">The list of selected cards for submission.</param>
         public void SubmissionCheck(List<CardModel> selectedCard)
         {
+            currentSelectedCard = selectedCard;
+
             // Broadcast an event to notify that card submission is not allowed.
             Big2GlobalEvent.BroadcastCardSubmissionNotAllowed();
 
             // Check if no cards are selected for submission.
             if (selectedCard.Count == 0)
             {
-                Debug.Log("No cards selected for submission.");
+                //Debug.Log("No cards selected for submission.");
                 return;
             }
 
@@ -86,7 +93,7 @@ namespace Big2Meow.Player
             if (Big2GMStateMachine.DetermineWhoGoFirst &&
                 !selectedCard.Exists(card => card.CardRank == Rank.Three && card.CardSuit == Suit.Diamonds))
             {
-                Debug.Log("The Three of Diamonds must be included in the initial round.");
+                Debug.LogWarning("The Three of Diamonds must be included in the initial round.");
                 return;
             }
 
@@ -123,8 +130,12 @@ namespace Big2Meow.Player
             // If all checks pass, add the selected cards to the submitted cards.
             AddNewSubmittedCardToSubmittedCardList();
 
-            // Broadcast an event to notify that card submission is allowed.
-            Big2GlobalEvent.BroadcastCardSubmissionAllowed();
+            if (isPlaying)
+            {
+                // Broadcast an event to notify that card submission is allowed.
+                Big2GlobalEvent.BroadcastCardSubmissionAllowed();
+            }
+            
         }
 
 
@@ -238,6 +249,8 @@ namespace Big2Meow.Player
 
             Big2GlobalEvent.BroadcastCardSubmissionNotAllowed();
             StartCoroutine(DelayedAction(EndTurn, _turnDelay));
+
+            isPlaying = false;
         }
 
         /// <summary>
@@ -264,7 +277,7 @@ namespace Big2Meow.Player
         /// </summary>
         private void SubscribeEvent()
         {
-            // Subscribe to events here.
+            playerSM.OnPlayerIsPlaying += OnPlaying;
         }
 
         /// <summary>
@@ -272,7 +285,14 @@ namespace Big2Meow.Player
         /// </summary>
         private void UnsubscribeEvent()
         {
-            // Unsubscribe from events here.
+            playerSM.OnPlayerIsPlaying -= OnPlaying;
+        }
+
+        private void OnPlaying() 
+        {
+            isPlaying = true;
+
+            SubmissionCheck(currentSelectedCard);
         }
         #endregion
 
@@ -294,6 +314,7 @@ namespace Big2Meow.Player
         private void ParameterInitialization()
         {
             playerHand = GetComponent<Big2PlayerHand>();
+            playerSM = GetComponent<Big2PlayerStateMachine>();
             playerType = playerHand.PlayerTypeLookUp();
 
             if (playerType == PlayerType.Human)

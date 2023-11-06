@@ -56,13 +56,12 @@ namespace Big2Meow.FSM
 
             DealCards();
 
-            GMSM.IsInitialized = true;
-
             bool violatingRule = GMSM.Big2Rule.CheckBig2RuleViolation(GMSM.PlayerHands);
 
             if (!violatingRule)
             {
                 DetermineTurn();
+                GMSM.IsInitialized = true;
             }
             else
             {

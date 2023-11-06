@@ -9,7 +9,7 @@ namespace Big2Meow.FSM
     /// </summary>
     public class Big2GMStateP0Turn : BaseState<GMState>
     {
-        private Big2GMStateMachine gmStateMachine;
+        private Big2GMStateMachine GMSM;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Big2GMStateP0Turn"/> class.
@@ -18,7 +18,7 @@ namespace Big2Meow.FSM
         /// <param name="stateMachine">The game state machine.</param>
         public Big2GMStateP0Turn(GMState key, Big2GMStateMachine stateMachine) : base(key)
         {
-            gmStateMachine = stateMachine;
+            GMSM = stateMachine;
         }
 
         /// <summary>
@@ -27,7 +27,7 @@ namespace Big2Meow.FSM
         public override void EnterState()
         {
             Debug.Log("GM in P0 Turn State");
-            gmStateMachine.OrderPlayerToPlay(0);
+            GMSM.OrderPlayerToPlay(0);
         }
 
         /// <summary>

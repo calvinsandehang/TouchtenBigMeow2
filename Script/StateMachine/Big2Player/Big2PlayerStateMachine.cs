@@ -27,7 +27,6 @@ namespace Big2Meow.FSM
     /// </summary>
     public class Big2PlayerStateMachine : StateManager<PlayerState>, ISubscriber
     {
-        public PlayerState CurrentPlayerState { get; private set; }
         public Big2PlayerHand PlayerHand { get; private set; }
         private Big2CardSubmissionCheck cardSubmissionCheck;
         private Big2PlayerSkipTurnHandler skipTurnHandler;
@@ -156,6 +155,12 @@ namespace Big2Meow.FSM
         #endregion
 
         #region Helper Methods
+        public bool CheckCurrentState(PlayerState state)
+        {
+            // Check if the provided state is the current state
+            return CurrentState == States[state];
+        }
+
 
         public PlayerType GetPlayerType()
         {

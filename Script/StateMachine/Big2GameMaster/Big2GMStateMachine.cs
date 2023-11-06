@@ -40,8 +40,11 @@ namespace Big2Meow.FSM
 
         #region Prefabs and Deck
 
-        [Header("Prefabs")]
+        [Header("Player Instance")]
+        [Tooltip("Add player prefab")]
         [SerializeField] private GameObject _playerPrefab;
+        [Tooltip("Where do you want the Player prefab to be instantiated")]
+        [SerializeField] private Transform _playerParent;
 
         [Header("Deck")]
         [Tooltip("Test deck is not shuffled ")]
@@ -173,7 +176,7 @@ namespace Big2Meow.FSM
         /// <returns>The instantiated player object.</returns>
         public GameObject InstantiatePlayer()
         {
-            GameObject playerHandObject = Instantiate(_playerPrefab);
+            GameObject playerHandObject = Instantiate(_playerPrefab, _playerParent);
             return playerHandObject;
         }
 
@@ -463,6 +466,20 @@ namespace Big2Meow.FSM
             yield return new WaitForSeconds(delay);
             action.Invoke();
         }
+
+        private void OnValidate()
+        {
+            if (_playerPrefab == null)
+            {
+                Debug.LogWarning("Player prefab is not assigned!", this);
+            }
+            
+            if (_deckType == DeckType.Test)
+            {
+                Debug.LogWarning("Deck type is set to Test, which is not shuffled!", this);
+            }
+        }
+
 
         #endregion
 
