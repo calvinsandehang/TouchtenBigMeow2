@@ -22,7 +22,6 @@ namespace Big2Meow.Audio
             if (Instance == null)
             {
                 Instance = this;
-                DontDestroyOnLoad(gameObject);
             }
             else if (Instance != this)
             {
