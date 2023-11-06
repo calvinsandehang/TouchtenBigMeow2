@@ -8,6 +8,7 @@ namespace Big2Meow.UI
     public class UIBig2TableText : MonoBehaviour, ISubscriber
     {
         private const string FIVE_CARDS_LEFT_MESSAGE = "5 CARD LEFT!";
+        private const string MUST_INCLUDE_THREE_OF_DIAMONDS_MESSAGE = "5 CARD LEFT!";
 
         [SerializeField] private TextMeshProUGUI _big2TableText;
         [SerializeField] private Color _textColor = Color.red;
@@ -16,7 +17,8 @@ namespace Big2Meow.UI
         [SerializeField] private float _stayDuration = 2.0f;
         [SerializeField] private float _fadeOutDuration = 1.0f;
 
-        private bool active = false;
+        private bool warningCardLessThanSixTextActive = false;
+        private bool warningMustIncludeThreeOfDiamondsTextActive = false;
 
         void Start()
         {
@@ -34,7 +36,7 @@ namespace Big2Meow.UI
 
         private void ResetState(Big2PlayerHand player) 
         {
-            active = false;
+            warningCardLessThanSixTextActive = false;
         }
 
         /// <summary>
@@ -49,11 +51,21 @@ namespace Big2Meow.UI
 
         public void FadeWarningTextInOut()
         {
-            if (!active) 
+            if (!warningCardLessThanSixTextActive) 
             {
-                active = true;
+                warningCardLessThanSixTextActive = true;
 
                 StartCoroutine(FadeTextInOutCoroutine(FIVE_CARDS_LEFT_MESSAGE));
+            }
+        }
+
+        public void FadeWarningMustIncludeThreeDiamondsTextInOut()
+        {
+            if (!warningMustIncludeThreeOfDiamondsTextActive)
+            {
+                warningCardLessThanSixTextActive = true;
+
+                StartCoroutine(FadeTextInOutCoroutine(MUST_INCLUDE_THREE_OF_DIAMONDS_MESSAGE));
             }
         }
 
@@ -72,6 +84,8 @@ namespace Big2Meow.UI
             yield return new WaitForSeconds(_stayDuration);
             // Fade Out
             yield return StartCoroutine(FadeTextToZeroAlpha(_fadeOutDuration, _big2TableText));
+
+            warningMustIncludeThreeOfDiamondsTextActive = false;
         }
 
         /// <summary>
@@ -110,12 +124,14 @@ namespace Big2Meow.UI
         {
             Big2GlobalEvent.SubscribePlayerCardLessThanSix(FadeWarningTextInOut);
             Big2GlobalEvent.SubscribePlayerDropLastCard(ResetState);
+            Big2GlobalEvent.SubscribeMustIncludeThreeOfDiamond(FadeWarningMustIncludeThreeDiamondsTextInOut);
         }
 
         public void UnsubscribeEvent()
         {
             Big2GlobalEvent.UnsubscribePlayerCardLessThanSix(FadeWarningTextInOut);
             Big2GlobalEvent.UnsubscribePlayerDropLastCard(ResetState);
+            Big2GlobalEvent.UnsubscribeMustIncludeThreeOfDiamond(FadeWarningMustIncludeThreeDiamondsTextInOut);
         }
     }
 }

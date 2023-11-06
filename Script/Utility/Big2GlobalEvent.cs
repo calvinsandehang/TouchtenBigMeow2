@@ -434,5 +434,44 @@ public static class Big2GlobalEvent
         }
     }
     #endregion
+    #region Event : MustIncludeThreeOfDiamond
+    private static List<Action> mustIncludeThreeOfDiamondListeners = new List<Action>();
+
+    /// <summary>
+    /// Subscribes a new listener for the MustIncludeThreeOfDiamond event.
+    /// </summary>
+    /// <param name="listener">The callback method to invoke when the event is broadcasted.</param>
+    public static void SubscribeMustIncludeThreeOfDiamond(Action listener)
+    {
+        if (!mustIncludeThreeOfDiamondListeners.Contains(listener))
+        {
+            mustIncludeThreeOfDiamondListeners.Add(listener);
+        }
+    }
+
+    /// <summary>
+    /// Unsubscribes a listener from the MustIncludeThreeOfDiamond event.
+    /// </summary>
+    /// <param name="listener">The callback method to remove from the event's invocation list.</param>
+    public static void UnsubscribeMustIncludeThreeOfDiamond(Action listener)
+    {
+        if (mustIncludeThreeOfDiamondListeners.Contains(listener))
+        {
+            mustIncludeThreeOfDiamondListeners.Remove(listener);
+        }
+    }
+
+    /// <summary>
+    /// Broadcasts the MustIncludeThreeOfDiamond event to all subscribed listeners.
+    /// </summary>
+    public static void BroadcastMustIncludeThreeOfDiamond()
+    {
+        foreach (var listener in mustIncludeThreeOfDiamondListeners)
+        {
+            listener.Invoke();
+        }
+    }
+    #endregion
+
 
 }

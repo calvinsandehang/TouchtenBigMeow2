@@ -94,6 +94,7 @@ namespace Big2Meow.Player
                 !selectedCard.Exists(card => card.CardRank == Rank.Three && card.CardSuit == Suit.Diamonds))
             {
                 Debug.LogWarning("The Three of Diamonds must be included in the initial round.");
+                Big2GlobalEvent.BroadcastMustIncludeThreeOfDiamond();
                 return;
             }
 
