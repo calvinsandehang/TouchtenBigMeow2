@@ -7665,7 +7665,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _playerPrefab: {fileID: 2972835322702556544, guid: 614bb5fadbf330a4aa51edc942a672c9, type: 3}
   _playerParent: {fileID: 1602986292}
-  _deckType: 1
+  _deckType: 0
   _normalDeck: {fileID: 11400000, guid: d961765c7f1bf924ab72ed7a393bde5d, type: 2}
   _testDeck: {fileID: 11400000, guid: 19d8ccf3d27ba724ea0b0b58f7fb7af8, type: 2}
   _playerNumber: 4

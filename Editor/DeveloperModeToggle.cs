@@ -1,5 +1,9 @@
 #if UNITY_EDITOR
 using UnityEditor;
+using UnityEditor.Build;
+using UnityEditor.Build.Reporting;
+using UnityEditor.Callbacks;
+using UnityEngine;
 
 /// <summary>
 /// A utility class for toggling developer mode in the Unity Editor.
@@ -17,6 +21,7 @@ public static class DeveloperModeToggle
         bool currentSetting = IsDeveloperModeEnabled();
         Menu.SetChecked(MENU_PATH, !currentSetting);
         EditorPrefs.SetBool("DeveloperMode", !currentSetting);
+        ShowDeveloperModeWarning(!currentSetting);
     }
 
     /// <summary>
@@ -37,6 +42,46 @@ public static class DeveloperModeToggle
     public static bool IsDeveloperModeEnabled()
     {
         return EditorPrefs.GetBool("DeveloperMode", false);
+    }
+
+    /// <summary>
+    /// Displays a warning in the console if the developer mode is enabled.
+    /// </summary>
+    [DidReloadScripts]
+    private static void OnScriptsReloaded()
+    {
+        if (IsDeveloperModeEnabled())
+        {
+            ShowDeveloperModeWarning(true);
+        }
+    }
+
+    /// <summary>
+    /// Shows a warning in the console that developer mode is active.
+    /// </summary>
+    /// <param name="isActive">If set to true, show the developer mode warning.</param>
+    private static void ShowDeveloperModeWarning(bool isActive)
+    {
+        if (isActive)
+        {
+            Debug.LogWarning("Developer Mode is active. Builds are disabled.");
+        }
+    }
+}
+
+/// <summary>
+/// Prevents building when developer mode is enabled.
+/// </summary>
+public class DeveloperModeBuildPreprocessor : IPreprocessBuildWithReport
+{
+    public int callbackOrder { get { return 0; } }
+
+    public void OnPreprocessBuild(BuildReport report)
+    {
+        if (DeveloperModeToggle.IsDeveloperModeEnabled())
+        {
+            throw new BuildFailedException("Build failed because Developer Mode is active. Disable Developer Mode to build the project.");
+        }
     }
 }
 #endif
