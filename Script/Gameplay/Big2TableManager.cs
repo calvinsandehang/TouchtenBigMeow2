@@ -1,5 +1,4 @@
 using Big2Meow.DeckNCard;
-using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -20,19 +19,16 @@ namespace Big2Meow.Gameplay
         /// <summary>
         /// The type of hand on the table.
         /// </summary>
-        [ShowInInspector]
         public HandType TableHandType { get; private set; }
 
         /// <summary>
         /// The rank of the hand on the table.
         /// </summary>
-        [ShowInInspector]
         public HandRank TableHandRank { get; private set; }
 
         /// <summary>
         /// The list of cards currently on the table.
         /// </summary>
-        [ShowInInspector]
         public List<CardModel> TableCards { get; private set; }
 
         private void Awake()

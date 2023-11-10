@@ -3,7 +3,6 @@ using Big2Meow.FSM;
 using Big2Meow.Gameplay;
 using Big2Meow.Injection;
 using Big2Meow.UI;
-using Sirenix.OdinInspector;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -17,7 +16,6 @@ namespace Big2Meow.Player
     /// <summary>
     /// Manages the card submission and validation between players and the table.
     /// </summary>
-    [InfoBox("Bridge between Player and Table")]
     public class Big2CardSubmissionCheck : MonoBehaviour
     {
         #region Fields

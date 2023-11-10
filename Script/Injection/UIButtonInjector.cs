@@ -1,4 +1,3 @@
-using Sirenix.OdinInspector;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -20,7 +19,6 @@ namespace Big2Meow.Injection
         /// <summary>
         /// Gets the dictionary containing all the injected buttons.
         /// </summary>
-        [ShowInInspector]
         public Dictionary<ButtonType, Button> InjectedButtons { get; private set; } = new Dictionary<ButtonType, Button>();
 
         /// <summary>

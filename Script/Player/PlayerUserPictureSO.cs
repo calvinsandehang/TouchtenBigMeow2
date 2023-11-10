@@ -1,4 +1,3 @@
-using Sirenix.OdinInspector;
 using UnityEngine;
 using static GlobalDefine;
 
@@ -8,7 +7,7 @@ namespace Big2Meow.Player
     /// ScriptableObject that defines a player's user picture with various emotional states.
     /// </summary>
     [CreateAssetMenu(fileName = "UserPicture_", menuName = "Player/UserPicture")]
-    public class PlayerUserPictureSO : SerializedScriptableObject
+    public class PlayerUserPictureSO : ScriptableObject
     {
         /// <summary>
         /// The ID of the avatar.

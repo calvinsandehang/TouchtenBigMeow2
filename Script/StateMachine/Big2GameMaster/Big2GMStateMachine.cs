@@ -1,7 +1,6 @@
 using Big2Meow.DeckNCard;
 using Big2Meow.Gameplay;
 using Big2Meow.Player;
-using Sirenix.OdinInspector;
 using System;
 using System.Collections;
 using System.Collections.Generic;
